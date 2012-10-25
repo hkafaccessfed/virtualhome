@@ -5,20 +5,22 @@ import groovy.transform.ToString
 
 import aaf.base.identity.Subject
 
-@ToString(includeNames=true, includeFields=true, excludes="sharedToken, hash, plainPassword, plainPasswordConfirmation")
+@ToString(includeNames=true, includeFields=true, excludes="pii, hash, plainPassword, plainPasswordConfirmation")
 @EqualsAndHashCode
-class ManagedSubject extends Subject {
+class ManagedSubject {
   String login
   String hash
 
   String plainPassword
   String plainPasswordConfirmation
   
+  List pii
+  
+  static hasMany = [pii: AttributeValue]  // Personally Identifiable Information (PII)
   static transients = ['plainPassword', 'plainPasswordConfirmation']
 
   static constraints = {
-    principal nullable: true
-    login nullable:false, blank: false, unique: true, size: 6..100
+    login nullable:true, blank: false, unique: true, size: 5..100
     hash blank:false, minSize:60, maxSize:60
   }
 }

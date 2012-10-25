@@ -53,6 +53,11 @@ environments {
 
 
 aaf {
+  vhr {
+    crypto {
+      log_rounds = 12
+    }
+  }
   base {
     //Session Expiry Warning - minutes
     session_warning = 50 
