@@ -8,7 +8,7 @@ import grails.plugin.spock.*
 import aaf.vhr.ManagedSubject
 
 @TestFor(aaf.vhr.ManagedSubject)
-@Build([ManagedSubject, Attribute, AttributeValue])
+@Build([ManagedSubject, Attribute, AttributeValue, ChallengeResponse])
 class ManagedSubjectSpec extends UnitSpec {
 
   def 'ensure login can be null'() {
@@ -104,6 +104,44 @@ class ManagedSubjectSpec extends UnitSpec {
     then:
     s.save()
     s.pii.size() == 3
+  }
+
+  def 'ensure subject stores challenge responses'() {
+    setup:
+    def s = ManagedSubject.build()
+    def cr = ChallengeResponse.build()
+
+    expect:
+    s.save()
+
+    when:
+    s.addToChallengeResponse(cr)
+
+    then:
+    s.save()
+    s.challengeResponse.size() == 1
+    s.challengeResponse[0].subject == s
+  }
+
+  def 'ensure subject stores multiple challenge responses'() {
+    setup:
+    def s = ManagedSubject.build()
+    def cr = ChallengeResponse.build()
+    def cr2 = ChallengeResponse.build()
+    def cr3 = ChallengeResponse.build()
+
+    expect:
+    s.save()
+
+    when:
+    s.addToChallengeResponse(cr)
+    s.addToChallengeResponse(cr2)
+    s.addToChallengeResponse(cr3)
+
+    then:
+    s.save()
+    s.challengeResponse.size() == 3
+    s.challengeResponse[2].subject == s
   }
 
 }

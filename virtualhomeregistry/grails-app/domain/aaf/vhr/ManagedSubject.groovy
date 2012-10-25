@@ -12,8 +12,10 @@ class ManagedSubject {
   String hash
   
   List pii
+  List challengeResponse
 
-  static hasMany = [pii: AttributeValue]  // Personally Identifiable Information (PII)
+  static hasMany = [pii: AttributeValue,  // Personally Identifiable Information (PII)
+                    challengeResponse: ChallengeResponse]  
 
   static constraints = {
     login nullable:true, blank: false, unique: true, size: 5..100
