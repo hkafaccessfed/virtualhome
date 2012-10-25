@@ -10,17 +10,17 @@ import aaf.base.identity.Subject
 class ManagedSubject {
   String login
   String hash
-
-  String plainPassword
-  String plainPasswordConfirmation
   
   List pii
-  
+
   static hasMany = [pii: AttributeValue]  // Personally Identifiable Information (PII)
-  static transients = ['plainPassword', 'plainPasswordConfirmation']
 
   static constraints = {
     login nullable:true, blank: false, unique: true, size: 5..100
     hash blank:false, minSize:60, maxSize:60
   }
+
+  String plainPassword
+  String plainPasswordConfirmation
+  static transients = ['plainPassword', 'plainPasswordConfirmation']
 }

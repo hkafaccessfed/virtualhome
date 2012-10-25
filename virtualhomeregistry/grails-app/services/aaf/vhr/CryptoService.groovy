@@ -1,8 +1,9 @@
 package aaf.vhr
 
 import aaf.vhr.crypto.BCrypt
+import org.apache.shiro.crypto.hash.Sha512Hash
 
-class PasswordService {
+class CryptoService {
   boolean transactional = true
   def grailsApplication
 
@@ -29,15 +30,43 @@ class PasswordService {
 
     For gensalt we can utilise a value of between 4 and 31. This should be increased in
     configuration over time as server power increases.
+
+    @pre: Subject.plainPassword is non null, non blank and meets any min length requirements
+    of the caller.
   */
-  public String generateHash(ManagedSubject subject) {
+  public void generateBCryptHash(ManagedSubject subject) {
     def salt = BCrypt.gensalt(grailsApplication.config.aaf.vhr.crypto.log_rounds)
     def hash = BCrypt.hashpw(subject.plainPassword, salt)
     subject.hash = hash
   }
 
-  public boolean verify(String plainPassword, ManagedSubject subject) {
+  /*
+  @pre: plainPassword is non null, subject.hash is populated and was created by generateBCryptHash
+  */
+  public boolean verifyBCryptHash(String plainPassword, ManagedSubject subject) {
     BCrypt.checkpw(plainPassword, subject.hash)
+  }
+
+  /*
+    We use SHA-512 for hashing challenge response answers only.
+
+    @pre: challengeResponse.response is non null, non blank and meets any min length requirements
+    of the caller.
+  */
+  public void generateSha512Hash(ChallengeResponse challengeResponse) {
+    def hash = new Sha512Hash(challengeResponse.response)  
+    challengeResponse.hash = hash
+  }
+
+  /*
+    We use SHA-512 for hashing challenge response answers only.
+
+    @pre: challengeResponse is non null, non blank and meets any min length requirements
+    of the caller.
+  */
+  public void verifySha512Hash(String response, ChallengeResponse challengeResponse) {
+    def hash = new Sha512Hash(challengeResponse.response)  
+    challengeResponse.hash = hash
   }
 
 }
