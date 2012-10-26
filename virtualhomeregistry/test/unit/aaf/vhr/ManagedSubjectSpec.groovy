@@ -13,7 +13,7 @@ class ManagedSubjectSpec extends UnitSpec {
 
   def 'ensure login can be null'() {
     setup:
-    def s = ManagedSubject.build(login:'login')
+    def s = ManagedSubject.build()
     mockForConstraintsTests(ManagedSubject, [s])
 
     expect:
@@ -49,8 +49,8 @@ class ManagedSubjectSpec extends UnitSpec {
 
   def 'ensure login must be unique'() {
     setup:
-    def s = ManagedSubject.build(login:'login123')
-    def s2 = ManagedSubject.build(login:'login456')
+    def s = ManagedSubject.build()
+    def s2 = ManagedSubject.build()
     mockForConstraintsTests(ManagedSubject, [s])
 
     expect:
@@ -142,6 +142,54 @@ class ManagedSubjectSpec extends UnitSpec {
     s.save()
     s.challengeResponse.size() == 3
     s.challengeResponse[2].subject == s
+  }
+
+  def 'ensure email must not be null or blank and be an email address'() {
+    setup:
+    def s = ManagedSubject.build()
+    mockForConstraintsTests(ManagedSubject, [s])
+
+    expect:
+    s.validate()
+
+    when:
+    s.email = val
+    def result = s.validate()
+
+    then:
+    result == expectedResult
+
+    if (!expectedResult)
+      reason == s.errors['email']
+
+    where:
+    val << [null, '', 'testuser', 'testuser@domain.com']
+    reason << ['nullable', 'blank', 'email', '']
+    expectedResult << [false, false, false, true]
+  }
+
+  def 'ensure cn must not be null or blank and either singular or first<space>last name formatted'() {
+    setup:
+    def s = ManagedSubject.build()
+    mockForConstraintsTests(ManagedSubject, [s])
+
+    expect:
+    s.validate()
+
+    when:
+    s.cn = val
+    def result = s.validate()
+
+    then:
+    result == expectedResult
+
+    if (!expectedResult)
+      reason == s.errors['cn']
+
+    where:
+    val << [null, '', 'Testuser', 'Test User', 'Mr Test User']
+    reason << ['nullable', 'blank', '', '', 'cn']
+    expectedResult << [false, false, true, true, false]
   }
 
 }
