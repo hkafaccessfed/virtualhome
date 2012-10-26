@@ -34,16 +34,16 @@ class CryptoService {
     @pre: Subject.plainPassword is non null, non blank and meets any min length requirements
     of the caller.
   */
-  public void generateBCryptHash(ManagedSubject subject) {
+  public void generatePasswordHash(ManagedSubject subject) {
     def salt = BCrypt.gensalt(grailsApplication.config.aaf.vhr.crypto.log_rounds)
     def hash = BCrypt.hashpw(subject.plainPassword, salt)
     subject.hash = hash
   }
 
   /*
-  @pre: plainPassword is non null, subject.hash is populated and was created by generateBCryptHash
+  @pre: plainPassword is non null, subject.hash is populated and was created by generatePasswordHash
   */
-  public boolean verifyBCryptHash(String plainPassword, ManagedSubject subject) {
+  public boolean verifyPasswordHash(String plainPassword, ManagedSubject subject) {
     BCrypt.checkpw(plainPassword, subject.hash)
   }
 
@@ -53,7 +53,7 @@ class CryptoService {
     @pre: challengeResponse.response is non null, non blank and meets any min length requirements
     of the caller.
   */
-  public void generateSha512Hash(ChallengeResponse challengeResponse) {
+  public void generateChallengeResponseHash(ChallengeResponse challengeResponse) {
     // We use BCrypt salt generation for convenience
     challengeResponse.salt = BCrypt.gensalt(grailsApplication.config.aaf.vhr.crypto.log_rounds)
     def hash = new Sha512Hash(challengeResponse.response, challengeResponse.salt, grailsApplication.config.aaf.vhr.crypto.sha_rounds)  
@@ -66,9 +66,33 @@ class CryptoService {
     @pre: challengeResponse is non null, non blank and meets any min length requirements
     of the caller.
   */
-  public boolean verifySha512Hash(String response, ChallengeResponse challengeResponse) {
+  public boolean verifyChallengeResponseHash(String response, ChallengeResponse challengeResponse) {
     def hash = new Sha512Hash(response, challengeResponse.salt, grailsApplication.config.aaf.vhr.crypto.sha_rounds)  
     challengeResponse.hash == hash.toString()
+  }
+
+  /*
+    We use SHA-512 for hashing challenge response answers only.
+
+    @pre: emailReset is non null
+  */
+  public void generateEmailResetHash(EmailReset emailReset) {
+    emailReset.code = org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(24)
+    // We use BCrypt salt generation for convenience
+    emailReset.salt = BCrypt.gensalt(grailsApplication.config.aaf.vhr.crypto.log_rounds)
+    def hash = new Sha512Hash(emailReset.code, emailReset.salt, grailsApplication.config.aaf.vhr.crypto.sha_rounds)  
+    emailReset.hash = hash.toString()
+  }
+
+  /*
+    We use SHA-512 for hashing challenge response answers only.
+
+    @pre: emailReset is non null and has subject it is associated with populated
+    of the caller.
+  */
+  public boolean verifyEmailResetHash(String code, EmailReset emailReset) {
+    def hash = new Sha512Hash(code, emailReset.salt, grailsApplication.config.aaf.vhr.crypto.sha_rounds)  
+    emailReset.hash == hash.toString()
   }
 
 }

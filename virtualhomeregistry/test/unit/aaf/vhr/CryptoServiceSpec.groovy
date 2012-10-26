@@ -9,7 +9,7 @@ import aaf.vhr.ManagedSubject
 import aaf.vhr.crypto.BCrypt
 
 @TestFor(aaf.vhr.CryptoService)
-@Build([ManagedSubject, ChallengeResponse])
+@Build([ManagedSubject, ChallengeResponse, EmailReset])
 class CryptoServiceSpec extends UnitSpec {
 
   def cs
@@ -31,12 +31,12 @@ class CryptoServiceSpec extends UnitSpec {
     subject.hash == null
 
     when:
-    cs.generateBCryptHash(subject)
+    cs.generatePasswordHash(subject)
 
     then:
     subject.hash.size() == 60
     subject.validate()
-    cs.verifyBCryptHash(pw, subject)
+    cs.verifyPasswordHash(pw, subject)
 
     where:
     pw << ['today123', 'I really enjoy XKCD.com 936 style PasswordS', 'XXYfgLvCehJ6qjflkMRBZ99Jw2I=']
@@ -53,12 +53,12 @@ class CryptoServiceSpec extends UnitSpec {
     subject.hash == null
 
     when:
-    cs.generateBCryptHash(subject)
+    cs.generatePasswordHash(subject)
 
     then:
     subject.hash.size() == 60
     subject.validate()
-    !cs.verifyBCryptHash(plainPW, subject)
+    !cs.verifyPasswordHash(plainPW, subject)
 
     where:
     pw << ['today123', 'I really enjoy XKCD.com 936 style PasswordS', 'XXYfgLvCehJ6qjflkMRBZ99Jw2I=']
@@ -76,12 +76,12 @@ class CryptoServiceSpec extends UnitSpec {
     subject.hash == null
 
     when:
-    cs.generateBCryptHash(subject)
+    cs.generatePasswordHash(subject)
 
     then:
     subject.hash.size() == 60
     subject.validate()
-    cs.verifyBCryptHash(plainPW, subject) == expected
+    cs.verifyPasswordHash(plainPW, subject) == expected
 
     where:
     pw << [ '1Tix4JWX8OdFgPrf0JBy/RQAE1SjMgkP/yjG6cDFV7fElPgQTe3vuL77w95qwcUvU+Nqh9D89o', 
@@ -115,9 +115,9 @@ class CryptoServiceSpec extends UnitSpec {
     cr.response == response
 
     when:
-    cs.generateSha512Hash(cr)
+    cs.generateChallengeResponseHash(cr)
     cr.response = null
-    def verify = cs.verifySha512Hash(response, cr)
+    def verify = cs.verifyChallengeResponseHash(response, cr)
 
     then:
     verify
@@ -129,6 +129,22 @@ class CryptoServiceSpec extends UnitSpec {
     response << ["My mother's maiden name was jones",
                  "Inspector Gadget! goGadgetgo",
                  "bradleY"]
+  }
+
+  def 'Validate code and sha512 hash creation for ChallengeResponse'() {
+    setup:
+    def er = EmailReset.build()
+
+    when:
+    cs.generateEmailResetHash(er)
+    def verify = cs.verifyEmailResetHash(er.code, er)
+
+    then:
+    verify
+    er.code.size() == 24
+    er.hash.size() == 128
+    er.salt.size() == 29
+
   }
 
 }
