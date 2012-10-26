@@ -56,9 +56,10 @@ class ChallengeResponseSpec extends UnitSpec {
     where:
     val << [null, '', 
     '0e819f575d8ca7e9b12dec270db4208c0ae20746d647432b2f846aff7ffc559c1029b85b23b7d25fa42a4d39aa3f76f6f9199310472ab1cb28921e', 
-    '0e819f575d8ca7e9b12dec270db4208c0ae20746d647432b2f846aff7ffc559c1029b85b23b7d25fa42a4d39aa3f76f6f9199310472ab1cb28921e3e5347db47']
-    reason << ['nullable', 'blank', 'minSize', '']
-    expectedResult << [false, false, false, true]
+    '0e819f575d8ca7e9b12dec270db4208c0ae20746d647432b2f846aff7ffc559c1029b85b23b7d25fa42a4d39aa3f76f6f9199310472ab1cb28921e3e5347db47', 
+    '0e819f575d8ca7e9b12dec270db4208c0ae20746d647432b2f846aff7ffc559c1029b85b23b7d25fa42a4d39aa3f76f6f9199310472ab1cb28921e3e5347db477']
+    reason << ['nullable', 'blank', 'minSize', '', 'maxSize']
+    expectedResult << [false, false, false, true, false]
   }
 
   def 'ensure salt must not be null or blank and exactly 29 characters long'() {
