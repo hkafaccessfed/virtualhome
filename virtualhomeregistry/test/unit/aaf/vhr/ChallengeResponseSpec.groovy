@@ -61,4 +61,32 @@ class ChallengeResponseSpec extends UnitSpec {
     expectedResult << [false, false, false, true]
   }
 
+  def 'ensure salt must not be null or blank and exactly 29 characters long'() {
+    setup:
+    def cr = ChallengeResponse.build()
+    cr.hash = '0e819f575d8ca7e9b12dec270db4208c0ae20746d647432b2f846aff7ffc559c1029b85b23b7d25fa42a4d39aa3f76f6f9199310472ab1cb28921e3e5347db47'
+    mockForConstraintsTests(ChallengeResponse, [cr])
+
+    expect:
+    cr.validate()
+
+    when:
+    cr.salt = val
+    def result = cr.validate()
+
+    then:
+    result == expectedResult
+
+    if (!expectedResult)
+      reason == cr.errors['salt']
+
+    where:
+    val << [null, '', 
+    '$2a$12$zJCuKWn8srzSFqCH8P', 
+    '$2a$12$zJCuKWn8srzSFqCH8P/bAu',
+    '$2a$12$zJCuKWn8srzSFqCH8P/bAu1']
+    reason << ['nullable', 'blank', 'minSize', '', '']
+    expectedResult << [false, false, false, true, false]
+  }
+
 }

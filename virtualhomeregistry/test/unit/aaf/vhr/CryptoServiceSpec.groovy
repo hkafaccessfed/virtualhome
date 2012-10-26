@@ -6,6 +6,7 @@ import spock.lang.*
 import grails.plugin.spock.*
 
 import aaf.vhr.ManagedSubject
+import aaf.vhr.crypto.BCrypt
 
 @TestFor(aaf.vhr.CryptoService)
 @Build([ManagedSubject, ChallengeResponse])
@@ -16,6 +17,7 @@ class CryptoServiceSpec extends UnitSpec {
   def setup() {
     cs = new CryptoService(grailsApplication: grailsApplication)
     grailsApplication.config.aaf.vhr.crypto.log_rounds = 12
+    grailsApplication.config.aaf.vhr.crypto.sha_rounds = 2048
   }
 
   def 'validate various passwords store and confirm correctly'() {
@@ -91,6 +93,17 @@ class CryptoServiceSpec extends UnitSpec {
     expected << [true, true, false]
   }
 
+  def 'Validate bCrypt salt is always 29 char regardless of log_rounds'() {
+    when:
+    def salt = BCrypt.gensalt(rounds)
+
+    then:
+    salt.size() == 29
+
+    where:
+    rounds << [2,6,10,14,18]
+  }
+
   def 'Validate sha512 hash creation for ChallengeResponse'() {
     setup:
     def cr = new ChallengeResponse(challenge:challenge)
@@ -103,9 +116,11 @@ class CryptoServiceSpec extends UnitSpec {
 
     when:
     cs.generateSha512Hash(cr)
+    cr.response = null
+    def verify = cs.verifySha512Hash(response, cr)
 
     then:
-    cr.hash == hash
+    verify
 
     where:
     challenge << ["What was your mothers maiden name?",
@@ -114,40 +129,6 @@ class CryptoServiceSpec extends UnitSpec {
     response << ["My mother's maiden name was jones",
                  "Inspector Gadget! goGadgetgo",
                  "bradleY"]
-
-    // Generated via OpenSSL to test conformance of Java Impl.
-    hash << ["03adaadcff390d6d5a035c437af1636c0a376c6d9a67a2faf0c749f169a441d70692572e6b30e8af636cae24274f4c0236ad480ec8687404a93b1f433d13ce04",
-             "0fd44bcdae1f30a2e691da0229f5edfa229661f0ffa4ea1d13838b100efc95f0c5f1797fbf9c831cc5068e9df40d033b54146e61870370d6546758ca9c66ae46",
-             "0e819f575d8ca7e9b12dec270db4208c0ae20746d647432b2f846aff7ffc559c1029b85b23b7d25fa42a4d39aa3f76f6f9199310472ab1cb28921e3e5347db47"]
-  }
-
-  def 'Ensure sha512 hash validation for ChallengeResponse'() {
-    setup:
-    def cr = new ChallengeResponse(challenge:challenge, hash:hash)
-    cr.response = response
-
-    expect:
-    cr.hash == hash
-    cr.challenge == challenge
-
-    when:
-    cs.verifySha512Hash(response, cr)
-
-    then:
-    cr.hash == hash
-
-    where:
-    challenge << ["What was your mothers maiden name?",
-                  "What is your favourite TV show?",
-                  "What is the haxors name who wrote this test?"]
-    response << ["My mother's maiden name was jones",
-                 "Inspector Gadget! goGadgetgo",
-                 "bradleY"]
-
-    // Generated via OpenSSL to test conformance of Java Impl.
-    hash << ["03adaadcff390d6d5a035c437af1636c0a376c6d9a67a2faf0c749f169a441d70692572e6b30e8af636cae24274f4c0236ad480ec8687404a93b1f433d13ce04",
-             "0fd44bcdae1f30a2e691da0229f5edfa229661f0ffa4ea1d13838b100efc95f0c5f1797fbf9c831cc5068e9df40d033b54146e61870370d6546758ca9c66ae46",
-             "0e819f575d8ca7e9b12dec270db4208c0ae20746d647432b2f846aff7ffc559c1029b85b23b7d25fa42a4d39aa3f76f6f9199310472ab1cb28921e3e5347db47"]
   }
 
 }

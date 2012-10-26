@@ -1,7 +1,7 @@
 package aaf.vhr
 
-import aaf.vhr.crypto.BCrypt
 import org.apache.shiro.crypto.hash.Sha512Hash
+import aaf.vhr.crypto.BCrypt
 
 class CryptoService {
   boolean transactional = true
@@ -54,8 +54,10 @@ class CryptoService {
     of the caller.
   */
   public void generateSha512Hash(ChallengeResponse challengeResponse) {
-    def hash = new Sha512Hash(challengeResponse.response)  
-    challengeResponse.hash = hash
+    // We use BCrypt salt generation for convenience
+    challengeResponse.salt = BCrypt.gensalt(grailsApplication.config.aaf.vhr.crypto.log_rounds)
+    def hash = new Sha512Hash(challengeResponse.response, challengeResponse.salt, grailsApplication.config.aaf.vhr.crypto.sha_rounds)  
+    challengeResponse.hash = hash.toString()
   }
 
   /*
@@ -64,9 +66,9 @@ class CryptoService {
     @pre: challengeResponse is non null, non blank and meets any min length requirements
     of the caller.
   */
-  public void verifySha512Hash(String response, ChallengeResponse challengeResponse) {
-    def hash = new Sha512Hash(challengeResponse.response)  
-    challengeResponse.hash = hash
+  public boolean verifySha512Hash(String response, ChallengeResponse challengeResponse) {
+    def hash = new Sha512Hash(response, challengeResponse.salt, grailsApplication.config.aaf.vhr.crypto.sha_rounds)  
+    challengeResponse.hash == hash.toString()
   }
 
 }
