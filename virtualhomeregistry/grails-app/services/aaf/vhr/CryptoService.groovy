@@ -41,14 +41,14 @@ class CryptoService {
   }
 
   /*
-  @pre: plainPassword is non null, subject.hash is populated and was created by generatePasswordHash
+    @pre: plainPassword is non null, subject.hash is populated and was created by generatePasswordHash
   */
   public boolean verifyPasswordHash(String plainPassword, ManagedSubject subject) {
     BCrypt.checkpw(plainPassword, subject.hash)
   }
 
   /*
-    We use SHA-512 for hashing challenge response answers only.
+    SHA-512 for hashing challenge response answers.
 
     @pre: challengeResponse.response is non null, non blank and meets any min length requirements
     of the caller.
@@ -61,7 +61,7 @@ class CryptoService {
   }
 
   /*
-    We use SHA-512 for hashing challenge response answers only.
+    Verify using SHA-512 for challenge response answers.
 
     @pre: challengeResponse is non null, non blank and meets any min length requirements
     of the caller.
@@ -72,7 +72,7 @@ class CryptoService {
   }
 
   /*
-    We use SHA-512 for hashing challenge response answers only.
+    SHA-512 for hashing email reset codes.
 
     @pre: emailReset is non null
   */
@@ -85,10 +85,10 @@ class CryptoService {
   }
 
   /*
-    We use SHA-512 for hashing challenge response answers only.
+    Verify using Sha512 for email reset codes.
 
     @pre: emailReset is non null and has subject it is associated with populated
-    of the caller.
+    by the caller.
   */
   public boolean verifyEmailResetHash(String code, EmailReset emailReset) {
     def hash = new Sha512Hash(code, emailReset.salt, grailsApplication.config.aaf.vhr.crypto.sha_rounds)  
