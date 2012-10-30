@@ -53,6 +53,7 @@
               <li><g:link controller="adminDashboard" action="index"><g:message code="branding.nav.admin.dashboard" /></g:link></li>
               <li><g:link controller="subject"><g:message code="branding.nav.admin.subjects" /></g:link></li>
               <li><g:link controller="role"><g:message code="branding.nav.admin.roles" /></g:link></li>
+              <li><g:link controller="emailTemplate" action="list"><g:message code="branding.nav.admin.emailtemplate" /></g:link></li>
               <li class="dropdown-submenu">
                 <a tabindex="-1" href="#"><g:message code="branding.nav.admin.workflow" /> <i class="icon-chevron-right icon-white"></i></a>
                 <ul class="dropdown-menu">
