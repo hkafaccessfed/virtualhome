@@ -14,6 +14,7 @@ class ManagedSubject {
   String cn           // per oid:2.5.4.3
   String email        // per oid:0.9.2342.19200300.100.1.3
   String sharedToken  // per oid:1.3.6.1.4.1.27856.1.2.5
+  String mobileNumber // per oid:0.9.2342.19200300.100.1.41
   
   List pii
   List challengeResponse
@@ -31,6 +32,7 @@ class ManagedSubject {
       return (val != null && val != '' && (val.count(' ') == 0 || val.count(' ') == 1))
     }
     sharedToken nullable:false, blank: false, unique: true
+    mobileNumber nullable: true, blank: false
   }
 
   String plainPassword
