@@ -58,6 +58,10 @@ aaf {
       log_rounds = 12
       sha_rounds = 2048
     }
+
+    sharedtoken {
+      idp_entityid = ''   // VHR Entity ID
+    }
   }
   base {
     //Session Expiry Warning - minutes

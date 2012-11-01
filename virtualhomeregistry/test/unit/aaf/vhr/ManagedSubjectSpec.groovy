@@ -192,4 +192,46 @@ class ManagedSubjectSpec extends UnitSpec {
     expectedResult << [false, false, true, true, false]
   }
 
+  def 'ensure sharedtoken must not be null or blank'() {
+    setup:
+    def s = ManagedSubject.build()
+    mockForConstraintsTests(ManagedSubject, [s])
+
+    expect:
+    s.validate()
+
+    when:
+    s.sharedToken = val
+    def result = s.validate()
+
+    then:
+    result == expectedResult
+
+    if (!expectedResult)
+      reason == s.errors['sharedToken']
+
+    where:
+    val << [null, '', 'dfasf$@5asf#$',]
+    reason << ['nullable', 'blank', '']
+    expectedResult << [false, false, true]
+  }
+
+  def 'ensure shared token must be unique'() {
+    setup:
+    def s = ManagedSubject.build()
+    def s2 = ManagedSubject.build()
+    mockForConstraintsTests(ManagedSubject, [s])
+
+    expect:
+    s.validate()
+    s2.validate()
+
+    when:
+    s.sharedToken = s2.sharedToken
+
+    then:
+    !s.save()
+    'unique' == s.errors['sharedToken']
+  }
+
 }
