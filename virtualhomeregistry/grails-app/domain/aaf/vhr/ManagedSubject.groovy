@@ -26,7 +26,7 @@ class ManagedSubject {
 
   static constraints = {
     login nullable:true, blank: false, unique: true, size: 5..100
-    hash blank:false, minSize:60, maxSize:60
+    hash nullable:true, blank:false, minSize:60, maxSize:60
     email blank:false, unique:true, email:true
     cn validator: {val, obj ->
       return (val != null && val != '' && (val.count(' ') == 0 || val.count(' ') == 1))

@@ -7,6 +7,7 @@ import edu.vt.middleware.dictionary.sort.*
 class PasswordValidationService {
   boolean transactional = true
   def grailsApplication
+  def cryptoService
 
   ArrayWordList awl
   Properties msgs
@@ -70,6 +71,14 @@ class PasswordValidationService {
     if(subject.plainPassword.toLowerCase().contains(subject.login.toLowerCase())) {
       log.warn("The submitted plaintext passwords for $subject don't match, rejecting.")
       return [false, ['aaf.vhr.passwordvalidationservice.containslogin']]
+    }
+
+    println subject.hash
+    if(subject.hash != null) {
+      if(cryptoService.verifyPasswordHash(subject.plainPassword, subject)) {
+        log.warn("The submitted plaintext password for $subject is the same as the current value, rejecting.")
+        return [false, ['aaf.vhr.passwordvalidationservice.reused']]
+      }
     }
 
     def pw = subject.plainPassword

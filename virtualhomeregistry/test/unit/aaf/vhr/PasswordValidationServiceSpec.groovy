@@ -12,9 +12,13 @@ import aaf.vhr.ManagedSubject
 class PasswordValidationServiceSpec extends UnitSpec {
 
   def pv
+  def cs
 
   def setup() {
-    pv = new PasswordValidationService(grailsApplication: grailsApplication)
+    cs = new CryptoService(grailsApplication: grailsApplication)
+    grailsApplication.config.aaf.vhr.crypto.log_rounds = 12
+    grailsApplication.config.aaf.vhr.crypto.sha_rounds = 2048
+    pv = new PasswordValidationService(grailsApplication: grailsApplication, cryptoService: cs)
   }
 
   def 'confirm passwords submitted must match each other'() {
@@ -50,6 +54,25 @@ class PasswordValidationServiceSpec extends UnitSpec {
 
     where:
       val << ['Ab1!deXgharry', 'Ab1!deXghFBVGs183TrhiEsFtWCV3X4lp0ogharry', 'abcdharry', 'aharry']
+  }
+
+  def 'confirm password submitted is not the same as previously used'() {
+    setup:
+    def subject = ManagedSubject.build()
+    subject.login = 'harry'
+    subject.plainPassword = val
+    subject.plainPasswordConfirmation = val
+    cs.generatePasswordHash(subject)
+
+    when:
+    def result = pv.validate(subject)
+
+    then:
+    !result[0]
+    result[1][0] == 'aaf.vhr.passwordvalidationservice.reused'
+
+    where:
+      val << ['Ab1!deXg', 'Ab1!deXghFBVGs183TrhiEsFtWCV3X4lp0og']
   }
 
   def 'confirm password meets NIST minimum of 8 char for user generated pw'() {
