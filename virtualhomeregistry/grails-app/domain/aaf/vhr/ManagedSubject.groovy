@@ -8,6 +8,8 @@ import aaf.base.identity.Subject
 @ToString(includeNames=true, includeFields=true, excludes="pii, hash, plainPassword, plainPasswordConfirmation")
 @EqualsAndHashCode
 class ManagedSubject {
+  static auditable = true
+  
   String login
   String hash
 
