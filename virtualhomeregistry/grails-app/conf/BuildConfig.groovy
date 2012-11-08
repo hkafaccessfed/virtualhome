@@ -46,7 +46,7 @@ grails.project.dependency.resolution = {
     PLUGINS LISTED HERE SHOULD BE OVER AND ABOVE THOSE PROVIDED BY AAF-BASE-APPLICATION PLUGIN
   */
   plugins {
-
+    compile ":rest:0.7"
   }
 }
 

@@ -54,6 +54,12 @@ environments {
 
 aaf {
   vhr {
+    federationregistry {
+      server = "https://SERVER.aaf.edu.au"
+      api {
+        organisations = "/federationregistry/api/v1/organizations/"
+      }
+    }
     crypto {
       log_rounds = 12
       sha_rounds = 2048
