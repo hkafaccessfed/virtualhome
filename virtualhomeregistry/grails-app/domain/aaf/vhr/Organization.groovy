@@ -5,14 +5,12 @@ import groovy.transform.ToString
 
 @ToString(includeNames=true, includeFields=true, excludes="description, url, frURL")
 @EqualsAndHashCode
-class Organisation  {
+class Organization  {
   static auditable = true
 
   String name
   String displayName
   String description
-  String url
-  String frURL
 
   long frID
   
@@ -25,10 +23,6 @@ class Organisation  {
     name(nullable: false, blank: false)
     displayName(nullable: false, blank: false)
     description(nullable:true, blank: false, maxSize:2000)
-
-    url(nullable: false, blank: false, url: true)
-
-    frURL(nullable: false, blank: false, url: true)
 
     dateCreated(nullable:true)
     lastUpdated(nullable:true)

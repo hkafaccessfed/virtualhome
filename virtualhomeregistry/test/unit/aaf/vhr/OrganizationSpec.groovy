@@ -5,13 +5,13 @@ import grails.buildtestdata.mixin.Build
 import spock.lang.*
 import grails.plugin.spock.*
 
-@TestFor(aaf.vhr.Organisation)
-@Build([aaf.vhr.Organisation])
-class OrganisationSpec extends UnitSpec {
+@TestFor(aaf.vhr.Organization)
+@Build([aaf.vhr.Organization])
+class OrganizationSpec extends UnitSpec {
 
   def 'ensure name can not be null or blank'() {
     setup:
-    def o = Organisation.build()
+    def o = Organization.build()
     o.name = val
 
     when:
@@ -31,7 +31,7 @@ class OrganisationSpec extends UnitSpec {
 
   def 'ensure displayName can not be null or blank'() {
     setup:
-    def o = Organisation.build()
+    def o = Organization.build()
     o.displayName = val
 
     when:
@@ -51,7 +51,7 @@ class OrganisationSpec extends UnitSpec {
 
   def 'ensure description can be null but not blank'() {
     setup:
-    def o = Organisation.build()
+    def o = Organization.build()
     o.description = val
 
     when:
@@ -67,45 +67,5 @@ class OrganisationSpec extends UnitSpec {
     val << [null, '', 'name']
     expected << [true, false, true]
     reason << ['', 'blank', '']
-  }
-
-  def 'ensure url can not be null or blank and must be url formatted'() {
-    setup:
-    def o = Organisation.build()
-    o.url = val
-
-    when:
-    def result = o.validate()
-
-    then:
-    result == expected
-
-    if(!expected)
-      reason == o.errors['url']
-
-    where:
-    val << [null, '', 'name', 'http://url.com']
-    expected << [false, false, false, true]
-    reason << ['nullable', 'blank', 'url', '']
-  }
-
-  def 'ensure frURL can not be null or blank and must be url formatted'() {
-    setup:
-    def o = Organisation.build()
-    o.frURL = val
-
-    when:
-    def result = o.validate()
-
-    then:
-    result == expected
-
-    if(!expected)
-      reason == o.errors['frURL']
-
-    where:
-    val << [null, '', 'name', 'http://url.com']
-    expected << [false, false, false, true]
-    reason << ['nullable', 'blank', 'url', '']
   }
 }
