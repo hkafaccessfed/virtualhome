@@ -6,7 +6,7 @@ import spock.lang.*
 import grails.plugin.spock.*
 
 @TestFor(aaf.vhr.Organization)
-@Build([aaf.vhr.Organization])
+@Build([aaf.vhr.Organization, aaf.vhr.ManagedSubject])
 class OrganizationSpec extends UnitSpec {
 
   def 'ensure name can not be null or blank'() {
@@ -67,5 +67,139 @@ class OrganizationSpec extends UnitSpec {
     val << [null, '', 'name']
     expected << [true, false, true]
     reason << ['', 'blank', '']
+  }
+
+  def 'Ensure unlimited and active org can register subjects'() {
+    setup:
+    def o = Organization.build()
+    o.active = true
+    o.subjectLimit = 0
+
+    when:
+    def result = o.canRegisterSubjects()
+
+    then:
+    result
+  }
+
+  def 'Ensure unlimited but inactive org can register subjects'() {
+    setup:
+    def o = Organization.build()
+    o.active = false
+    o.subjectLimit = 0
+
+    when:
+    def result = o.canRegisterSubjects()
+
+    then:
+    !result
+  }
+
+  def 'Ensure limited, active org that hasnt reached max can register subjects'() {
+    setup:
+    def o = Organization.build()
+    o.active = true
+    o.subjectLimit = 100
+
+    (1..99).each {
+      def s = ManagedSubject.build()
+      o.addToSubjects(s)
+    }
+
+    when:
+    def result = o.canRegisterSubjects()
+
+    then:
+    result
+  }
+
+  def 'Ensure limited, active org that has reached max cant register subjects'() {
+    setup:
+    def o = Organization.build()
+    o.active = true
+    o.subjectLimit = 100
+
+    (1..100).each {
+      def s = ManagedSubject.build()
+      o.addToSubjects(s)
+    }
+
+    when:
+    def result = o.canRegisterSubjects()
+
+    then:
+    !result
+  }
+
+  def 'Ensure limited, active org some how over max cant register subjects'() {
+    setup:
+    def o = Organization.build()
+    o.active = true
+    o.subjectLimit = 100
+
+    (1..101).each {
+      def s = ManagedSubject.build()
+      o.addToSubjects(s)
+    }
+
+    when:
+    def result = o.canRegisterSubjects()
+
+    then:
+    !result
+  }
+
+  def 'Ensure limited, inactive org that hasnt reached max cant register subjects'() {
+    setup:
+    def o = Organization.build()
+    o.active = false
+    o.subjectLimit = 100
+
+    (1..99).each {
+      def s = ManagedSubject.build()
+      o.addToSubjects(s)
+    }
+
+    when:
+    def result = o.canRegisterSubjects()
+
+    then:
+    !result
+  }
+
+  def 'Ensure limited, inactive org that has reached max cant register subjects'() {
+    setup:
+    def o = Organization.build()
+    o.active = false
+    o.subjectLimit = 100
+
+    (1..100).each {
+      def s = ManagedSubject.build()
+      o.addToSubjects(s)
+    }
+
+    when:
+    def result = o.canRegisterSubjects()
+
+    then:
+    !result
+  }
+
+  def 'Ensure limited, inactive org some how over max cant register subjects'() {
+    setup:
+    def o = Organization.build()
+    o.active = false
+    o.subjectLimit = 100
+
+    (1..101).each {
+      def s = ManagedSubject.build()
+      o.addToSubjects(s)
+    }
+
+    when:
+    def result = o.canRegisterSubjects()
+
+    then:
+    !result
   }
 }

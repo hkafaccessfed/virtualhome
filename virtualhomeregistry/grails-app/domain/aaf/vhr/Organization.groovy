@@ -3,6 +3,8 @@ package aaf.vhr
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
+import aaf.base.identity.Role
+
 @ToString(includeNames=true, includeFields=true, excludes="description, url, frURL")
 @EqualsAndHashCode
 class Organization  {
@@ -13,8 +15,13 @@ class Organization  {
   String description
 
   long frID
+  long subjectLimit 
+  long roleLimit
   
   boolean active = false
+
+  static hasMany = [subjects: ManagedSubject,
+                    roles: Role]
   
   Date dateCreated
   Date lastUpdated
@@ -27,4 +34,13 @@ class Organization  {
     dateCreated(nullable:true)
     lastUpdated(nullable:true)
   }
+
+  public boolean canRegisterSubjects() {
+    (subjectLimit == 0 || subjects.size() < subjectLimit) && active
+  }
+
+  public boolean canRegisterRoles() {
+    (roleLimit == 0 || subjects.size() < roleLimit) && active
+  }
+
 }
