@@ -202,4 +202,56 @@ class OrganizationSpec extends UnitSpec {
     then:
     !result
   }
+
+  def 'Ensure active, non workflow Organization is functioning'() {
+    setup:
+    def o = Organization.build()
+    o.active = true
+    o.undergoingWorkflow = false
+
+    when:
+    def result = o.functioning()
+
+    then:
+    result
+  }
+
+  def 'Ensure non active, non workflow Organization isnt functioning'() {
+    setup:
+    def o = Organization.build()
+    o.active = false
+    o.undergoingWorkflow = false
+
+    when:
+    def result = o.functioning()
+
+    then:
+    !result
+  }
+
+  def 'Ensure non active, workflow Organization isnt functioning'() {
+    setup:
+    def o = Organization.build()
+    o.active = false
+    o.undergoingWorkflow = true
+
+    when:
+    def result = o.functioning()
+
+    then:
+    !result
+  }
+
+  def 'Ensure active, workflow Organization isnt functioning'() {
+    setup:
+    def o = Organization.build()
+    o.active = true
+    o.undergoingWorkflow = true
+
+    when:
+    def result = o.functioning()
+
+    then:
+    !result
+  }
 }

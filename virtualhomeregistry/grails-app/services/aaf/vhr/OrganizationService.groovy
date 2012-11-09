@@ -45,31 +45,38 @@ class OrganizationService {
             org.displayName = result.displayName
             org.description = !result.description.equals(null) ? result.description:null
 
+            if(!org.undergoingWorkflow)
+              org.active = result.functioning
+
             if(!org.save()) {
-              println "here"
               log.error "Unable to update Organization instance ${org}"
               org.errors.each { error ->
                 log.error error
               }
             }
           } else {
-            org = new Organization(name:result.name, displayName: result.displayName, frID: result.id)
-            org.description = !result.description.equals(null) ? result.description:null
-            if(!org.save()) {
-              log.error "Unable to save new Organization instance to represent ${result.name}"
-              org.errors.each { error ->
-                log.error error
+            if(result.functioning) {
+              org = new Organization(name:result.name, displayName: result.displayName, frID: result.id)
+              org.description = !result.description.equals(null) ? result.description:null
+              org.undergoingWorkflow = true
+              if(!org.save()) {
+                log.error "Unable to save new Organization instance to represent ${result.name}"
+                org.errors.each { error ->
+                  log.error error
+                }
               }
-            }
 
-            // kickoff workflow
-            def params = ['agentCN':'aaf.vhr.OrganizationService', 'agentEmail':'']
-            def(created, processInstance) = workflowProcessService.initiate(OrganizationService.CREATE_ORGANIZATION_WORKFLOW, "Approve activation of $org", ProcessPriority.LOW, params)
-            if(!created)
-              log.error "Unable to create workflow process to approve creation of new $org"
-            else {
-              log.info "Created workflow process to approve creation of new $org"
-              workflowProcessService.run(processInstance)
+              // kickoff workflow
+              def params = ['agentCN':'aaf.vhr.OrganizationService', 'agentEmail':'']
+              def(created, processInstance) = workflowProcessService.initiate(OrganizationService.CREATE_ORGANIZATION_WORKFLOW, "Approve activation of $org", ProcessPriority.LOW, params)
+              if(!created)
+                log.error "Unable to create workflow process to approve creation of new $org"
+              else {
+                log.info "Created workflow process to approve creation of new $org"
+                workflowProcessService.run(processInstance)
+              }
+            } else {
+              log.warn "Not creating new Organization instance to represent ${result.name} as currently not functioning in Federation Registry"
             }
           }
         }

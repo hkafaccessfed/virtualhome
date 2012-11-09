@@ -19,6 +19,7 @@ class Organization  {
   long roleLimit
   
   boolean active = false
+  boolean undergoingWorkflow = false
 
   static hasMany = [subjects: ManagedSubject,
                     roles: Role]
@@ -33,6 +34,10 @@ class Organization  {
 
     dateCreated(nullable:true)
     lastUpdated(nullable:true)
+  }
+
+  public boolean functioning() {
+    active && !undergoingWorkflow
   }
 
   public boolean canRegisterSubjects() {
