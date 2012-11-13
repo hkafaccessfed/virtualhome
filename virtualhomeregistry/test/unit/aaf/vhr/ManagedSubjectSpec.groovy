@@ -8,7 +8,7 @@ import grails.plugin.spock.*
 import aaf.vhr.ManagedSubject
 
 @TestFor(aaf.vhr.ManagedSubject)
-@Build([ManagedSubject, Attribute, AttributeValue, ChallengeResponse])
+@Build([ManagedSubject, Organization, Group, Attribute, AttributeValue, ChallengeResponse])
 class ManagedSubjectSpec extends UnitSpec {
 
   def 'ensure login can be null'() {
@@ -254,6 +254,117 @@ class ManagedSubjectSpec extends UnitSpec {
     val << [null, '', '0411222333']
     reason << ['', 'blank', '']
     expected << [true, false, true]
+  }
+
+  def 'ensure active is true by default'() {
+    when:
+    def s = ManagedSubject.build()
+
+    then:
+    s.active
+  }
+
+  def 'ensure active is true by default'() {
+    when:
+    def s = ManagedSubject.build()
+
+    then:
+    s.active
+  }
+
+  def 'ensure no sponsored org is valid'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    when:
+    s.organization = null
+
+    then:
+    s.validate()
+  }
+
+  def 'ensure no sponsored group is valid'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    when:
+    s.group = null
+
+    then:
+    s.validate()
+  }
+
+  def 'ensure no sponsored org or group is valid'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    when:
+    s.organization = null
+    s.group = null
+
+    then:
+    s.validate()
+  }
+
+  def 'ensure functioning when active and sponsored'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    when:
+    s.organization = Organization.build()
+    s.group = Group.build(organization:s.organization)
+
+    then:
+    s.functioning()
+  }
+
+  def 'ensure not functioning when inactive and sponsored'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    when:
+    s.active = false
+    s.organization = Organization.build()
+    s.group = Group.build(organization:s.organization)
+
+    then:
+    !s.functioning()
+  }
+
+  def 'ensure not functioning when active but not sponsor org'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    when:
+    s.organization = null
+    s.group = Group.build()
+
+    then:
+    !s.functioning()
+  }
+
+  def 'ensure not functioning when active but not sponsor group'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    when:
+    s.organization = Organization.build()
+    s.group = null
+
+    then:
+    !s.functioning()
+  }
+
+  def 'ensure not functioning when active but not sponsored'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    when:
+    s.organization = null
+    s.group = null
+
+    then:
+    !s.functioning()
   }
 
 }

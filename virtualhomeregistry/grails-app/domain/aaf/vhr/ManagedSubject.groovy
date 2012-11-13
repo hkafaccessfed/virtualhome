@@ -13,11 +13,15 @@ class ManagedSubject {
   String login
   String hash
 
+  // Frequently accessed PII is stored specifically
+  // All other PII accessible via ManagedSubject.pii list
   String cn           // per oid:2.5.4.3
   String email        // per oid:0.9.2342.19200300.100.1.3
   String sharedToken  // per oid:1.3.6.1.4.1.27856.1.2.5
   String mobileNumber // per oid:0.9.2342.19200300.100.1.41
   
+  boolean active = true
+
   List pii
   List challengeResponse
   List emailReset
@@ -38,9 +42,16 @@ class ManagedSubject {
     }
     sharedToken nullable:false, blank: false, unique: true
     mobileNumber nullable: true, blank: false
+
+    organization nullable: true
+    group nullable: true
   }
 
   String plainPassword
   String plainPasswordConfirmation
   static transients = ['plainPassword', 'plainPasswordConfirmation']
+
+  public boolean functioning() {
+    active && organization != null && group != null
+  }
 }
