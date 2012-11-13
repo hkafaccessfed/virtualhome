@@ -10,6 +10,8 @@ class Group {
 
   String name
   String description
+
+  boolean active = true
   
   Date dateCreated
   Date lastUpdated
@@ -23,5 +25,9 @@ class Group {
     description (nullable: false, blank:false)
     dateCreated(nullable:true)
     lastUpdated(nullable:true)
+  }
+
+  public boolean functioning() {
+    active && organization.functioning()
   }
 }
