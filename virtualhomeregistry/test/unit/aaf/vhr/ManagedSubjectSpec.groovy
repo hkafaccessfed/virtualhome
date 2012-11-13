@@ -311,11 +311,35 @@ class ManagedSubjectSpec extends UnitSpec {
     def s = ManagedSubject.build()
 
     when:
-    s.organization = Organization.build()
-    s.group = Group.build(organization:s.organization)
+    s.organization = Organization.build(active:true)
+    s.group = Group.build(organization:s.organization, active:true)
 
     then:
     s.functioning()
+  }
+
+  def 'ensure not functioning when active and sponsor org is not functioning'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    when:
+    s.organization = Organization.build(active:false)
+    s.group = Group.build(organization:s.organization, active:true)
+
+    then:
+    !s.functioning()
+  }
+
+  def 'ensure not functioning when active and sponsor group is not functioning'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    when:
+    s.organization = Organization.build(active:true)
+    s.group = Group.build(organization:s.organization, active:false)
+
+    then:
+    !s.functioning()
   }
 
   def 'ensure not functioning when inactive and sponsored'() {

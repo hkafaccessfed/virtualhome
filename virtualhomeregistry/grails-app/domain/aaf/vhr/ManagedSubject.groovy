@@ -52,6 +52,6 @@ class ManagedSubject {
   static transients = ['plainPassword', 'plainPasswordConfirmation']
 
   public boolean functioning() {
-    active && organization != null && group != null
+    active && organization?.functioning() && group?.functioning()
   }
 }
