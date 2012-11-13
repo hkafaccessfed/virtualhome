@@ -27,6 +27,10 @@ class Group {
     lastUpdated(nullable:true)
   }
 
+  static mapping = {
+    table 'vhr_group'
+  }
+
   public boolean functioning() {
     active && organization.functioning()
   }
