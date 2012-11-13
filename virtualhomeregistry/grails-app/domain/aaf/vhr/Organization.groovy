@@ -16,13 +16,13 @@ class Organization  {
 
   long frID
   long subjectLimit 
-  long roleLimit
+  long groupLimit
   
   boolean active = false
   boolean undergoingWorkflow = false
 
   static hasMany = [subjects: ManagedSubject,
-                    roles: Role]
+                    groups: Group]
   
   Date dateCreated
   Date lastUpdated
@@ -41,11 +41,11 @@ class Organization  {
   }
 
   public boolean canRegisterSubjects() {
-    (subjectLimit == 0 || subjects.size() < subjectLimit) && active
+    (subjectLimit == 0 || subjects.size() < subjectLimit) && functioning()
   }
 
-  public boolean canRegisterRoles() {
-    (roleLimit == 0 || subjects.size() < roleLimit) && active
+  public boolean canRegisterGroups() {
+    (groupLimit == 0 || groups.size() < groupLimit) && functioning()
   }
 
 }

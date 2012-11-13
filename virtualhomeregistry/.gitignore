@@ -41,6 +41,7 @@ application_config.groovy
 /target
 
 # other
+shiro.properties
 *.iws
 cobertura.ser
 .DS_Store

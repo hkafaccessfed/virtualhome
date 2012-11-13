@@ -9,7 +9,7 @@ import aaf.base.identity.Subject
 @EqualsAndHashCode
 class ManagedSubject {
   static auditable = true
-  
+
   String login
   String hash
 
@@ -25,6 +25,9 @@ class ManagedSubject {
   static hasMany = [pii: AttributeValue,  // Personally Identifiable Information (PII)
                     challengeResponse: ChallengeResponse,
                     emailReset: EmailReset]  
+
+  static belongsTo = [organization:Organization,
+                      group:Group]
 
   static constraints = {
     login nullable:true, blank: false, unique: true, size: 5..100

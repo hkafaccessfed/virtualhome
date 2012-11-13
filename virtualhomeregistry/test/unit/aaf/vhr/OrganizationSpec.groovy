@@ -6,7 +6,7 @@ import spock.lang.*
 import grails.plugin.spock.*
 
 @TestFor(aaf.vhr.Organization)
-@Build([aaf.vhr.Organization, aaf.vhr.ManagedSubject])
+@Build([aaf.vhr.Organization, aaf.vhr.ManagedSubject, aaf.vhr.Group])
 class OrganizationSpec extends UnitSpec {
 
   def 'ensure name can not be null or blank'() {
@@ -198,6 +198,140 @@ class OrganizationSpec extends UnitSpec {
 
     when:
     def result = o.canRegisterSubjects()
+
+    then:
+    !result
+  }
+
+  def 'Ensure unlimited and active org can register groups'() {
+    setup:
+    def o = Organization.build()
+    o.active = true
+    o.groupLimit = 0
+
+    when:
+    def result = o.canRegisterGroups()
+
+    then:
+    result
+  }
+
+  def 'Ensure unlimited but inactive org cant register groups'() {
+    setup:
+    def o = Organization.build()
+    o.active = false
+    o.groupLimit = 0
+
+    when:
+    def result = o.canRegisterGroups()
+
+    then:
+    !result
+  }
+
+  def 'Ensure limited, active org that hasnt reached max can register groups'() {
+    setup:
+    def o = Organization.build()
+    o.active = true
+    o.groupLimit = 100
+
+    (1..99).each {
+      def s = Group.build()
+      o.addToGroups(s)
+    }
+
+    when:
+    def result = o.canRegisterGroups()
+
+    then:
+    result
+  }
+
+  def 'Ensure limited, active org that has reached max cant register groups'() {
+    setup:
+    def o = Organization.build()
+    o.active = true
+    o.groupLimit = 100
+
+    (1..100).each {
+      def g = Group.build()
+      o.addToGroups(g)
+    }
+
+    when:
+    def result = o.canRegisterGroups()
+
+    then:
+    !result
+  }
+
+  def 'Ensure limited, active org some how over max cant register groups'() {
+    setup:
+    def o = Organization.build()
+    o.active = true
+    o.groupLimit = 100
+
+    (1..101).each {
+      def s = Group.build()
+      o.addToGroups(s)
+    }
+
+    when:
+    def result = o.canRegisterGroups()
+    
+    then:
+    !result
+  }
+
+  def 'Ensure limited, inactive org that hasnt reached max cant register groups'() {
+    setup:
+    def o = Organization.build()
+    o.active = false
+    o.groupLimit = 100
+
+    (1..99).each {
+      def s = Group.build()
+      o.addToGroups(s)
+    }
+
+    when:
+    def result = o.canRegisterGroups()
+
+    then:
+    !result
+  }
+
+  def 'Ensure limited, inactive org that has reached max cant register groups'() {
+    setup:
+    def o = Organization.build()
+    o.active = false
+    o.groupLimit = 100
+
+    (1..100).each {
+      def s = Group.build()
+      o.addToGroups(s)
+    }
+
+    when:
+    def result = o.canRegisterGroups()
+
+    then:
+    !result
+  }
+
+  def 'Ensure limited, inactive org some how over max cant register groups'() {
+    setup:
+    def o = Organization.build()
+    o.active = false
+    o.groupLimit = 100
+
+    (1..101).each {
+      def s = Group.build()
+      o.addToGroups(s)
+    }
+
+    when:
+    def result = o.canRegisterGroups()
 
     then:
     !result
