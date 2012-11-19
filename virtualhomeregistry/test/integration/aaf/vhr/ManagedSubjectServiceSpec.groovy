@@ -47,14 +47,17 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
 
   def 'ensure successful finalize for ManagedSubject'() {
     setup:
-    def o = Organization.build()
-    def g = Group.build(organization: o)
-    def ms = ManagedSubject.build(organization:o, group:g)
+    def o = Organization.build(active: true)
+    def g = Group.build(active:true, organization: o)
+    def ms = ManagedSubject.build(login:null, hash:null, organization:o, group:g, active:false)
     def inv = ManagedSubjectInvitation.build(managedSubject: ms)
 
     expect:
     ManagedSubject.count() == 1
     ManagedSubjectInvitation.count() == 1
+    !ms.functioning()
+    ms.login == null
+    ms.hash == null
     o.subjects.size() == 1
     g.subjects.size() == 1
 
@@ -69,6 +72,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     managedSubject.hasErrors() == false
     managedSubject.login == 'usert'
     cryptoService.verifyPasswordHash('thisisalongpasswordtotest', managedSubject)
+    ms.functioning()
   }
 
   def 'ensure failed finalize for ManagedSubject with poor password'() {
@@ -125,8 +129,8 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
 
   def 'ensure register creates new ManagedSubject'() {
     setup:
-    def o = Organization.build()
-    def g = Group.build(organization: o)
+    def o = Organization.build(active:true)
+    def g = Group.build(organization: o, active:true)
     def a = new Attribute(name:"eduPersonAffiliation", oid:"1.3.6.1.4.1.5923.1.1.1.1", description:"Specifies the persons relationship(s) to the institution").save()
     def et = new EmailTemplate(name:'registered_managed_subject', content: 'This is an email for ${managedSubject.cn} telling them to come and complete registration with code ${invitation.inviteCode}').save()
     
@@ -143,6 +147,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
 
     then:
     managedSubject != null
+    !managedSubject.functioning()
 
     ManagedSubject.count() == 1
     managedSubject.cn == "Test User"
@@ -194,8 +199,8 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
 
   def 'ensure valid CSV creates new ManagedSubject from each line'() {
     setup:
-    def o = Organization.build()
-    def g = Group.build(organization: o)
+    def o = Organization.build(active:true)
+    def g = Group.build(organization: o, active:true)
     def a = new Attribute(name:"eduPersonAffiliation", oid:"1.3.6.1.4.1.5923.1.1.1.1", description:"Specifies the persons relationship(s) to the institution").save()
     def et = new EmailTemplate(name:'registered_managed_subject', content: 'This is an email for ${managedSubject.cn} telling them to come and complete registration with code ${invitation.inviteCode}').save()
     
@@ -217,6 +222,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     subjects.size() == expectedLinesProcessed
 
     ManagedSubject.count() == expectedLinesProcessed
+    !subjects[0].functioning()
     subjects[0].cn == "Test User"
     subjects[0].email == "testuser@testdomain.com"
     !subjects[0].active
@@ -225,6 +231,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     subjects[0].organization == o
     subjects[0].group == g
 
+    !subjects[1].functioning()
     subjects[1].cn == "Test User2"
     subjects[1].email == "testuser2@testdomain.com"
     !subjects[1].active

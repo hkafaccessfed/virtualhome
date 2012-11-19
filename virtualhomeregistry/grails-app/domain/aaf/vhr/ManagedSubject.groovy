@@ -20,7 +20,7 @@ class ManagedSubject {
   String sharedToken  // per oid:1.3.6.1.4.1.27856.1.2.5
   String mobileNumber // per oid:0.9.2342.19200300.100.1.41
   
-  boolean active = true
+  boolean active = false
 
   List pii
   List challengeResponse

@@ -256,25 +256,17 @@ class ManagedSubjectSpec extends UnitSpec {
     expected << [true, false, true]
   }
 
-  def 'ensure active is true by default'() {
+  def 'ensure active is false by default'() {
     when:
     def s = ManagedSubject.build()
 
     then:
-    s.active
-  }
-
-  def 'ensure active is true by default'() {
-    when:
-    def s = ManagedSubject.build()
-
-    then:
-    s.active
+    !s.active
   }
 
   def 'ensure functioning when active and sponsored'() {
     setup:
-    def s = ManagedSubject.build()
+    def s = ManagedSubject.build(active:true)
 
     when:
     s.organization = Organization.build(active:true)

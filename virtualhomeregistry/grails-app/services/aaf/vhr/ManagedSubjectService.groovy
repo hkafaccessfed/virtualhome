@@ -44,6 +44,8 @@ class ManagedSubjectService {
     }
 
     cryptoService.generatePasswordHash(managedSubject)
+    managedSubject.active = true
+    
     if(!managedSubject.save()) {
       log.error "Failed trying to save $managedSubject when finalizing"
       managedSubject.errors.each {
