@@ -216,7 +216,7 @@
                                     <td valign="top">
                                         <div >
                                            An important message from the Australian Access Federation<br> 
-                                           [APPLICATION NAME]
+                                           Virtual Home Registry
                                         </div>
                                       </td>
                                       <td valign="top" width="190">

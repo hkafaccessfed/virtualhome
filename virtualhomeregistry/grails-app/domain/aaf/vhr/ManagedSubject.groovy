@@ -43,8 +43,8 @@ class ManagedSubject {
     sharedToken nullable:false, blank: false, unique: true
     mobileNumber nullable: true, blank: false
 
-    organization nullable: true
-    group nullable: true
+    organization nullable: false
+    group nullable: false
   }
 
   String plainPassword

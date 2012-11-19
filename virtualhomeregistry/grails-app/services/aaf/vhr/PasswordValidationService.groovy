@@ -65,19 +65,21 @@ class PasswordValidationService {
   def validate(ManagedSubject subject) {
     if(subject.plainPassword != subject.plainPasswordConfirmation) {
       log.warn("The submitted plaintext passwords for $subject don't match, rejecting.")
-      return [false, ['aaf.vhr.passwordvalidationservice.notmatching']]
+      subject.errors.rejectValue('plainPassword', 'aaf.vhr.passwordvalidationservice.notmatching')
+      return [false, ['aaf.vhr.passwordvalidationservice.notmatching'], subject]
     }
 
     if(subject.plainPassword.toLowerCase().contains(subject.login.toLowerCase())) {
       log.warn("The submitted plaintext passwords for $subject don't match, rejecting.")
-      return [false, ['aaf.vhr.passwordvalidationservice.containslogin']]
+      subject.errors.rejectValue('plainPassword', 'aaf.vhr.passwordvalidationservice.containslogin')
+      return [false, ['aaf.vhr.passwordvalidationservice.containslogin'], subject]
     }
 
-    println subject.hash
     if(subject.hash != null) {
       if(cryptoService.verifyPasswordHash(subject.plainPassword, subject)) {
         log.warn("The submitted plaintext password for $subject is the same as the current value, rejecting.")
-        return [false, ['aaf.vhr.passwordvalidationservice.reused']]
+        subject.errors.rejectValue('plainPassword', 'aaf.vhr.passwordvalidationservice.reused')
+        return [false, ['aaf.vhr.passwordvalidationservice.reused'], subject]
       }
     }
 
@@ -131,7 +133,11 @@ class PasswordValidationService {
 
     if(result.isValid())
       [true, null]
-    else
-      [false, validator.getMessages(result)]
+    else {
+      validator.getMessages(result).each { e ->
+        subject.errors.rejectValue('plainPassword', e)
+      }
+      [false, validator.getMessages(result), subject]
+    }
   }
 }
