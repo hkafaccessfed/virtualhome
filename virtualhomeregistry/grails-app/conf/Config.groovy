@@ -52,6 +52,24 @@ grails.web.disable.multipart=false
 
 grails.exceptionresolver.params.exclude = ['password', 'password_confim']
 
+environments {
+  test {
+    testDataConfig.enabled = true
+    grails.mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port 
+
+    log4j = {
+      appenders {
+        console name: "stdout", layout: pattern(conversionPattern: "%c{2} %m%n")
+      }
+      info  'stdout'    :['grails.app.controllers',
+                          'grails.app.domains',
+                          'grails.app.services',
+                          'grails.app.realms',
+                          'aaf.vhr']
+      } 
+  }
+}
+
 /**
 * This is allows usage of environment variables in production
 * while maintaining flexibility in development.
