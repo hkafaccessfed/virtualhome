@@ -120,11 +120,6 @@ log4j = {
     appender new DailyRollingFileAppender(name:"stacktrace", layout:pattern(conversionPattern: "%d{[ dd.MM.yy HH:mm:ss.SSS]} %-5p %c %x - %m%n"), file:"/tmp/app-stacktrace.log", datePattern:"'.'yyyy-MM-dd")
   }
 
-  root {
-    info 'stdout'
-    additivity = true
-  }
-
   info  'app-security'  :['grails.app.filters'], additivity: false
 
   info  'app'           :['grails.app.controllers',

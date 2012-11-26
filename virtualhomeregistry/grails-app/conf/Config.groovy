@@ -61,6 +61,7 @@ environments {
       appenders {
         console name: "stdout", layout: pattern(conversionPattern: "%c{2} %m%n")
       }
+      warn 'stdout'     :['grails.buildtestdata'], additivity:false
       info  'stdout'    :['grails.app.controllers',
                           'grails.app.domains',
                           'grails.app.services',
