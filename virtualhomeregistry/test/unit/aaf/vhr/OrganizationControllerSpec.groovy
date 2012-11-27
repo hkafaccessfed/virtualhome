@@ -137,8 +137,12 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
     def organizationTestInstance = Organization.build()
     organizationTestInstance.properties.each {
-      if(it.value)
-        params."${it.key}" = "${it.value}"
+      if(it.value) {
+        if(it.value.hasProperty('id'))
+          params."${it.key}.id" = "${it.value.id}"
+        else
+          params."${it.key}" = "${it.value}"
+      }
     }
     organizationTestInstance.delete()
 
@@ -163,8 +167,12 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
     def organizationTestInstance = Organization.build()
     organizationTestInstance.properties.each {
-      if(it.value)
-        params."${it.key}" = "${it.value}"
+      if(it.value) {
+        if(it.value.hasProperty('id'))
+          params."${it.key}.id" = "${it.value.id}"
+        else
+          params."${it.key}" = "${it.value}"
+      }
     }
     organizationTestInstance.delete()
 
@@ -251,8 +259,12 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     organizationTestInstance.getVersion() >> 20
     
     organizationTestInstance.properties.each {
-      if(it.value)
-        params."${it.key}" = "${it.value}"
+      if(it.value) {
+        if(it.value.hasProperty('id'))
+          params."${it.key}.id" = "${it.value.id}"
+        else
+          params."${it.key}" = "${it.value}"
+      }
     }
     Organization.metaClass.save { null }
     
@@ -280,8 +292,12 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     subject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
     
     organizationTestInstance.properties.each {
-      if(it.value)
-        params."${it.key}" = "${it.value}"
+      if(it.value) {
+        if(it.value.hasProperty('id'))
+          params."${it.key}.id" = "${it.value.id}"
+        else
+          params."${it.key}" = "${it.value}"
+      }
     }
 
     expect:
