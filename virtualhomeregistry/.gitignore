@@ -26,6 +26,9 @@ application_config.groovy
 /test/reports
 /logs
 
+# templates
+src/templates/scaffolding
+
 # project release file
 /*.war
 
