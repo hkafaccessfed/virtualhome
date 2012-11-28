@@ -9,23 +9,28 @@ import spock.lang.*
 import test.shared.ShiroEnvironment
 
 @TestFor(aaf.vhr.OrganizationController)
-@Build([Organization])
+@Build([Organization, aaf.base.identity.Subject])
 class OrganizationControllerSpec  extends spock.lang.Specification {
-
-  def subject
+  
   @Shared def shiroEnvironment = new ShiroEnvironment()
+
+  aaf.base.identity.Subject subject
+  org.apache.shiro.subject.Subject shiroSubject
   
   def cleanupSpec() { 
     shiroEnvironment.tearDownShiro() 
   }
 
   def setup() {
-    subject = Mock(org.apache.shiro.subject.Subject)
+    subject = aaf.base.identity.Subject.build()
 
-    subject.isAuthenticated() >> true
-    shiroEnvironment.setSubject(subject)
+    shiroSubject = Mock(org.apache.shiro.subject.Subject)
+    shiroSubject.id >> subject.id
+    shiroSubject.principal >> subject.principal
+    shiroSubject.isAuthenticated() >> true
+    shiroEnvironment.setSubject(shiroSubject)
     
-    controller.metaClass.getSubject = { [id:1, principal:'http://test.com!http://sp.test.com!1234'] }
+    controller.metaClass.getSubject = { subject }
   }
 
   def 'ensure beforeInterceptor only excludes list, create, save'() {
@@ -98,7 +103,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from create when valid permission'() {
     setup:
-    subject.isPermitted("app:manage:organization:create") >> true
+    shiroSubject.isPermitted("app:manage:organization:create") >> true
 
     when:
     def model = controller.create()
@@ -109,7 +114,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from create when invalid permission'() {
     setup:
-    subject.isPermitted("app:manage:organization:create") >> false
+    shiroSubject.isPermitted("app:manage:organization:create") >> false
 
     when:
     def model = controller.create()
@@ -121,7 +126,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from save when invalid permission'() {
     setup:
-    subject.isPermitted("app:manage:organization:create") >> false
+    shiroSubject.isPermitted("app:manage:organization:create") >> false
 
     when:
     def model = controller.save()
@@ -133,7 +138,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from save with invalid data and when valid permission'() {
     setup:
-    subject.isPermitted("app:manage:organization:create") >> true
+    shiroSubject.isPermitted("app:manage:organization:create") >> true
 
     def organizationTestInstance = Organization.build()
     organizationTestInstance.properties.each {
@@ -163,7 +168,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from save with valid data and when valid permission'() {
     setup:
-    subject.isPermitted("app:manage:organization:create") >> true
+    shiroSubject.isPermitted("app:manage:organization:create") >> true
 
     def organizationTestInstance = Organization.build()
     organizationTestInstance.properties.each {
@@ -196,7 +201,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from edit when invalid permission'() {
     setup:
     def organizationTestInstance = Organization.build()
-    subject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> false
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> false
 
     when:
     params.id = organizationTestInstance.id
@@ -210,7 +215,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from edit when valid permission'() {
     setup:
     def organizationTestInstance = Organization.build()
-    subject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
 
     when:
     params.id = organizationTestInstance.id
@@ -223,7 +228,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from update when invalid permission'() {
     setup:
     def organizationTestInstance = Organization.build()
-    subject.isPermitted("app:manage:organization:${organizationTestInstance}.id}:edit") >> false
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance}.id}:edit") >> false
 
     when:
     def model = controller.update()
@@ -236,7 +241,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from update with null version but valid permission'() {
     setup:
     def organizationTestInstance = Organization.build()
-    subject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
     
     expect:
     Organization.count() == 1
@@ -255,7 +260,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from update with invalid data and when valid permission'() {
     setup:
     def organizationTestInstance = Organization.build()
-    subject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
     organizationTestInstance.getVersion() >> 20
     
     organizationTestInstance.properties.each {
@@ -289,7 +294,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from update with valid data and when valid permission'() {
     setup:
     def organizationTestInstance = Organization.build()
-    subject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
     
     organizationTestInstance.properties.each {
       if(it.value) {
@@ -324,7 +329,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from delete when invalid permission'() {
     setup:
     def organizationTestInstance = Organization.build()
-    subject.isPermitted("app:manage:organization:${organizationTestInstance.id}:delete") >> false
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:delete") >> false
 
     when:
     params.id = organizationTestInstance.id
@@ -338,7 +343,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from delete when valid permission'() {
     setup:
     def organizationTestInstance = Organization.build()
-    subject.isPermitted("app:manage:organization:${organizationTestInstance.id}:delete") >> true
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:delete") >> true
 
     expect:
     Organization.count() == 1
@@ -359,7 +364,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from delete when integrity violation'() {
     setup:
     def organizationTestInstance = Organization.build()
-    subject.isPermitted("app:manage:organization:${organizationTestInstance.id}:delete") >> true
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:delete") >> true
 
     Organization.metaClass.delete { throw new org.springframework.dao.DataIntegrityViolationException("Thrown from test case") }
 
