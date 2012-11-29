@@ -144,7 +144,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     organizationTestInstance.properties.each {
       if(it.value) {
         if(it.value.hasProperty('id'))
-          params."${it.key}.id" = "${it.value.id}"
+          params."${it.key}" = [id:"${it.value.id}"]
         else
           params."${it.key}" = "${it.value}"
       }
@@ -174,7 +174,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     organizationTestInstance.properties.each {
       if(it.value) {
         if(it.value.hasProperty('id'))
-          params."${it.key}.id" = "${it.value.id}"
+          params."${it.key}" = [id:"${it.value.id}"]
         else
           params."${it.key}" = "${it.value}"
       }
@@ -266,7 +266,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     organizationTestInstance.properties.each {
       if(it.value) {
         if(it.value.hasProperty('id'))
-          params."${it.key}.id" = "${it.value.id}"
+          params."${it.key}" = [id:"${it.value.id}"]
         else
           params."${it.key}" = "${it.value}"
       }
@@ -299,7 +299,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     organizationTestInstance.properties.each {
       if(it.value) {
         if(it.value.hasProperty('id'))
-          params."${it.key}.id" = "${it.value.id}"
+          params."${it.key}" = [id:"${it.value.id}"]
         else
           params."${it.key}" = "${it.value}"
       }
