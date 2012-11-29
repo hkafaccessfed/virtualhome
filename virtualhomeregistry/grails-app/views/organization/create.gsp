@@ -14,6 +14,11 @@
     <g:render template="/templates/errors_bean" model="['bean':organizationInstance]" plugin="aafApplicationBase"/>
 
     <h2><g:message code="views.aaf.vhr.organization.create.heading" /></h2>
+
+    <div class="alert alert-block alert-info">
+      <h4><g:message code="label.warning"/>!</h4>
+      <p><g:message code="views.aaf.vhr.organization.create.warning"/></p>
+    </div>
     
     <g:form action="save" class="form-validating form-horizontal">
       <g:render template="form"/>

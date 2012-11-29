@@ -9,7 +9,9 @@
       <li><g:link controller="dashboard"><g:message code="branding.application.name"/></g:link> <span class="divider">/</span></li>
       <li class="active"><g:message code="branding.nav.breadcrumb.organization"/></li>
       
-      <li class="pull-right"><strong><g:link action="create"><g:message code="branding.nav.breadcrumb.organization.create"/></g:link></strong></li>
+      <aaf:hasPermission target="app:manage:organization:create">
+        <li class="pull-right"><strong><g:link action="create"><g:message code="branding.nav.breadcrumb.organization.create"/></g:link></strong></li>
+      </aaf:hasPermission>
     </ul>
 
     <g:render template="/templates/flash" plugin="aafApplicationBase"/>
@@ -23,8 +25,6 @@
               <th><g:message code="label.displayname" /></th> 
               <th><g:message code="label.description" /></th> 
               <th><g:message code="label.active" /></th> 
-              <th><g:message code="label.frid" /></th> 
-              <th><g:message code="label.grouplimit" /></th> 
               <th/>
           </tr>
         </thead>
@@ -35,8 +35,6 @@
             <td>${fieldValue(bean: organizationInstance, field: "displayName")}</td>
             <td>${fieldValue(bean: organizationInstance, field: "description")}</td>
             <td><g:formatBoolean boolean="${organizationInstance.active}" /></td>
-            <td>${fieldValue(bean: organizationInstance, field: "frID")}</td>
-            <td>${fieldValue(bean: organizationInstance, field: "groupLimit")}</td>
             <td><g:link action="show" id="${organizationInstance.id}" class="btn btn-small"><g:message code="label.view"/></g:link></td>
           </tr>
         </g:each>
