@@ -34,7 +34,9 @@ class OrganizationController {
 
   def save() {
     if(SecurityUtils.subject.isPermitted("app:manage:organization:create")) {
-      def organizationInstance = new Organization(params)
+      def organizationInstance = new Organization()
+      bindData(organizationInstance, params, [include: ['name', 'displayName', 'description', 'frID', 'subjectLimit', 'groupLimit']])
+
       if (!organizationInstance.save()) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.organization.save.failed'
@@ -82,7 +84,7 @@ class OrganizationController {
         return
       }
 
-      organizationInstance.properties = params
+      bindData(organizationInstance, params, [include: ['name', 'displayName', 'description', 'subjectLimit', 'groupLimit']])
 
       if (!organizationInstance.save()) {
         flash.type = 'error'
