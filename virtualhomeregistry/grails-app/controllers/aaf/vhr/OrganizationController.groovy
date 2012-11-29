@@ -24,7 +24,7 @@ class OrganizationController {
   def create() {
     if(SecurityUtils.subject.isPermitted("app:manage:organization:create")) {
       log.info "Action: create, Subject: $subject"
-      [organizationInstance: new Organization(params)]
+      [organizationInstance: new Organization()]
     }
     else {
       log.warn "Attempt to do administrative Organization create by $subject was denied - not permitted by assigned permissions"
