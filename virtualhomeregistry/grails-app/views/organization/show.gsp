@@ -15,7 +15,7 @@
     <g:render template="/templates/flash" plugin="aafApplicationBase"/>
     <g:render template="/templates/errors_bean" model="['bean':organizationInstance]" plugin="aafApplicationBase"/>
 
-    <h2><g:message code="views.aaf.vhr.organization.show.heading" args="${[organizationInstance.name]}"/></h2>
+    <h2><g:message code="views.aaf.vhr.organization.show.heading" args="${[organizationInstance.displayName]}"/></h2>
 
     <g:if test="${organizationInstance.undergoingWorkflow}">
       <div class="alert alert-block alert-info">
@@ -48,7 +48,7 @@
           
           <ul class="dropdown-menu">
             <li>
-              <g:link action="create" controller="group" params=""><g:message code="label.creategroup"/></g:link>
+              <g:link action="create" controller="group" params='['organization.id':"${organizationInstance.id}"]'><g:message code="label.creategroup"/></g:link>
             </li>
             <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:edit">
               <li>

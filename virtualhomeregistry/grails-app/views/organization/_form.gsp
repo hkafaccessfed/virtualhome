@@ -23,7 +23,7 @@
     </div>
   </div>
 
-  <g:if test="${!organizationInstance.frID}">
+  <g:if test="${actionName == 'create'}">
     <div class="control-group ${hasErrors(bean: organizationInstance, field: 'frID', 'error')}">
       <label class="control-label" for="frID"><g:message code="label.frid"/></label>
       <div class="controls">

@@ -7,14 +7,14 @@
     <ul class="breadcrumb">
       <li><g:link controller="dashboard"><g:message code="branding.application.name"/></g:link> <span class="divider">/</span></li>
       <li><g:link action="list"><g:message code="branding.nav.breadcrumb.organization"/></g:link> <span class="divider">/</span></li>
-      <li><g:link action="show" id="${organizationInstance?.id}"><g:message code="branding.nav.breadcrumb.organization.show"/></g:link> <span class="divider">/</span></li>
+      <li><g:link action="show" id="${organizationInstance?.id}"><g:fieldValue bean="${organizationInstance}" field="displayName"/></g:link> <span class="divider">/</span></li>
       <li class="active"><g:message code="branding.nav.breadcrumb.organization.edit"/></li>
     </ul>
 
     <g:render template="/templates/flash" plugin="aafApplicationBase"/>
     <g:render template="/templates/errors_bean" model="['bean':organizationInstance]" plugin="aafApplicationBase"/>
 
-    <h2><g:message code="views.aaf.vhr.organization.edit.heading" args="[]"/></h2>
+    <h2><g:message code="views.aaf.vhr.organization.edit.heading" args="${[organizationInstance.displayName]}"/></h2>
     
     <g:form action="update" class="form-validating form-horizontal">
       <g:hiddenField name="id" value="${organizationInstance?.id}" />
