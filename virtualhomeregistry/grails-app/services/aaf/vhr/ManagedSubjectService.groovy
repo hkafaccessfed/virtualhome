@@ -69,12 +69,10 @@ class ManagedSubjectService {
     return [true, managedSubject]
   }
 
-  def register(String cn, String email, String affiliation, Group group, boolean confirm = true) {
+  def register(String cn, String email, String eduPersonAffiliation, Group group, boolean confirm = true, boolean except = true) {
       def managedSubject = new ManagedSubject(cn:cn, email:email, active:false, organization:group.organization, group:group)
+      managedSubject.addToEduPersonAffiliation(eduPersonAffiliation)
       sharedTokenService.generate(managedSubject)
-
-      def eduPersonAffiliation = new AttributeValue(value:affiliation, attribute:Attribute.findWhere(oid:"1.3.6.1.4.1.5923.1.1.1.1"))
-      managedSubject.addToPii(eduPersonAffiliation)
 
       if(!managedSubject.save()) {
         log.error "Failed trying to save $managedSubject"
@@ -82,7 +80,10 @@ class ManagedSubjectService {
           log.warn it
         }
 
-        throw new RuntimeException("Failed trying to save $managedSubject")  // Rollback transaction
+        if(except)
+          throw new RuntimeException("Failed trying to save $managedSubject")  // Rollback transaction
+        else
+          return managedSubject
       }
 
       if(confirm)

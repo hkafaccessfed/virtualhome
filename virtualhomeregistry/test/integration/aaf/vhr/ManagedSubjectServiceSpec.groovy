@@ -131,12 +131,10 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     setup:
     def o = Organization.build(active:true)
     def g = Group.build(organization: o, active:true)
-    def a = new Attribute(name:"eduPersonAffiliation", oid:"1.3.6.1.4.1.5923.1.1.1.1", description:"Specifies the persons relationship(s) to the institution").save()
     def et = new EmailTemplate(name:'registered_managed_subject', content: 'This is an email for ${managedSubject.cn} telling them to come and complete registration with code ${invitation.inviteCode}').save()
     
     expect:
     ManagedSubject.count() == 0
-    Attribute.count() == 1
     o.subjects == null
     g.subjects == null
 
@@ -153,8 +151,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     managedSubject.cn == "Test User"
     managedSubject.email == "testuser@testdomain.com"
     !managedSubject.active
-    managedSubject.pii[0].attribute == a
-    managedSubject.pii[0].value == "student"
+    managedSubject.eduPersonAffiliation[0] == "student"
 
     greenMail.getReceivedMessages().length == 1
 
@@ -201,12 +198,10 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     setup:
     def o = Organization.build(active:true)
     def g = Group.build(organization: o, active:true)
-    def a = new Attribute(name:"eduPersonAffiliation", oid:"1.3.6.1.4.1.5923.1.1.1.1", description:"Specifies the persons relationship(s) to the institution").save()
     def et = new EmailTemplate(name:'registered_managed_subject', content: 'This is an email for ${managedSubject.cn} telling them to come and complete registration with code ${invitation.inviteCode}').save()
     
     expect:
     ManagedSubject.count() == 0
-    Attribute.count() == 1
     o.subjects == null
     g.subjects == null
 
@@ -226,8 +221,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     subjects[0].cn == "Test User"
     subjects[0].email == "testuser@testdomain.com"
     !subjects[0].active
-    subjects[0].pii[0].attribute == a
-    subjects[0].pii[0].value == "student"
+    subjects[0].eduPersonAffiliation[0] == "student"
     subjects[0].organization == o
     subjects[0].group == g
 
@@ -235,8 +229,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     subjects[1].cn == "Test User2"
     subjects[1].email == "testuser2@testdomain.com"
     !subjects[1].active
-    subjects[1].pii[0].attribute == a
-    subjects[1].pii[0].value == "staff"
+    subjects[1].eduPersonAffiliation[0] == "staff"
     subjects[1].organization == o
     subjects[1].group == g
 
