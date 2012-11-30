@@ -69,8 +69,8 @@ class ManagedSubjectService {
     return [true, managedSubject]
   }
 
-  def register(String cn, String email, String affiliation, Organization organization, Group group, boolean confirm = true) {
-      def managedSubject = new ManagedSubject(cn:cn, email:email, active:false, organization:organization, group:group)
+  def register(String cn, String email, String affiliation, Group group, boolean confirm = true) {
+      def managedSubject = new ManagedSubject(cn:cn, email:email, active:false, organization:group.organization, group:group)
       sharedTokenService.generate(managedSubject)
 
       def eduPersonAffiliation = new AttributeValue(value:affiliation, attribute:Attribute.findWhere(oid:"1.3.6.1.4.1.5923.1.1.1.1"))
@@ -91,7 +91,7 @@ class ManagedSubjectService {
       managedSubject
   }
 
-  def registerFromCSV(Organization organization, Group group, byte[] csv) {
+  def registerFromCSV(Group group, byte[] csv) {
 
     def emailValidator = EmailValidator.getInstance()
 
@@ -147,7 +147,7 @@ class ManagedSubjectService {
     is.eachCsvLine { tokens ->
       lc++
 
-      def managedSubject = register(tokens[0], tokens[1], tokens[2], organization, group, false)
+      def managedSubject = register(tokens[0], tokens[1], tokens[2], group, false)
       log.info "Created $managedSubject from CSV file submitted by $subject"
       subjects.add(managedSubject)
     }

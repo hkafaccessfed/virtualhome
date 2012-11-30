@@ -141,7 +141,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     g.subjects == null
 
     when:
-    def managedSubject = managedSubjectService.register('Test User', 'testuser@testdomain.com', 'student', o, g)
+    def managedSubject = managedSubjectService.register('Test User', 'testuser@testdomain.com', 'student', g)
     o.refresh()
     g.refresh()
 
@@ -179,7 +179,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     ManagedSubject.count() == 0
 
     when:
-    def (result, errors, subjects, linesProcessed) = managedSubjectService.registerFromCSV(o, g, csv.bytes)
+    def (result, errors, subjects, linesProcessed) = managedSubjectService.registerFromCSV(g, csv.bytes)
 
     then:
     !result
@@ -211,7 +211,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     g.subjects == null
 
     when:
-    def (result, errors, subjects, linesProcessed) = managedSubjectService.registerFromCSV(o, g, csv.bytes)
+    def (result, errors, subjects, linesProcessed) = managedSubjectService.registerFromCSV(g, csv.bytes)
     o.refresh()
     g.refresh()
 
