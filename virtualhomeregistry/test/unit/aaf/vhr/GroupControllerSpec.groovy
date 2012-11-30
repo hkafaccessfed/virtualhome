@@ -9,7 +9,7 @@ import spock.lang.*
 import test.shared.ShiroEnvironment
 
 @TestFor(aaf.vhr.GroupController)
-@Build([Group, aaf.base.identity.Subject])
+@Build([ManagedSubject, Group, aaf.base.identity.Subject])
 class GroupControllerSpec  extends spock.lang.Specification {
   
   @Shared def shiroEnvironment = new ShiroEnvironment()
@@ -103,9 +103,11 @@ class GroupControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from create when valid permission'() {
     setup:
-    shiroSubject.isPermitted("app:manage:group:create") >> true
+    def o = Organization.build()
+    shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:create") >> true
 
     when:
+    params.organization = [id:o.id]
     def model = controller.create()
 
     then:
@@ -113,10 +115,11 @@ class GroupControllerSpec  extends spock.lang.Specification {
   }
 
   def 'ensure correct output from create when invalid permission'() {
-    setup:
-    shiroSubject.isPermitted("app:manage:group:create") >> false
+def o = Organization.build()
+    shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:create") >> false
 
     when:
+    params.organization = [id:o.id]
     def model = controller.create()
 
     then:
@@ -125,10 +128,11 @@ class GroupControllerSpec  extends spock.lang.Specification {
   }
 
   def 'ensure correct output from save when invalid permission'() {
-    setup:
-    shiroSubject.isPermitted("app:manage:group:create") >> false
+    def o = Organization.build()
+    shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:create") >> false
 
     when:
+    params.organization = [id:o.id]
     def model = controller.save()
 
     then:
@@ -138,13 +142,14 @@ class GroupControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from save with invalid data and when valid permission'() {
     setup:
-    shiroSubject.isPermitted("app:manage:group:create") >> true
+    def o = Organization.build()
+    shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:create") >> true
 
-    def groupTestInstance = Group.build()
+    def groupTestInstance = Group.build(organization: o)
     groupTestInstance.properties.each {
       if(it.value) {
         if(grailsApplication.isDomainClass(it.value.getClass()))
-          params."${it.key}.id" = "${it.value.id}"
+          params."${it.key}" = [id:"${it.value.id}"]
         else
           params."${it.key}" = "${it.value}"
       }
@@ -168,13 +173,14 @@ class GroupControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from save with valid data and when valid permission'() {
     setup:
-    shiroSubject.isPermitted("app:manage:group:create") >> true
+    def o = Organization.build()
+    shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:create") >> true
 
-    def groupTestInstance = Group.build()
+    def groupTestInstance = Group.build(organization: o)
     groupTestInstance.properties.each {
       if(it.value) {
         if(grailsApplication.isDomainClass(it.value.getClass()))
-          params."${it.key}.id" = "${it.value.id}"
+          params."${it.key}" = [id:"${it.value.id}"]
         else
           params."${it.key}" = "${it.value}"
       }
@@ -266,7 +272,7 @@ class GroupControllerSpec  extends spock.lang.Specification {
     groupTestInstance.properties.each {
       if(it.value) {
         if(it.value.hasProperty('id'))
-          params."${it.key}.id" = "${it.value.id}"
+          params."${it.key}" = [id:"${it.value.id}"]
         else
           params."${it.key}" = "${it.value}"
       }
@@ -299,7 +305,7 @@ class GroupControllerSpec  extends spock.lang.Specification {
     groupTestInstance.properties.each {
       if(it.value) {
         if(it.value.hasProperty('id'))
-          params."${it.key}.id" = "${it.value.id}"
+          params."${it.key}" = [id:"${it.value.id}"]
         else
           params."${it.key}" = "${it.value}"
       }
@@ -328,8 +334,9 @@ class GroupControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from delete when invalid permission'() {
     setup:
-    def groupTestInstance = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${groupTestInstance.id}:delete") >> false
+    def o = Organization.build()
+    def groupTestInstance = Group.build(organization:o)
+    shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:delete") >> false
 
     when:
     params.id = groupTestInstance.id
@@ -342,8 +349,9 @@ class GroupControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from delete when valid permission'() {
     setup:
-    def groupTestInstance = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${groupTestInstance.id}:delete") >> true
+    def o = Organization.build()
+    def groupTestInstance = Group.build(organization:o)
+    shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:delete") >> true
 
     expect:
     Group.count() == 1
@@ -363,8 +371,9 @@ class GroupControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from delete when integrity violation'() {
     setup:
-    def groupTestInstance = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${groupTestInstance.id}:delete") >> true
+    def o = Organization.build()
+    def groupTestInstance = Group.build(organization:o)
+    shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:delete") >> true
 
     Group.metaClass.delete { throw new org.springframework.dao.DataIntegrityViolationException("Thrown from test case") }
 

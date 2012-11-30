@@ -22,34 +22,44 @@ class GroupController {
   }
 
   def create() {
-    if(SecurityUtils.subject.isPermitted("app:manage:group:create")) {
-      log.info "Action: create, Subject: $subject"
-      [groupInstance: new Group(params)]
-    }
-    else {
-      log.warn "Attempt to do administrative Group create by $subject was denied - not permitted by assigned permissions"
-      response.sendError 403
+    if(validOrganization()) {
+      if(SecurityUtils.subject.isPermitted("app:manage:organization:${params.organization.id}:groups:create")) {
+        log.info "Action: create, Subject: $subject"
+        def groupInstance = new Group()
+        groupInstance.organization = Organization.get(params.organization.id)
+        [groupInstance: groupInstance]
+      }
+      else {
+        log.warn "Attempt to do administrative Group create by $subject was denied - not permitted by assigned permissions"
+        response.sendError 403
+      }
     }
   }
 
   def save() {
-    if(SecurityUtils.subject.isPermitted("app:manage:group:create")) {
-      def groupInstance = new Group(params)
-      if (!groupInstance.save()) {
-        flash.type = 'error'
-        flash.message = 'controllers.aaf.vhr.group.save.failed'
-        render(view: "create", model: [groupInstance: groupInstance])
-        return
-      }
+    if(validOrganization()) {
+      if(SecurityUtils.subject.isPermitted("app:manage:organization:${params.organization.id}:groups:create")) {
+        
+        def groupInstance = new Group()
+        bindData(groupInstance, params, [include: ['name', 'description', 'organization']])
+        groupInstance.organization = Organization.get(params.organization.id) 
 
-      log.info "Action: save, Subject: $subject, Object: groupInstance"
-      flash.type = 'success'
-      flash.message = 'controllers.aaf.vhr.group.save.success'
-      redirect(action: "show", id: groupInstance.id)
-    }
-    else {
-      log.warn "Attempt to do administrative Group save by $subject was denied - not permitted by assigned permissions"
-      response.sendError 403
+        if (!groupInstance.save()) {
+          flash.type = 'error'
+          flash.message = 'controllers.aaf.vhr.group.save.failed'
+          render(view: "create", model: [groupInstance: groupInstance])
+          return
+        }
+
+        log.info "Action: save, Subject: $subject, Object: groupInstance"
+        flash.type = 'success'
+        flash.message = 'controllers.aaf.vhr.group.save.success'
+        redirect(action: "show", id: groupInstance.id)
+      }
+      else {
+        log.warn "Attempt to do administrative Group save by $subject was denied - not permitted by assigned permissions"
+        response.sendError 403
+      }
     }
   }
 
@@ -82,7 +92,7 @@ class GroupController {
         return
       }
 
-      groupInstance.properties = params
+      bindData(groupInstance, params, [include: ['name', 'description']])
 
       if (!groupInstance.save()) {
         flash.type = 'error'
@@ -103,8 +113,8 @@ class GroupController {
   }
 
   def delete(Long id) {
-    if(SecurityUtils.subject.isPermitted("app:manage:group:$id:delete")) {
-      def groupInstance = Group.get(id)
+    def groupInstance = Group.get(id)
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${groupInstance.organization.id}:groups:delete")) {
       try {
         groupInstance.delete()
 
@@ -123,6 +133,31 @@ class GroupController {
       log.warn "Attempt to do administrative Group delete by $subject was denied - not permitted by assigned permissions"
       response.sendError 403
     }
+  }
+
+  private validOrganization() {
+    if(!params.organization?.id) {
+      log.warn "Organization ID was not present"
+
+      flash.type = 'info'
+      flash.message = message(code: 'controllers.aaf.vhr.groups.organization.no.id')
+
+      redirect action:'list'
+      return false
+    }
+
+    def organizationInstance = Organization.get(params.organization.id)
+    if (!organizationInstance) {
+      log.warn "organizationInstance was not a valid instance"
+
+      flash.type = 'info'
+      flash.message = 'controllers.aaf.vhr.groups.organization.notfound'
+
+      redirect action:'list'
+      return false
+    }
+
+    true
   }
 
   private validGroup() {
@@ -146,5 +181,7 @@ class GroupController {
       redirect action:'list'
       return false
     }
+
+    true
   }
 }
