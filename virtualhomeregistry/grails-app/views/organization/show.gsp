@@ -50,6 +50,9 @@
             <li>
               <g:link action="create" controller="group" params='['organization.id':"${organizationInstance.id}"]'><g:message code="label.creategroup"/></g:link>
             </li>
+
+            <li class="divider"></li>
+            
             <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:edit">
               <li>
                 <g:link action="edit" id="${organizationInstance.id}"><g:message code="label.edit"/></g:link>

@@ -21,17 +21,15 @@
       <table class="table table-borderless table-sortable">
         <thead>
           <tr>
-              <th><g:message code="label.name" /></th> 
-              <th><g:message code="label.displayname" /></th> 
-              <th><g:message code="label.description" /></th> 
-              <th><g:message code="label.active" /></th> 
-              <th/>
+            <th><g:message code="label.displayname" /></th> 
+            <th><g:message code="label.description" /></th> 
+            <th><g:message code="label.active" /></th> 
+            <th/>
           </tr>
         </thead>
         <tbody>
-        <g:each in="${organizationInstanceList}" status="i" var="organizationInstance">
+        <g:each in="${organizationInstanceList.sort{it.displayName}}" status="i" var="organizationInstance">
           <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-            <td>${fieldValue(bean: organizationInstance, field: "name")}</td>
             <td>${fieldValue(bean: organizationInstance, field: "displayName")}</td>
             <td>${fieldValue(bean: organizationInstance, field: "description")}</td>
             <td><g:formatBoolean boolean="${organizationInstance.active}" /></td>
