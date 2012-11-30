@@ -6,15 +6,17 @@
 
     <ul class="breadcrumb">
       <li><g:link controller="dashboard"><g:message code="branding.application.name"/></g:link> <span class="divider">/</span></li>
+      <li><g:link action="list" controller="organization"><g:message code="branding.nav.breadcrumb.organization"/></g:link> <span class="divider">/</span></li>
+      <li><g:link action="show" controller="organization" id="${groupInstance.organization.id}"><g:fieldValue bean="${groupInstance.organization}" field="displayName"/></g:link> <span class="divider">/</span></li>
       <li><g:link action="list"><g:message code="branding.nav.breadcrumb.group"/></g:link> <span class="divider">/</span></li>
-      <li><g:link action="show" id="${groupInstance?.id}"><g:message code="branding.nav.breadcrumb.group.show"/></g:link> <span class="divider">/</span></li>
+      <li><g:link action="show" id="${groupInstance?.id}"><g:fieldValue bean="${groupInstance}" field="name"/></g:link> <span class="divider">/</span></li>
       <li class="active"><g:message code="branding.nav.breadcrumb.group.edit"/></li>
     </ul>
 
     <g:render template="/templates/flash" plugin="aafApplicationBase"/>
     <g:render template="/templates/errors_bean" model="['bean':groupInstance]" plugin="aafApplicationBase"/>
 
-    <h2><g:message code="views.aaf.vhr.group.edit.heading" args="[]"/></h2>
+    <h2><g:message code="views.aaf.vhr.group.edit.heading" args="${[groupInstance.name]}"/></h2>
     
     <g:form action="update" class="form-validating form-horizontal">
       <g:hiddenField name="id" value="${groupInstance?.id}" />
