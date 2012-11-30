@@ -133,13 +133,10 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     def g = Group.build(organization: o, active:true)
     def et = new EmailTemplate(name:'registered_managed_subject', content: 'This is an email for ${managedSubject.cn} telling them to come and complete registration with code ${invitation.inviteCode}').save()
     
-    expect:
-    ManagedSubject.count() == 0
-    o.subjects == null
-    g.subjects == null
+    def managedSubjectTestInstance = ManagedSubject.buildWithoutSave(organization:o, group:g)
 
-    when:
-    def managedSubject = managedSubjectService.register('Test User', 'testuser@testdomain.com', 'student', g)
+    when:  
+    def managedSubject = managedSubjectService.register(managedSubjectTestInstance)
     o.refresh()
     g.refresh()
 
@@ -148,20 +145,20 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     !managedSubject.functioning()
 
     ManagedSubject.count() == 1
-    managedSubject.cn == "Test User"
-    managedSubject.email == "testuser@testdomain.com"
+    managedSubject.cn == managedSubjectTestInstance.cn
+    managedSubject.email == managedSubjectTestInstance.email
     !managedSubject.active
-    managedSubject.eduPersonAffiliation[0] == "student"
+    managedSubject.eduPersonAffiliation == managedSubjectTestInstance.eduPersonAffiliation
 
     greenMail.getReceivedMessages().length == 1
 
     def message = greenMail.getReceivedMessages()[0]
     message.subject == 'Action Required: Your new AAF VHR account is almost ready!'
-    GreenMailUtil.getBody(message).contains('This is an email for Test User telling them')
-    GreenMailUtil.getAddressList(message.getRecipients(Message.RecipientType.TO)) == 'testuser@testdomain.com'
+    GreenMailUtil.getBody(message).contains("This is an email for ${managedSubject.cn} telling them")
+    GreenMailUtil.getAddressList(message.getRecipients(Message.RecipientType.TO)) == managedSubject.email
 
-    o.subjects.size() == 1
-    g.subjects.size() == 1
+    //o.subjects.size() == 1
+    //g.subjects.size() == 1
 
     managedSubject.organization == o
     managedSubject.group == g
@@ -221,7 +218,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     subjects[0].cn == "Test User"
     subjects[0].email == "testuser@testdomain.com"
     !subjects[0].active
-    subjects[0].eduPersonAffiliation[0] == "student"
+    subjects[0].eduPersonAffiliation == "student"
     subjects[0].organization == o
     subjects[0].group == g
 
@@ -229,7 +226,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     subjects[1].cn == "Test User2"
     subjects[1].email == "testuser2@testdomain.com"
     !subjects[1].active
-    subjects[1].eduPersonAffiliation[0] == "staff"
+    subjects[1].eduPersonAffiliation == "staff"
     subjects[1].organization == o
     subjects[1].group == g
 

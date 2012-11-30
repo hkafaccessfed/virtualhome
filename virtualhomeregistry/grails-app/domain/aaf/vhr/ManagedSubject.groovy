@@ -14,33 +14,27 @@ class ManagedSubject {
   String hash
 
   // AAF Core
-  String cn                 // oid:2.5.4.3
-  String email              // oid:0.9.2342.19200300.100.1.3
-  String sharedToken        // oid:1.3.6.1.4.1.27856.1.2.5
-  String displayName        // oid:2.16.840.1.113730.3.1.241
-  String eduPersonAssurance // oid:1.3.6.1.4.1.5923.1.1.1.11
+  String cn                   // oid:2.5.4.3
+  String email                // oid:0.9.2342.19200300.100.1.3
+  String sharedToken          // oid:1.3.6.1.4.1.27856.1.2.5
+  String displayName          // oid:2.16.840.1.113730.3.1.241
+  String eduPersonAssurance   // oid:1.3.6.1.4.1.5923.1.1.1.11
+  String eduPersonAffiliation // oid:1.3.6.1.4.1.5923.1.1.1.1
   
   // AAF Optional
-  String givenName          // oid:2.5.4.42
-  String surname            // oid:2.5.4.4
-  String mobileNumber       // oid:0.9.2342.19200300.100.1.41
-  String telephoneNumber    // oid:2.5.4.20
-  String postalAddress      // oid:2.5.4.16
-  String organizationalUnit // oid:2.5.4.11
+  String givenName            // oid:2.5.4.42
+  String surname              // oid:2.5.4.4
+  String mobileNumber         // oid:0.9.2342.19200300.100.1.41
+  String telephoneNumber      // oid:2.5.4.20
+  String postalAddress        // oid:2.5.4.16
+  String organizationalUnit   // oid:2.5.4.11
 
   boolean active = false
 
-  List eduPersonAffiliation
-  List eduPersonEntitlement
   List challengeResponse
   List emailReset
 
-  static hasMany = [
-                    // AAF Core
-                    eduPersonAffiliation: String,    // oid:1.3.6.1.4.1.5923.1.1.1.1
-                    eduPersonEntitlement: String,    // oid:1.3.6.1.4.1.5923.1.1.1.7
-
-                    challengeResponse: ChallengeResponse,
+  static hasMany = [challengeResponse: ChallengeResponse,
                     emailReset: EmailReset]  
 
   static belongsTo = [organization:Organization,
@@ -54,6 +48,20 @@ class ManagedSubject {
       return (val != null && val != '' && (val.count(' ') == 0 || val.count(' ') == 1))
     }
     sharedToken nullable:false, blank: false, unique: true
+/*
+    eduPersonAssurance inList: ['urn:mace:aaf.edu.au:iap:id:1',
+                                'urn:mace:aaf.edu.au:iap:id:2'
+                                'urn:mace:aaf.edu.au:iap:id:3'
+                                'urn:mace:aaf.edu.au:iap:id:4']
+*/
+    eduPersonAffiliation inList: ['faculty',
+                                  'student',
+                                  'staff',
+                                  'employee',
+                                  'member',
+                                  'affiliate',
+                                  'alum',
+                                  'library-walk-in']
 
     mobileNumber nullable: true, blank: false
     givenName nullable: true, blank: false          

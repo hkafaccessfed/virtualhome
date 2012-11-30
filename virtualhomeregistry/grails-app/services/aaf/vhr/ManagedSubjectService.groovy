@@ -28,6 +28,8 @@ class ManagedSubjectService {
   public static final String[] AFFILIATIONS = [ 'faculty', 'student', 'staff', 'alum', 'member', 
                                                 'affiliate', 'employee', 'library-walk-in' ]
 
+  public static final String DEFAULT_ASSURANCE = 'urn:mace:aaf.edu.au:iap:id:1'
+
   def finalize(ManagedSubjectInvitation invitation, String login, String plainPassword, String plainPasswordConfirmation) {
     if(invitation.utilized)
       return [false, messageSource.getMessage(INVITATION_INVALID, [] as Object[], INVITATION_INVALID, LocaleContextHolder.locale)]
@@ -69,27 +71,20 @@ class ManagedSubjectService {
     return [true, managedSubject]
   }
 
-  def register(String cn, String email, String eduPersonAffiliation, Group group, boolean confirm = true, boolean except = true) {
-      def managedSubject = new ManagedSubject(cn:cn, email:email, active:false, organization:group.organization, group:group)
-      managedSubject.addToEduPersonAffiliation(eduPersonAffiliation)
-      sharedTokenService.generate(managedSubject)
-
-      if(!managedSubject.save()) {
-        log.error "Failed trying to save $managedSubject"
-        managedSubject.errors.each {
-          log.warn it
-        }
-
-        if(except)
-          throw new RuntimeException("Failed trying to save $managedSubject")  // Rollback transaction
-        else
-          return managedSubject
+  def register(ManagedSubject managedSubject, boolean confirm = true) {
+    if(!managedSubject.save()) {
+      log.error "Failed trying to save $managedSubject"
+      managedSubject.errors.each {
+        log.warn it
       }
 
-      if(confirm)
-        sendConfirmation(managedSubject)
+      throw new RuntimeException("Failed trying to save $managedSubject")  // Rollback transaction
+    }
 
-      managedSubject
+    if(confirm)
+      sendConfirmation(managedSubject)
+
+    managedSubject
   }
 
   def registerFromCSV(Group group, byte[] csv) {
@@ -148,11 +143,15 @@ class ManagedSubjectService {
     is.eachCsvLine { tokens ->
       lc++
 
-      def managedSubject = register(tokens[0], tokens[1], tokens[2], group, false)
+      def managedSubject = new ManagedSubject(cn:tokens[0], email:tokens[1], eduPersonAffiliation:tokens[2], active:false, displayName:tokens[0], eduPersonAssurance: DEFAULT_ASSURANCE, organization:group.organization, group:group)
+      sharedTokenService.generate(managedSubject)
+
+      managedSubject = register(managedSubject, false)
       log.info "Created $managedSubject from CSV file submitted by $subject"
       subjects.add(managedSubject)
     }
 
+    log.info "Created all subjects from CSV file submitted by $subject, emailing welcome messages"
     subjects.each { ms ->
       sendConfirmation(ms)
     }
