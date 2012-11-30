@@ -30,7 +30,7 @@ class GroupController {
         [groupInstance: groupInstance]
       }
       else {
-        log.warn "Attempt to do administrative Group create by $subject was denied - not permitted by assigned permissions"
+        log.warn "Attempt to do administrative Group create by $subject for organization ${params.organization.id} was denied - not permitted by assigned permissions"
         response.sendError 403
       }
     }
@@ -57,7 +57,7 @@ class GroupController {
         redirect(action: "show", id: groupInstance.id)
       }
       else {
-        log.warn "Attempt to do administrative Group save by $subject was denied - not permitted by assigned permissions"
+        log.warn "Attempt to do administrative Group save by $subject for organization ${params.organization.id} was denied - not permitted by assigned permissions"
         response.sendError 403
       }
     }
