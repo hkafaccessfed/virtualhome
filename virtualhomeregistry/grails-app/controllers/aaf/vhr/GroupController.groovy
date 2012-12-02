@@ -41,7 +41,7 @@ class GroupController {
       if(SecurityUtils.subject.isPermitted("app:manage:organization:${params.organization.id}:groups:create")) {
         
         def groupInstance = new Group()
-        bindData(groupInstance, params, [include: ['name', 'description', 'organization']])
+        bindData(groupInstance, params, [include: ['name', 'description']])
         groupInstance.organization = Organization.get(params.organization.id) 
 
         if (!groupInstance.save()) {
