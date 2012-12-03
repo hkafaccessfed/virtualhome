@@ -4,11 +4,12 @@ class ManagedSubjectInvitation {
   static auditable = true
 
   String inviteCode
-  ManagedSubject managedSubject
   boolean utilized
 
   Date dateCreated
   Date lastUpdated
+
+  static belongsTo = [managedSubject:ManagedSubject]
 
   public ManagedSubjectInvitation() {
     this.inviteCode = org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(24)
