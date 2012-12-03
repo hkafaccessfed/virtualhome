@@ -161,6 +161,78 @@ class ManagedSubjectController {
     }
   }
 
+  def toggleLock(Long id, Long version) {
+    def managedSubjectInstance = ManagedSubject.get(id)
+    if(SecurityUtils.subject.isPermitted("app:administration")) {
+      if (version == null) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.managedsubject.togglelock.noversion'
+        redirect(action: "show", id: managedSubjectInstance.id)
+        return
+      }
+
+      if (managedSubjectInstance.version > version) {
+        managedSubjectInstance.errors.rejectValue("version", "controllers.aaf.vhr.managedsubject.togglelock.optimistic.locking.failure")
+        redirect(action: "show", id: managedSubjectInstance.id)
+        return
+      }
+
+      managedSubjectInstance.locked = !managedSubjectInstance.locked
+
+      if (!managedSubjectInstance.save()) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.managedsubject.togglelock.failed'
+        redirect(action: "show", id: managedSubjectInstance.id)
+        return
+      }
+
+      log.info "Action: toggleLock, Subject: $subject, Object: $managedSubjectInstance"
+      flash.type = 'success'
+      flash.message = 'controllers.aaf.vhr.managedsubject.togglelock.success'
+      redirect(action: "show", id: managedSubjectInstance.id)
+    }
+    else {
+      log.warn "Attempt to do administrative ManagedSubject togglelock by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
+  }
+
+  def toggleActive(Long id, Long version) {
+    def managedSubjectInstance = ManagedSubject.get(id)
+    if(SecurityUtils.subject.isPermitted("app:manage:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+      if (version == null) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.managedsubject.toggleactive.noversion'
+        redirect(action: "show", id: managedSubjectInstance.id)
+        return
+      }
+
+      if (managedSubjectInstance.version > version) {
+        managedSubjectInstance.errors.rejectValue("version", "controllers.aaf.vhr.managedsubject.toggleactive.optimistic.locking.failure")
+        redirect(action: "show", id: managedSubjectInstance.id)
+        return
+      }
+
+      managedSubjectInstance.active = !managedSubjectInstance.active
+
+      if (!managedSubjectInstance.save()) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.managedsubject.toggleactive.failed'
+        redirect(action: "show", id: managedSubjectInstance.id)
+        return
+      }
+
+      log.info "Action: toggleActive, Subject: $subject, Object: $managedSubjectInstance"
+      flash.type = 'success'
+      flash.message = 'controllers.aaf.vhr.managedsubject.toggleactive.success'
+      redirect(action: "show", id: managedSubjectInstance.id)
+    }
+    else {
+      log.warn "Attempt to do administrative ManagedSubject toggleactive by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
+  }
+
   private validGroup() {
     if(!params.group?.id) {
       log.warn "Group ID was not present"

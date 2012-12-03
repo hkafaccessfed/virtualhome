@@ -509,4 +509,118 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
 
     1 * managedSubjectService.sendConfirmation(_ as ManagedSubject)
   }
+
+  def 'ensure correct output from togglelock when invalid permission'() {
+    setup:
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    shiroSubject.isPermitted("app:administration") >> false
+
+    when:
+    params.id = managedSubjectTestInstance.id
+    def model = controller.toggleLock()
+
+    then:
+    model == null
+    response.status == 403
+  }
+
+  def 'ensure correct output from toggleLock with null version but valid permission'() {
+    setup:
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    shiroSubject.isPermitted("app:administration") >> true
+    
+    expect:
+    ManagedSubject.count() == 1
+
+    when:
+    params.id = managedSubjectTestInstance.id
+    params.version = null
+    controller.toggleLock()
+
+    then:
+    ManagedSubject.count() == 1
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.managedsubject.togglelock.noversion'
+  }
+
+  def 'ensure correct output from toggleLock with valid permission'() {
+    setup:
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(locked:true, group:group, organization:group.organization)
+    shiroSubject.isPermitted("app:administration") >> true
+    
+    expect:
+    ManagedSubject.count() == 1
+    managedSubjectTestInstance.locked
+
+    when:
+    params.id = managedSubjectTestInstance.id
+    params.version = 1
+    controller.toggleLock()
+    managedSubjectTestInstance.refresh()
+
+    then:   
+    !managedSubjectTestInstance.locked
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.managedsubject.togglelock.success'
+  }
+
+    def 'ensure correct output from toggleActive when invalid permission'() {
+    setup:
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    shiroSubject.isPermitted("app:manage:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> false
+
+    when:
+    params.id = managedSubjectTestInstance.id
+    def model = controller.toggleActive()
+
+    then:
+    model == null
+    response.status == 403
+  }
+
+  def 'ensure correct output from toggleLock with null version but valid permission'() {
+    setup:
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    shiroSubject.isPermitted("app:manage:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
+    
+    expect:
+    ManagedSubject.count() == 1
+
+    when:
+    params.id = managedSubjectTestInstance.id
+    params.version = null
+    controller.toggleActive()
+
+    then:
+    ManagedSubject.count() == 1
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.managedsubject.toggleactive.noversion'
+  }
+
+  def 'ensure correct output from toggleActive with valid permission'() {
+    setup:
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(active:false, group:group, organization:group.organization)
+    shiroSubject.isPermitted("app:manage:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
+    
+    expect:
+    ManagedSubject.count() == 1
+    !managedSubjectTestInstance.active
+
+    when:
+    params.id = managedSubjectTestInstance.id
+    params.version = 1
+    controller.toggleActive()
+    managedSubjectTestInstance.refresh()
+
+    then:   
+    managedSubjectTestInstance.active
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.managedsubject.toggleactive.success'
+  }
 }
