@@ -44,7 +44,8 @@ class ManagedSubjectController {
       if(SecurityUtils.subject.isPermitted("app:manage:group:${params.group.id}:managedsubject:create")) {
         def group = Group.get(params.group.id)
         def managedSubjectInstance = new ManagedSubject()
-        bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'displayName', 'eduPersonAssurance', 'eduPersonAffiliation']])
+        bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance', 'eduPersonAffiliation']])
+        managedSubjectInstance.displayName = managedSubjectInstance.cn
         managedSubjectInstance.group = group
         managedSubjectInstance.organization = group.organization
         sharedTokenService.generate(managedSubjectInstance)
@@ -99,7 +100,9 @@ class ManagedSubjectController {
         return
       }
 
-      bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'displayName', 'eduPersonAssurance', 'eduPersonAffiliation']])
+      bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance', 'eduPersonAffiliation', 'displayName', 
+                                                          'givenName', 'surname', 'mobileNumber', 'telephoneNumber', 'postalAddress', 
+                                                          'organizationalUnit']])
 
       if (!managedSubjectInstance.save()) {
         flash.type = 'error'
