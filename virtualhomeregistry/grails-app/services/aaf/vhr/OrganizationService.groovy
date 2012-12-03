@@ -38,7 +38,7 @@ class OrganizationService {
       organisations.each { o ->
         def result = queryOrganization(server, o.link.replace(server, ''))
         if(result) {
-          def org = Organization.findWhere(frID: o.id)
+          def org = Organization.findWhere(frID: o.id.longValue())
           if(org) {
             // Ensure we cache any updates coming down from FR
             org.name = result.name
