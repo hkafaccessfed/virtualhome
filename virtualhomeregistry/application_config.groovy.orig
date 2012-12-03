@@ -61,6 +61,7 @@ aaf {
     }
 
     sharedtoken {
+      sha_rounds = 1024
       idp_entityid = ''   // VHR Entity ID
     }
   }
