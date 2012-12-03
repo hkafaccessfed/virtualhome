@@ -135,6 +135,43 @@ class GroupController {
     }
   }
 
+  def toggleActive(Long id, Long version) {
+    if(SecurityUtils.subject.isPermitted("app:manage:group:$id:edit")) {
+      def groupInstance = Group.get(id)
+      
+      if (version == null) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.group.toggleactive.noversion'
+        redirect(action: "show", id: groupInstance.id)
+        return
+      }
+
+      if (groupInstance.version > version) {
+        groupInstance.errors.rejectValue("version", "controllers.aaf.vhr.group.toggleactive.optimistic.locking.failure")
+        redirect(action: "show", id: groupInstance.id)
+        return
+      }
+
+      groupInstance.active = !groupInstance.active
+
+      if (!groupInstance.save()) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.group.toggleactive.failed'
+        redirect(action: "show", id: groupInstance.id)
+        return
+      }
+
+      log.info "Action: toggleActive, Subject: $subject, Object: $groupInstance"
+      flash.type = 'success'
+      flash.message = 'controllers.aaf.vhr.group.toggleactive.success'
+      redirect(action: "show", id: groupInstance.id)
+    }
+    else {
+      log.warn "Attempt to do administrative Group toggleactive by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
+  }
+
   private validOrganization() {
     if(!params.organization?.id) {
       log.warn "Organization ID was not present"

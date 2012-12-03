@@ -49,6 +49,20 @@
           
           <aaf:hasPermission target="app:manage:group:${groupInstance.id}:edit">
             <li>
+              <g:form action="toggleActive" method="post">
+                <g:hiddenField name="version" value="${groupInstance?.version}" />
+                <g:hiddenField name="id" value="${groupInstance.id}" />
+                <a href="#" onclick="$(this).parents('form').submit();">
+                  <g:if test="${groupInstance.active}">
+                    <g:message code="views.aaf.vhr.group.show.deactivate"/>
+                  </g:if>
+                  <g:else>
+                    <g:message code="views.aaf.vhr.group.show.activate"/>
+                  </g:else>
+                </a>
+              </g:form>
+            </li>
+            <li>
               <g:link action="edit" id="${groupInstance.id}"><g:message code="label.edit"/></g:link>
             </li>
           </aaf:hasPermission>

@@ -392,4 +392,57 @@ def o = Organization.build()
     flash.type == 'error'
     flash.message == 'controllers.aaf.vhr.group.delete.failure'
   }
+
+  def 'ensure correct output from toggleActive when invalid permission'() {
+    setup:
+    def groupTestInstance = Group.build()
+    shiroSubject.isPermitted("app:manage:group:${groupTestInstance}.id}:edit") >> false
+
+    when:
+    def model = controller.toggleActive()
+
+    then:
+    model == null
+    response.status == 403
+  }
+
+  def 'ensure correct output from toggleActive with null version but valid permission'() {
+    setup:
+    def groupTestInstance = Group.build()
+    shiroSubject.isPermitted("app:manage:group:${groupTestInstance.id}:edit") >> true
+    
+    expect:
+    Group.count() == 1
+
+    when:
+    params.id = groupTestInstance.id
+    params.version = null
+    controller.toggleActive()
+
+    then:
+    Group.count() == 1
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.group.toggleactive.noversion'
+  }
+
+  def 'ensure correct output from toggleActive'() {
+    setup:
+    def groupTestInstance = Group.build(active:false)
+    shiroSubject.isPermitted("app:manage:group:${groupTestInstance.id}:edit") >> true
+    
+    expect:
+    Group.count() == 1
+    !groupTestInstance.active
+
+    when:
+    params.id = groupTestInstance.id
+    params.version = 1
+    controller.toggleActive()
+
+    then:
+    Group.count() == 1
+    groupTestInstance.active
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.group.toggleactive.success'
+  }
 }
