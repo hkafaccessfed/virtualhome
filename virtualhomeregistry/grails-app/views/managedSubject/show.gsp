@@ -21,6 +21,13 @@
 
     <h2><g:message code="views.aaf.vhr.managedsubject.show.heading" args="${[managedSubjectInstance.cn]}"/></h2>
 
+    <g:if test="${managedSubjectInstance.locked}">
+      <div class="alert alert-block alert-warning">
+        <h4><g:message code="views.aaf.vhr.managedsubject.show.locked.heading"/></h4>
+        <p><g:message code="views.aaf.vhr.managedsubject.show.locked.reason"/></p>
+        <p><g:message code="views.aaf.vhr.managedsubject.show.locked.correct"/></p>
+      </div>
+    </g:if>
     <g:if test="${managedSubjectInstance.login == null}">
       <div class="alert alert-block alert-info">
         <h4><g:message code="views.aaf.vhr.managedsubject.show.finalized.heading"/></h4>
@@ -28,7 +35,7 @@
         <p><g:message code="views.aaf.vhr.managedsubject.show.finalized.correct"/></p>
       </div>
     </g:if>
-    <g:if test="${!managedSubjectInstance.functioning() && !managedSubjectInstance.login == null}">
+    <g:if test="${!(managedSubjectInstance.functioning()) && managedSubjectInstance.login != null && !managedSubjectInstance.locked}">
       <div class="alert alert-block alert-error">
         <h4><g:message code="views.aaf.vhr.managedsubject.show.functioning.heading"/></h4>
         <p><g:message code="views.aaf.vhr.managedsubject.show.functioning.reason"/></p>
@@ -57,6 +64,21 @@
             </g:if>
 
             <li>
+              <g:form action="toggleActive" method="post">
+                <g:hiddenField name="version" value="${managedSubjectInstance?.version}" />
+                <g:hiddenField name="id" value="${managedSubjectInstance.id}" />
+                <a href="#" onclick="$(this).parents('form').submit();">
+                  <g:if test="${managedSubjectInstance.active}">
+                    <g:message code="views.aaf.vhr.managedsubject.show.deactivate"/>
+                  </g:if>
+                  <g:else>
+                    <g:message code="views.aaf.vhr.managedsubject.show.activate"/>
+                  </g:else>
+                </a>
+              </g:form>
+            </li>
+
+            <li>
               <g:link action="edit" id="${managedSubjectInstance.id}"><g:message code="label.edit"/></g:link>
             </li>
           </aaf:hasPermission>
@@ -66,6 +88,24 @@
               <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.managedsubject.confirm.remove')}"><g:message code="label.delete"/></a>
               <g:form action="delete" method="delete">
                 <g:hiddenField name="id" value="${managedSubjectInstance.id}" />
+              </g:form>
+            </li>
+          </aaf:hasPermission>
+
+          <aaf:hasPermission target="app:administrator">
+            <li class="divider"></li>
+            <li>
+              <g:form action="toggleLock" method="post">
+                <g:hiddenField name="version" value="${managedSubjectInstance?.version}" />
+                <g:hiddenField name="id" value="${managedSubjectInstance.id}" />
+                <a href="#" onclick="$(this).parents('form').submit();">
+                  <g:if test="${managedSubjectInstance.locked}">
+                    <g:message code="views.aaf.vhr.managedsubject.show.admin.unlock"/>
+                  </g:if>
+                  <g:else>
+                    <g:message code="views.aaf.vhr.managedsubject.show.admin.lock"/>
+                  </g:else>
+                </a>
               </g:form>
             </li>
           </aaf:hasPermission>
@@ -179,6 +219,11 @@
             <tr>
               <th class="span4"><span id="active-label"><strong><g:message code="label.active" /></strong></span></th>
               <td><span aria-labelledby="active-label"><g:formatBoolean boolean="${managedSubjectInstance?.active}" /></span>
+            </tr>
+
+            <tr>
+              <th class="span4"><span id="locked-label"><strong><g:message code="label.locked" /></strong></span></th>
+              <td><span aria-labelledby="locked-label"><g:formatBoolean boolean="${managedSubjectInstance?.locked}" /></span>
             </tr>
 
             <tr>

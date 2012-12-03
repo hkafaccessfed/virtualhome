@@ -19,15 +19,6 @@
     <g:render template="/templates/errors_bean" model="['bean':managedSubjectInstance]" plugin="aafApplicationBase"/>
 
     <h2><g:message code="views.aaf.vhr.managedsubject.edit.heading" args="${[managedSubjectInstance.cn]}"/></h2>
-
-    <div class="alert alert-info">
-      <p>The following attributes are not able to be modified:</p>
-      <ul>
-        <li>auEduPersonSharedToken</li>
-        <li>eduPersonAssurance</li>
-        <li>Login (username)</li>
-      </ul>
-    </div>
     
     <g:form action="update" class="form-validating form-horizontal">
       <g:hiddenField name="id" value="${managedSubjectInstance?.id}" />
