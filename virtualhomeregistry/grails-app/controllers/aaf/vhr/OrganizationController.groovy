@@ -44,7 +44,7 @@ class OrganizationController {
         return
       }
 
-      log.info "Action: save, Subject: $subject, Object: organizationInstance"
+      log.info "Action: save, Subject: $subject, Object: $organizationInstance"
       flash.type = 'success'
       flash.message = 'controllers.aaf.vhr.organization.save.success'
       redirect(action: "show", id: organizationInstance.id)
@@ -93,7 +93,7 @@ class OrganizationController {
         return
       }
 
-      log.info "Action: update, Subject: $subject, Object: organizationInstance"
+      log.info "Action: update, Subject: $subject, Object: $organizationInstance"
       flash.type = 'success'
       flash.message = 'controllers.aaf.vhr.organization.update.success'
       redirect(action: "show", id: organizationInstance.id)

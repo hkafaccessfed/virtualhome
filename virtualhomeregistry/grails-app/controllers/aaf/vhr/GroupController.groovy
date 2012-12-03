@@ -51,7 +51,7 @@ class GroupController {
           return
         }
 
-        log.info "Action: save, Subject: $subject, Object: groupInstance"
+        log.info "Action: save, Subject: $subject, Object: $groupInstance"
         flash.type = 'success'
         flash.message = 'controllers.aaf.vhr.group.save.success'
         redirect(action: "show", id: groupInstance.id)
@@ -101,7 +101,7 @@ class GroupController {
         return
       }
 
-      log.info "Action: update, Subject: $subject, Object: groupInstance"
+      log.info "Action: update, Subject: $subject, Object: $groupInstance"
       flash.type = 'success'
       flash.message = 'controllers.aaf.vhr.group.update.success'
       redirect(action: "show", id: groupInstance.id)
