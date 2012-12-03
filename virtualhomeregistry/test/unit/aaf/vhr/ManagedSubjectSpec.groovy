@@ -238,9 +238,9 @@ class ManagedSubjectSpec extends UnitSpec {
     !s.active
   }
 
-  def 'ensure functioning when active and sponsored'() {
+  def 'ensure functioning when active, not locked and sponsored'() {
     setup:
-    def s = ManagedSubject.build(active:true)
+    def s = ManagedSubject.build(active:true, locked:false)
 
     when:
     s.organization = Organization.build(active:true)
@@ -277,6 +277,19 @@ class ManagedSubjectSpec extends UnitSpec {
   def 'ensure not functioning when inactive and sponsored'() {
     setup:
     def s = ManagedSubject.build()
+
+    when:
+    s.active = false
+    s.organization = Organization.build()
+    s.group = Group.build(organization:s.organization)
+
+    then:
+    !s.functioning()
+  }
+
+  def 'ensure not functioning when active and sponsored but locked by AAF'() {
+    setup:
+    def s = ManagedSubject.build(active:true, locked:true)
 
     when:
     s.active = false

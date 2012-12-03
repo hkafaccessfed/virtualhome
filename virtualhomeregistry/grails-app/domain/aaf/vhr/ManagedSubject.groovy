@@ -30,12 +30,14 @@ class ManagedSubject {
   String organizationalUnit   // oid:2.5.4.11
 
   boolean active = false
+  boolean locked = false
 
   List challengeResponse
   List emailReset
 
   static hasMany = [challengeResponse: ChallengeResponse,
-                    emailReset: EmailReset]  
+                    emailReset: EmailReset,
+                    invitations: ManagedSubjectInvitation]  
 
   static belongsTo = [organization:Organization,
                       group:Group]
@@ -79,6 +81,6 @@ class ManagedSubject {
   static transients = ['plainPassword', 'plainPasswordConfirmation']
 
   public boolean functioning() {
-    active && organization?.functioning() && group?.functioning()
+    active && !locked && organization?.functioning() && group?.functioning()
   }
 }
