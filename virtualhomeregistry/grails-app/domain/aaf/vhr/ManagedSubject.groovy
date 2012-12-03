@@ -48,12 +48,12 @@ class ManagedSubject {
       return (val != null && val != '' && (val.count(' ') == 0 || val.count(' ') == 1))
     }
     sharedToken nullable:false, blank: false, unique: true
-/*
+
     eduPersonAssurance inList: ['urn:mace:aaf.edu.au:iap:id:1',
-                                'urn:mace:aaf.edu.au:iap:id:2'
-                                'urn:mace:aaf.edu.au:iap:id:3'
+                                'urn:mace:aaf.edu.au:iap:id:2',
+                                'urn:mace:aaf.edu.au:iap:id:3',
                                 'urn:mace:aaf.edu.au:iap:id:4']
-*/
+
     eduPersonAffiliation inList: ['faculty',
                                   'student',
                                   'staff',
