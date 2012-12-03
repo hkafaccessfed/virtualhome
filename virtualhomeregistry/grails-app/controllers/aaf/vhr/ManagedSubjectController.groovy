@@ -6,7 +6,7 @@ import org.apache.shiro.SecurityUtils
 class ManagedSubjectController {
 
   static defaultAction = "list"
-  static allowedMethods = [save: "POST", update: "POST", delete: "DELETE"]
+  static allowedMethods = [save: "POST", update: "POST", delete: "DELETE", resend:"POST"]
 
   def beforeInterceptor = [action: this.&validManagedSubject, except: ['list', 'create', 'save']]
 
@@ -141,6 +141,22 @@ class ManagedSubjectController {
     }
     else {
       log.warn "Attempt to do administrative ManagedSubject delete by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
+  }
+
+  def resend(Long id) {
+    def managedSubjectInstance = ManagedSubject.get(id)
+    if(SecurityUtils.subject.isPermitted("app:manage:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+      managedSubjectService.sendConfirmation(managedSubjectInstance)
+
+      log.info "Action: resend, Subject: $subject, Object: $managedSubjectInstance"
+      flash.type = 'success'
+      flash.message = 'controllers.aaf.vhr.managedsubject.resend.success'
+      redirect(action: "show", id: managedSubjectInstance.id)
+    }
+    else {
+      log.warn "Attempt to do administrative ManagedSubject resend by $subject was denied - not permitted by assigned permissions"
       response.sendError 403
     }
   }

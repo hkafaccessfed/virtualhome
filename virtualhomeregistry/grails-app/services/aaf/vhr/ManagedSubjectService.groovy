@@ -159,7 +159,7 @@ class ManagedSubjectService {
     [true, errors, subjects, lc]
   }
 
-  private void sendConfirmation(ManagedSubject managedSubject) {
+  public void sendConfirmation(ManagedSubject managedSubject) {
     def emailSubject = messageSource.getMessage(TOKEN_EMAIL_SUBJECT, [] as Object[], TOKEN_EMAIL_SUBJECT, LocaleContextHolder.locale)
     def emailTemplate = EmailTemplate.findWhere(name:"registered_managed_subject")
 

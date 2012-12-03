@@ -455,4 +455,58 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     flash.type == 'error'
     flash.message == 'controllers.aaf.vhr.managedsubject.delete.failure'
   }
+
+  def 'ensure correct output from resend when invalid permission'() {
+    setup:
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    shiroSubject.isPermitted("app:manage:group:${group.id + 1}:managedsubject:edit") >> true
+
+    when:
+    params.id = managedSubjectTestInstance.id
+    def model = controller.resend()
+
+    then:
+    model == null
+    response.status == 403
+  }
+
+  def 'ensure correct output from resend when invalid permission'() {
+    setup:
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    shiroSubject.isPermitted("app:manage:group:${group.id + 1}:managedsubject:edit") >> true
+
+    when:
+    params.id = managedSubjectTestInstance.id
+    def model = controller.resend()
+
+    then:
+    model == null
+    response.status == 403
+  }
+
+  def 'ensure correct output from resend with valid data and when valid permission'() {
+    setup:
+    def managedSubjectService = Mock(aaf.vhr.ManagedSubjectService)
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    shiroSubject.isPermitted("app:manage:group:${group.id}:managedsubject:edit") >> true
+    
+    controller.managedSubjectService = managedSubjectService
+
+    expect:
+    ManagedSubject.count() == 1
+
+    when:
+    params.id = managedSubjectTestInstance.id
+    controller.resend()
+
+    then:
+    ManagedSubject.count() == 1
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.managedsubject.resend.success'
+
+    1 * managedSubjectService.sendConfirmation(_ as ManagedSubject)
+  }
 }
