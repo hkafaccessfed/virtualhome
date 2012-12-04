@@ -42,7 +42,10 @@ class GroupController {
         
         def groupInstance = new Group()
         bindData(groupInstance, params, [include: ['name', 'description']])
-        groupInstance.organization = Organization.get(params.organization.id) 
+        def organization = Organization.get(params.organization.id)
+
+        groupInstance.organization = organization 
+        organization.addToGroups(groupInstance)
 
         if (!groupInstance.save()) {
           flash.type = 'error'
