@@ -13,7 +13,7 @@ import aaf.base.workflow.WorkflowProcessService
 import aaf.base.workflow.WorkflowTaskService
 
 @TestFor(aaf.vhr.OrganizationService)
-@Build([aaf.vhr.Organization, ProcessInstance])
+@Build([aaf.vhr.Organization, aaf.vhr.Group, ProcessInstance])
 class OrganizationServiceSpec extends UnitSpec {
 
   def os
@@ -82,6 +82,7 @@ class OrganizationServiceSpec extends UnitSpec {
 
     expect:
     Organization.count() == 0
+    Group.count() == 0
     workflows == 0
 
     when:
@@ -89,12 +90,15 @@ class OrganizationServiceSpec extends UnitSpec {
 
     then:
     Organization.count() == 93
+    Group.count() == 93
     workflows == 93
 
     def o = Organization.findWhere(frID:11)
     o.name == "ramp.org.au"
     o.displayName == "ramp.org.au"
     o.description == "Boostrappted IdP of: ramp.org.au"
+    o.groups[0].name == "Default Group"
+    o.groups[0].description == "Default group for accounts belonging to ${o.displayName}"
 
     def o2 = Organization.findWhere(frID:146)
     o2.name == "usc.edu.au"
@@ -141,6 +145,7 @@ class OrganizationServiceSpec extends UnitSpec {
 
     then:
     Organization.count() == 93
+    Group.count() == 93
     workflows == 0
 
     def o = Organization.findWhere(frID:11)
@@ -189,6 +194,7 @@ class OrganizationServiceSpec extends UnitSpec {
 
     expect:
     Organization.count() == 0
+    Group.count() == 0
     workflows == 0
 
     when:
@@ -235,6 +241,7 @@ class OrganizationServiceSpec extends UnitSpec {
 
     expect:
     Organization.count() == 2
+    Group.count() == 0
     Organization.first().displayName == "test displayName"
     Organization.first().frID == 11
 
@@ -243,6 +250,7 @@ class OrganizationServiceSpec extends UnitSpec {
 
     then:
     Organization.count() == 93
+    Group.count() == 91
     workflows == 91
 
     def o = Organization.findWhere(frID:11)
@@ -497,6 +505,7 @@ class OrganizationServiceSpec extends UnitSpec {
 
     then:
     Organization.count() == 2
+    Group.count() == 0
   }
 
 }

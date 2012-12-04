@@ -21,6 +21,8 @@ class Organization  {
   boolean active = false
   boolean undergoingWorkflow = false
 
+  List groups
+
   static hasMany = [subjects: ManagedSubject,
                     groups: Group]
   

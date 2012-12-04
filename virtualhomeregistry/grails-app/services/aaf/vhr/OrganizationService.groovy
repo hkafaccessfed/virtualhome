@@ -59,6 +59,10 @@ class OrganizationService {
               org = new Organization(name:result.name, displayName: result.displayName, frID: result.id)
               org.description = !result.description.equals(null) ? result.description:null
               org.undergoingWorkflow = true
+
+              def group = new Group(name:"Default Group", description:"Default group for accounts belonging to ${org.displayName}", active:true)
+              org.addToGroups(group)
+
               if(!org.save()) {
                 log.error "Unable to save new Organization instance to represent ${result.name}"
                 org.errors.each { error ->
