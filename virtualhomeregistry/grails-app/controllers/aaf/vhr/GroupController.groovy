@@ -58,7 +58,7 @@ class GroupController {
         }
 
         def groupRole = new Role(name:"group:${groupInstance.id}:administrators", description: "Administrators for the Group ${groupInstance.name} of Organization ${groupInstance.organization.displayName}")
-        def groupPermission = new Permission(type: Permission.wildcardPerm, target: "app:manage:group:${groupInstance.id}:*", role:groupRole)
+        def groupPermission = new Permission(type: Permission.wildcardPerm, target: "app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:*", role:groupRole)
         groupRole.addToPermissions(groupPermission)
         if(!groupRole.save()) {
           log.error "Unable to save new Role instance to represent admin rights for ${groupInstance}"
@@ -80,9 +80,9 @@ class GroupController {
   }
 
   def edit(Long id) {
-    if(SecurityUtils.subject.isPermitted("app:manage:group:$id:edit")) {
+    def groupInstance = Group.get(id)
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit")) {
       log.info "Action: edit, Subject: $subject, Object: groupInstance"
-      def groupInstance = Group.get(id)
       [groupInstance: groupInstance]
     }
     else {
@@ -92,9 +92,8 @@ class GroupController {
   }
 
   def update(Long id, Long version) {
-    if(SecurityUtils.subject.isPermitted("app:manage:group:$id:edit")) {
-      def groupInstance = Group.get(id)
-      
+    def groupInstance = Group.get(id)
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit")) {
       if (version == null) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.group.update.noversion'
@@ -152,19 +151,18 @@ class GroupController {
   }
 
   def toggleActive(Long id, Long version) {
-    if(SecurityUtils.subject.isPermitted("app:manage:group:$id:edit")) {
-      def groupInstance = Group.get(id)
-      
+    def groupInstance = Group.get(id)
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit")) {
       if (version == null) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.group.toggleactive.noversion'
-        redirect(action: "show", id: groupInstance.id)
+        render(view: "show", model:[groupInstance: groupInstance])
         return
       }
 
       if (groupInstance.version > version) {
         groupInstance.errors.rejectValue("version", "controllers.aaf.vhr.group.toggleactive.optimistic.locking.failure")
-        redirect(action: "show", id: groupInstance.id)
+        render(view: "show", model:[groupInstance: groupInstance])
         return
       }
 
@@ -173,7 +171,7 @@ class GroupController {
       if (!groupInstance.save()) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.group.toggleactive.failed'
-        redirect(action: "show", id: groupInstance.id)
+        render(view: "show", model:[groupInstance: groupInstance])
         return
       }
 

@@ -146,7 +146,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from create when valid permission'() {
     setup:
     def group = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${group.id}:managedsubject:create") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create") >> true
 
     when:
     params.group = [id:group.id]
@@ -159,7 +159,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from create when invalid permission'() {
     setup:
     def group = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${group.id + 1}:managedsubject:create") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:create") >> true
 
     when:
     params.group = [id:group.id]
@@ -173,7 +173,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from save when invalid permission'() {
     setup:
     def group = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${group.id + 1}:managedsubject:create") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:create") >> true
 
     when:
     params.group = [id:group.id]
@@ -188,7 +188,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def sharedTokenService = Mock(aaf.vhr.SharedTokenService)
     def group = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${group.id}:managedsubject:create") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create") >> true
 
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
     managedSubjectTestInstance.properties.each {
@@ -225,7 +225,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     def sharedTokenService = Mock(aaf.vhr.SharedTokenService)
     def managedSubjectService = Mock(aaf.vhr.ManagedSubjectService)
     def group = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${group.id}:managedsubject:create") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create") >> true
 
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
     managedSubjectTestInstance.properties.each {
@@ -264,7 +264,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${group.id + 1}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:edit") >> true
 
     when:
     params.id = managedSubjectTestInstance.id
@@ -279,7 +279,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
 
     when:
     params.id = managedSubjectTestInstance.id
@@ -293,7 +293,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${group.id + 1}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:edit") >> true
 
     when:
     params.id = managedSubjectTestInstance.id
@@ -308,7 +308,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
     
     expect:
     ManagedSubject.count() == 1
@@ -328,7 +328,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
     managedSubjectTestInstance.getVersion() >> 20
     
     managedSubjectTestInstance.properties.each {
@@ -363,7 +363,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
     
     managedSubjectTestInstance.properties.each {
       if(it.value) {
@@ -399,7 +399,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${group.id + 1}:managedsubject:delete") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:delete") >> true
 
     when:
     params.id = managedSubjectTestInstance.id
@@ -414,7 +414,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${group.id}:managedsubject:delete") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:delete") >> true
 
     expect:
     ManagedSubject.count() == 1
@@ -436,7 +436,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${group.id}:managedsubject:delete") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:delete") >> true
 
     ManagedSubject.metaClass.delete { throw new org.springframework.dao.DataIntegrityViolationException("Thrown from test case") }
 
@@ -460,7 +460,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${group.id + 1}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:edit") >> true
 
     when:
     params.id = managedSubjectTestInstance.id
@@ -475,7 +475,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${group.id + 1}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:edit") >> true
 
     when:
     params.id = managedSubjectTestInstance.id
@@ -491,7 +491,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     def managedSubjectService = Mock(aaf.vhr.ManagedSubjectService)
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
     
     controller.managedSubjectService = managedSubjectService
 
@@ -571,8 +571,8 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> false
-
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> false
+    
     when:
     params.id = managedSubjectTestInstance.id
     def model = controller.toggleActive()
@@ -582,11 +582,11 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     response.status == 403
   }
 
-  def 'ensure correct output from toggleLock with null version but valid permission'() {
+  def 'ensure correct output from toggleActive with null version but valid permission'() {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
     
     expect:
     ManagedSubject.count() == 1
@@ -606,7 +606,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(active:false, group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
     
     expect:
     ManagedSubject.count() == 1

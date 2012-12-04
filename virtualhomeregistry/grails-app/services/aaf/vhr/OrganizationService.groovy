@@ -83,7 +83,7 @@ class OrganizationService {
               }
 
               def groupRole = new Role(name:"group:${group.id}:administrators", description: "Administrators for the default group of Organization ${org.displayName}")
-              def groupPermission = new Permission(type: Permission.wildcardPerm, target: "app:manage:group:${group.id}:*", role:groupRole)
+              def groupPermission = new Permission(type: Permission.wildcardPerm, target: "app:manage:organization:${org.id}:group:${group.id}:*", role:groupRole)
               groupRole.addToPermissions(groupPermission)
               if(!groupRole.save()) {
                 log.error "Unable to save new Role instance to represent admin rights for ${group}"

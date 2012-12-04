@@ -109,7 +109,7 @@ class OrganizationServiceSpec extends UnitSpec {
     def groupRole = Role.findWhere(name:"group:${o.groups[0].id}:administrators")
     groupRole.description == "Administrators for the default group of Organization ${o.displayName}"
     groupRole.permissions.size() == 1
-    groupRole.permissions.toArray()[0].target == "app:manage:group:${o.groups[0].id}:*"
+    groupRole.permissions.toArray()[0].target == "app:manage:organization:${o.id}:group:${o.groups[0].id}:*"
 
     def o2 = Organization.findWhere(frID:146)
     o2.name == "usc.edu.au"
@@ -124,7 +124,7 @@ class OrganizationServiceSpec extends UnitSpec {
     def groupRole2 = Role.findWhere(name:"group:${o2.groups[0].id}:administrators")
     groupRole2.description == "Administrators for the default group of Organization ${o2.displayName}"
     groupRole2.permissions.size() == 1
-    groupRole2.permissions.toArray()[0].target == "app:manage:group:${o2.groups[0].id}:*"
+    groupRole2.permissions.toArray()[0].target == "app:manage:organization:${o2.id}:group:${o2.groups[0].id}:*"
   }
 
   def 'expect all new Organisations to be created correctly but no workflows when errors with workflow system'() {

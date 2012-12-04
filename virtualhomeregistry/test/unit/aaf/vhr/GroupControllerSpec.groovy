@@ -213,13 +213,13 @@ def o = Organization.build()
     def groupRole = Role.findWhere(name:"group:${savedGroupTestInstance.id}:administrators")
     groupRole.description == "Administrators for the Group ${savedGroupTestInstance.name} of Organization ${savedGroupTestInstance.organization.displayName}"
     groupRole.permissions.size() == 1
-    groupRole.permissions.toArray()[0].target == "app:manage:group:${savedGroupTestInstance.id}:*"
+    groupRole.permissions.toArray()[0].target == "app:manage:organization:${savedGroupTestInstance.organization.id}:group:${savedGroupTestInstance.id}:*"
   }
 
   def 'ensure correct output from edit when invalid permission'() {
     setup:
     def groupTestInstance = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${groupTestInstance.id}:edit") >> false
+    shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:edit") >> false
 
     when:
     params.id = groupTestInstance.id
@@ -233,7 +233,7 @@ def o = Organization.build()
   def 'ensure correct output from edit when valid permission'() {
     setup:
     def groupTestInstance = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${groupTestInstance.id}:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:edit") >> true
 
     when:
     params.id = groupTestInstance.id
@@ -246,9 +246,10 @@ def o = Organization.build()
   def 'ensure correct output from update when invalid permission'() {
     setup:
     def groupTestInstance = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${groupTestInstance}.id}:edit") >> false
+    shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:edit") >> false
 
     when:
+    params.id = groupTestInstance.id
     def model = controller.update()
 
     then:
@@ -259,7 +260,7 @@ def o = Organization.build()
   def 'ensure correct output from update with null version but valid permission'() {
     setup:
     def groupTestInstance = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${groupTestInstance.id}:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:edit") >> true
     
     expect:
     Group.count() == 1
@@ -278,7 +279,7 @@ def o = Organization.build()
   def 'ensure correct output from update with invalid data and when valid permission'() {
     setup:
     def groupTestInstance = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${groupTestInstance.id}:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:edit") >> true
     groupTestInstance.getVersion() >> 20
     
     groupTestInstance.properties.each {
@@ -312,7 +313,7 @@ def o = Organization.build()
   def 'ensure correct output from update with valid data and when valid permission'() {
     setup:
     def groupTestInstance = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${groupTestInstance.id}:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:edit") >> true
     
     groupTestInstance.properties.each {
       if(it.value) {
@@ -408,9 +409,10 @@ def o = Organization.build()
   def 'ensure correct output from toggleActive when invalid permission'() {
     setup:
     def groupTestInstance = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${groupTestInstance}.id}:edit") >> false
+    shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:edit") >> false
 
     when:
+    params.id = groupTestInstance.id
     def model = controller.toggleActive()
 
     then:
@@ -421,7 +423,7 @@ def o = Organization.build()
   def 'ensure correct output from toggleActive with null version but valid permission'() {
     setup:
     def groupTestInstance = Group.build()
-    shiroSubject.isPermitted("app:manage:group:${groupTestInstance.id}:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:edit") >> true
     
     expect:
     Group.count() == 1
@@ -440,7 +442,7 @@ def o = Organization.build()
   def 'ensure correct output from toggleActive'() {
     setup:
     def groupTestInstance = Group.build(active:false)
-    shiroSubject.isPermitted("app:manage:group:${groupTestInstance.id}:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:edit") >> true
     
     expect:
     Group.count() == 1

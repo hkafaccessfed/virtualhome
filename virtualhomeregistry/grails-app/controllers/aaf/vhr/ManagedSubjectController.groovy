@@ -26,9 +26,9 @@ class ManagedSubjectController {
 
   def create() {
     if(validGroup()) {
-      if(SecurityUtils.subject.isPermitted("app:manage:group:${params.group.id}:managedsubject:create")) {
+      def group = Group.get(params.group.id)
+      if(SecurityUtils.subject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create")) {
         log.info "Action: create, Subject: $subject"
-        def group = Group.get(params.group.id)
         def managedSubjectInstance = new ManagedSubject(group:group, organization:group.organization)
         [managedSubjectInstance: managedSubjectInstance]
       }
@@ -41,8 +41,8 @@ class ManagedSubjectController {
 
   def save() {
     if(validGroup()) {
-      if(SecurityUtils.subject.isPermitted("app:manage:group:${params.group.id}:managedsubject:create")) {
-        def group = Group.get(params.group.id)
+      def group = Group.get(params.group.id)
+      if(SecurityUtils.subject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create")) {
         def managedSubjectInstance = new ManagedSubject()
         bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance', 'eduPersonAffiliation']])
         managedSubjectInstance.displayName = managedSubjectInstance.cn
@@ -73,7 +73,7 @@ class ManagedSubjectController {
 
   def edit(Long id) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
       log.info "Action: edit, Subject: $subject, Object: managedSubjectInstance"
 
       [managedSubjectInstance: managedSubjectInstance]
@@ -86,7 +86,7 @@ class ManagedSubjectController {
 
   def update(Long id, Long version) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
       if (version == null) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.managedsubject.update.noversion'
@@ -124,7 +124,7 @@ class ManagedSubjectController {
 
   def delete(Long id) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:group:${managedSubjectInstance.group.id}:managedsubject:delete")) {
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:delete")) {
       try {
         managedSubjectInstance.delete()
 
@@ -147,7 +147,7 @@ class ManagedSubjectController {
 
   def resend(Long id) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
       managedSubjectService.sendConfirmation(managedSubjectInstance)
 
       log.info "Action: resend, Subject: $subject, Object: $managedSubjectInstance"
@@ -167,13 +167,13 @@ class ManagedSubjectController {
       if (version == null) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.managedsubject.togglelock.noversion'
-        redirect(action: "show", id: managedSubjectInstance.id)
+        render(view: "show", model:[managedSubjectInstance: managedSubjectInstance])
         return
       }
 
       if (managedSubjectInstance.version > version) {
         managedSubjectInstance.errors.rejectValue("version", "controllers.aaf.vhr.managedsubject.togglelock.optimistic.locking.failure")
-        redirect(action: "show", id: managedSubjectInstance.id)
+        render(view: "show", model:[managedSubjectInstance: managedSubjectInstance])
         return
       }
 
@@ -182,7 +182,7 @@ class ManagedSubjectController {
       if (!managedSubjectInstance.save()) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.managedsubject.togglelock.failed'
-        redirect(action: "show", id: managedSubjectInstance.id)
+        render(view: "show", model:[managedSubjectInstance: managedSubjectInstance])
         return
       }
 
@@ -199,17 +199,17 @@ class ManagedSubjectController {
 
   def toggleActive(Long id, Long version) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
       if (version == null) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.managedsubject.toggleactive.noversion'
-        redirect(action: "show", id: managedSubjectInstance.id)
+        render(view: "show", model:[managedSubjectInstance: managedSubjectInstance])
         return
       }
 
       if (managedSubjectInstance.version > version) {
         managedSubjectInstance.errors.rejectValue("version", "controllers.aaf.vhr.managedsubject.toggleactive.optimistic.locking.failure")
-        redirect(action: "show", id: managedSubjectInstance.id)
+        render(view: "show", model:[managedSubjectInstance: managedSubjectInstance])
         return
       }
 
@@ -218,7 +218,7 @@ class ManagedSubjectController {
       if (!managedSubjectInstance.save()) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.managedsubject.toggleactive.failed'
-        redirect(action: "show", id: managedSubjectInstance.id)
+        render(view: "show", model:[managedSubjectInstance: managedSubjectInstance])
         return
       }
 
