@@ -6,14 +6,11 @@ import grails.buildtestdata.mixin.Build
 import spock.lang.*
 import grails.plugin.spock.*
 
-import aaf.base.workflow.Task
-import aaf.base.workflow.ProcessInstance
-import aaf.base.workflow.ProcessPriority
-import aaf.base.workflow.WorkflowProcessService
-import aaf.base.workflow.WorkflowTaskService
+import aaf.base.workflow.*
+import aaf.base.identity.*
 
 @TestFor(aaf.vhr.OrganizationService)
-@Build([aaf.vhr.Organization, aaf.vhr.Group, ProcessInstance])
+@Build([aaf.vhr.Organization, aaf.vhr.Group, ProcessInstance, Role, Permission])
 class OrganizationServiceSpec extends UnitSpec {
 
   def os
@@ -83,6 +80,8 @@ class OrganizationServiceSpec extends UnitSpec {
     expect:
     Organization.count() == 0
     Group.count() == 0
+    Role.count() == 0
+    Permission.count() == 0
     workflows == 0
 
     when:
@@ -91,6 +90,8 @@ class OrganizationServiceSpec extends UnitSpec {
     then:
     Organization.count() == 93
     Group.count() == 93
+    Role.count() == 186
+    Permission.count() == 186
     workflows == 93
 
     def o = Organization.findWhere(frID:11)
@@ -100,10 +101,30 @@ class OrganizationServiceSpec extends UnitSpec {
     o.groups[0].name == "Default Group"
     o.groups[0].description == "Default group for accounts belonging to ${o.displayName}"
 
+    def orgRole = Role.findWhere(name:"organization:${o.id}:administrators")
+    orgRole.description == "Administrators for the Organization ${o.displayName}"
+    orgRole.permissions.size() == 1
+    orgRole.permissions.toArray()[0].target == "app:manage:organization:${o.id}:*"
+
+    def groupRole = Role.findWhere(name:"group:${o.groups[0].id}:administrators")
+    groupRole.description == "Administrators for the default group of Organization ${o.displayName}"
+    groupRole.permissions.size() == 1
+    groupRole.permissions.toArray()[0].target == "app:manage:group:${o.id}:*"
+
     def o2 = Organization.findWhere(frID:146)
     o2.name == "usc.edu.au"
     o2.displayName == "University of the Sunshine Coast"
     o2.description == null
+
+    def orgRole2 = Role.findWhere(name:"organization:${o2.id}:administrators")
+    orgRole2.description == "Administrators for the Organization ${o2.displayName}"
+    orgRole2.permissions.size() == 1
+    orgRole2.permissions.toArray()[0].target == "app:manage:organization:${o2.id}:*"
+
+    def groupRole2 = Role.findWhere(name:"group:${o2.groups[0].id}:administrators")
+    groupRole2.description == "Administrators for the default group of Organization ${o2.displayName}"
+    groupRole2.permissions.size() == 1
+    groupRole2.permissions.toArray()[0].target == "app:manage:group:${o2.id}:*"
   }
 
   def 'expect all new Organisations to be created correctly but no workflows when errors with workflow system'() {

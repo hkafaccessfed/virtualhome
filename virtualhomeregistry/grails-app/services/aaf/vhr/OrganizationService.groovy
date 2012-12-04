@@ -8,6 +8,8 @@ import groovyx.net.http.ContentType
 import groovyx.net.http.Method
 
 import aaf.base.workflow.ProcessPriority
+import aaf.base.identity.Role
+import aaf.base.identity.Permission
 
 class OrganizationService {
   // A workflow process with the following name must be present in VHR
@@ -65,6 +67,26 @@ class OrganizationService {
 
               if(!org.save()) {
                 log.error "Unable to save new Organization instance to represent ${result.name}"
+                org.errors.each { error ->
+                  log.error error
+                }
+              }
+
+              def orgRole = new Role(name:"organization:${org.id}:administrators", description: "Administrators for the Organization ${org.displayName}")
+              def orgPermission = new Permission(type: Permission.wildcardPerm, target: "app:manage:organization:${org.id}:*", role:orgRole)
+              orgRole.addToPermissions(orgPermission)
+              if(!orgRole.save()) {
+                log.error "Unable to save new Role instance to represent admin rights for ${org}"
+                org.errors.each { error ->
+                  log.error error
+                }
+              }
+
+              def groupRole = new Role(name:"group:${group.id}:administrators", description: "Administrators for the default group of Organization ${org.displayName}")
+              def groupPermission = new Permission(type: Permission.wildcardPerm, target: "app:manage:group:${group.id}:*", role:groupRole)
+              groupRole.addToPermissions(groupPermission)
+              if(!groupRole.save()) {
+                log.error "Unable to save new Role instance to represent admin rights for ${group}"
                 org.errors.each { error ->
                   log.error error
                 }
