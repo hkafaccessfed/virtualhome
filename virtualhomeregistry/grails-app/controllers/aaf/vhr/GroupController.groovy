@@ -3,6 +3,9 @@ package aaf.vhr
 import org.springframework.dao.DataIntegrityViolationException
 import org.apache.shiro.SecurityUtils
 
+import aaf.base.identity.Role
+import aaf.base.identity.Permission
+
 class GroupController {
 
   static defaultAction = "list"
@@ -52,6 +55,16 @@ class GroupController {
           flash.message = 'controllers.aaf.vhr.group.save.failed'
           render(view: "create", model: [groupInstance: groupInstance])
           return
+        }
+
+        def groupRole = new Role(name:"group:${groupInstance.id}:administrators", description: "Administrators for the Group ${groupInstance.name} of Organization ${groupInstance.organization.displayName}")
+        def groupPermission = new Permission(type: Permission.wildcardPerm, target: "app:manage:group:${groupInstance.id}:*", role:groupRole)
+        groupRole.addToPermissions(groupPermission)
+        if(!groupRole.save()) {
+          log.error "Unable to save new Role instance to represent admin rights for ${groupInstance}"
+          org.errors.each { error ->
+            log.error error
+          }
         }
 
         log.info "Action: save, Subject: $subject, Object: $groupInstance"

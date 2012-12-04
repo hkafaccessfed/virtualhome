@@ -8,8 +8,10 @@ import spock.lang.*
 
 import test.shared.ShiroEnvironment
 
+import aaf.base.identity.*
+
 @TestFor(aaf.vhr.GroupController)
-@Build([ManagedSubject, Group, aaf.base.identity.Subject])
+@Build([ManagedSubject, Group, aaf.base.identity.Subject, aaf.base.identity.Role, aaf.base.identity.Permission])
 class GroupControllerSpec  extends spock.lang.Specification {
   
   @Shared def shiroEnvironment = new ShiroEnvironment()
@@ -189,12 +191,17 @@ def o = Organization.build()
 
     expect:
     Group.count() == 0
+    Role.count() == 0
+    Permission.count() == 0
 
     when:
     controller.save()
 
     then:
     Group.count() == 1
+    Role.count() == 1
+    Permission.count() == 1
+
     flash.type == 'success'
     flash.message == 'controllers.aaf.vhr.group.save.success'
 
@@ -202,6 +209,11 @@ def o = Organization.build()
     savedGroupTestInstance.properties.each {
       it.value == groupTestInstance.getProperty(it.key)
     }
+
+    def groupRole = Role.findWhere(name:"group:${savedGroupTestInstance.id}:administrators")
+    groupRole.description == "Administrators for the Group ${savedGroupTestInstance.name} of Organization ${savedGroupTestInstance.organization.displayName}"
+    groupRole.permissions.size() == 1
+    groupRole.permissions.toArray()[0].target == "app:manage:group:${savedGroupTestInstance.id}:*"
   }
 
   def 'ensure correct output from edit when invalid permission'() {
