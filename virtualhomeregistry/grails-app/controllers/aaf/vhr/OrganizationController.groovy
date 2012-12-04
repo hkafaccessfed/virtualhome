@@ -127,6 +127,43 @@ class OrganizationController {
     }
   }
 
+  def toggleActive(Long id, Long version) {
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:$id:edit")) {
+      def organizationInstance = Organization.get(id)
+      
+      if (version == null) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.organization.toggleactive.noversion'
+        render(view: "edit", model: [organizationInstance: organizationInstance])
+        return
+      }
+
+      if (organizationInstance.version > version) {
+        organizationInstance.errors.rejectValue("version", "controllers.aaf.vhr.organization.toggleactive.optimistic.locking.failure")
+        render(view: "edit", model: [organizationInstance: organizationInstance])
+        return
+      }
+
+      organizationInstance.active = !organizationInstance.active
+
+      if (!organizationInstance.save()) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.organization.toggleactive.failed'
+        render(view: "edit", model: [organizationInstance: organizationInstance])
+        return
+      }
+
+      log.info "Action: toggleActive, Subject: $subject, Object: $organizationInstance"
+      flash.type = 'success'
+      flash.message = 'controllers.aaf.vhr.organization.toggleactive.success'
+      redirect(action: "show", id: organizationInstance.id)
+    }
+    else {
+      log.warn "Attempt to do administrative Organization toggleactive by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
+  }
+
   private validOrganization() {
     if(!params.id) {
       log.warn "ID was not present"

@@ -383,4 +383,57 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     flash.type == 'error'
     flash.message == 'controllers.aaf.vhr.organization.delete.failure'
   }
+
+  def 'ensure correct output from toggleActive when invalid permission'() {
+    setup:
+    def organizationTestInstance = Organization.build()
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance}.id}:edit") >> false
+
+    when:
+    def model = controller.toggleActive()
+
+    then:
+    model == null
+    response.status == 403
+  }
+
+  def 'ensure correct output from toggleActive with null version but valid permission'() {
+    setup:
+    def organizationTestInstance = Organization.build()
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
+    
+    expect:
+    Organization.count() == 1
+
+    when:
+    params.id = organizationTestInstance.id
+    params.version = null
+    controller.toggleActive()
+
+    then:
+    Organization.count() == 1
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.organization.toggleactive.noversion'
+  }
+
+  def 'ensure correct output from toggleActive'() {
+    setup:
+    def organizationTestInstance = Organization.build(active:false)
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
+    
+    expect:
+    Organization.count() == 1
+    !organizationTestInstance.active
+
+    when:
+    params.id = organizationTestInstance.id
+    params.version = 1
+    controller.toggleActive()
+
+    then:
+    Organization.count() == 1
+    organizationTestInstance.active
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.organization.toggleactive.success'
+  }
 }

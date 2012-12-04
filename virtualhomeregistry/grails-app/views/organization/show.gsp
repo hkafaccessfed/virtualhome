@@ -55,6 +55,20 @@
             
             <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:edit">
               <li>
+                <g:form action="toggleActive" method="post">
+                  <g:hiddenField name="version" value="${organizationInstance?.version}" />
+                  <g:hiddenField name="id" value="${organizationInstance.id}" />
+                  <a href="#" onclick="$(this).parents('form').submit();">
+                    <g:if test="${organizationInstance.active}">
+                      <g:message code="views.aaf.vhr.organization.show.deactivate"/>
+                    </g:if>
+                    <g:else>
+                      <g:message code="views.aaf.vhr.organization.show.activate"/>
+                    </g:else>
+                  </a>
+                </g:form>
+              </li>
+              <li>
                 <g:link action="edit" id="${organizationInstance.id}"><g:message code="label.edit"/></g:link>
               </li>
             </aaf:hasPermission>
