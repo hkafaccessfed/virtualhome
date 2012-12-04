@@ -62,7 +62,7 @@ class OrganizationService {
               org.description = !result.description.equals(null) ? result.description:null
               org.undergoingWorkflow = true
 
-              def group = new Group(name:"Default Group", description:"Default group for accounts belonging to ${org.displayName}", active:true)
+              def group = new Group(name:"Default Group", description:"Default group for accounts belonging to ${org.displayName}", active:true, organization:org)
               org.addToGroups(group)
 
               if(!org.save()) {
