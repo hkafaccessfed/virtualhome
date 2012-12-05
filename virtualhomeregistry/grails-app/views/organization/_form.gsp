@@ -32,18 +32,20 @@
     </div>
   </g:if>
 
-  <div class="control-group ${hasErrors(bean: organizationInstance, field: 'groupLimit', 'error')}">
-    <label class="control-label" for="groupLimit"><g:message code="label.grouplimit"/></label>
-    <div class="controls">
-      <g:field name="groupLimit" type="number" value="${organizationInstance.groupLimit}" required=""/>
+  <aaf:hasPermission target='app:administration'>
+    <div class="control-group ${hasErrors(bean: organizationInstance, field: 'groupLimit', 'error')}">
+      <label class="control-label" for="groupLimit"><g:message code="label.grouplimit"/></label>
+      <div class="controls">
+        <g:field name="groupLimit" type="number" value="${organizationInstance.groupLimit}" required=""/>
+      </div>
     </div>
-  </div>
 
-  <div class="control-group ${hasErrors(bean: organizationInstance, field: 'subjectLimit', 'error')}">
-    <label class="control-label" for="subjectLimit"><g:message code="label.subjectlimit"/></label>
-    <div class="controls">
-      <g:field name="subjectLimit" type="number" value="${organizationInstance.subjectLimit}" required=""/>
+    <div class="control-group ${hasErrors(bean: organizationInstance, field: 'subjectLimit', 'error')}">
+      <label class="control-label" for="subjectLimit"><g:message code="label.subjectlimit"/></label>
+      <div class="controls">
+        <g:field name="subjectLimit" type="number" value="${organizationInstance.subjectLimit}" required=""/>
+      </div>
     </div>
-  </div>
+  </aaf:hasPermission>
 
 </fieldset>

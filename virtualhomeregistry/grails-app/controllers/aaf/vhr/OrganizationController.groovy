@@ -88,7 +88,10 @@ class OrganizationController {
         return
       }
 
-      bindData(organizationInstance, params, [include: ['name', 'displayName', 'description', 'subjectLimit', 'groupLimit']])
+      if(SecurityUtils.subject.isPermitted("app:administration"))
+        bindData(organizationInstance, params, [include: ['name', 'displayName', 'description', 'subjectLimit', 'groupLimit']])
+      else
+        bindData(organizationInstance, params, [include: ['name', 'displayName', 'description']])
 
       if (!organizationInstance.save()) {
         flash.type = 'error'
