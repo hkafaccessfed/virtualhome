@@ -46,14 +46,14 @@
     <ul class="nav nav-tabs">
       <li class="active"><a href="#tab-overview" data-toggle="tab"><g:message code="label.overview" /></a></li>
 
-      <aaf:hasAnyPermission in='["app:manage:group:${managedSubjectInstance.group.id}:managedsubject:edit","app:manage:group:${managedSubjectInstance.group.id}:managedsubject:delete"]'>
+      <aaf:hasAnyPermission in='["app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit","app:manage:group:${managedSubjectInstance.group.id}:managedsubject:delete"]'>
       <li class="dropdown pull-right">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
           <g:message code="label.actions" />
           <b class="caret"></b>
         </a>
         <ul class="dropdown-menu">
-          <aaf:hasPermission target="app:manage:group:${managedSubjectInstance.group.id}:managedsubject:edit">
+          <aaf:hasPermission target="app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit">
             <g:if test="${managedSubjectInstance.login == null}">
               <g:form action="resend" method="post">
                 <g:hiddenField name="id" value="${managedSubjectInstance.id}" />
@@ -83,7 +83,7 @@
             </li>
           </aaf:hasPermission>
 
-          <aaf:hasPermission target="app:manage:group:${managedSubjectInstance.group.id}:managedsubject:delete">
+          <aaf:hasPermission target="app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:delete">
             <li>
               <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.managedsubject.confirm.remove')}"><g:message code="label.delete"/></a>
               <g:form action="delete" method="delete">

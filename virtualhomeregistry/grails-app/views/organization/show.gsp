@@ -38,7 +38,7 @@
       <li><a href="#tab-groups" data-toggle="tab"><g:message code="label.groups" /></a></li>
       <li><a href="#tab-managedsubjects" data-toggle="tab"><g:message code="label.managedsubjects" /></a></li>
 
-      <aaf:hasAnyPermission in='["app:manage:organization:${organizationInstance.id}:edit","app:manage:organization:${organizationInstance.id}:delete"]'>
+      <aaf:hasAnyPermission in='["app:manage:organization:${organizationInstance.id}:groups:create, app:manage:organization:${organizationInstance.id}:edit","app:manage:organization:${organizationInstance.id}:delete"]'>
         <li class="dropdown pull-right">
 
           <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -47,11 +47,13 @@
           </a>
           
           <ul class="dropdown-menu">
-            <li>
-              <g:link action="create" controller="group" params='['organization.id':"${organizationInstance.id}"]'><g:message code="label.creategroup"/></g:link>
-            </li>
 
-            <li class="divider"></li>
+            <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:groups:create">
+              <li>
+                <g:link action="create" controller="group" params='['organization.id':"${organizationInstance.id}"]'><g:message code="label.creategroup"/></g:link>
+              </li>
+              <li class="divider"></li>
+            </aaf:hasPermission>
             
             <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:edit">
               <li>

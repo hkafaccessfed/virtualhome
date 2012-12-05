@@ -31,23 +31,24 @@
       <li class="active"><a href="#tab-overview" data-toggle="tab"><g:message code="label.overview" /></a></li>
       <li><a href="#tab-managedsubjects" data-toggle="tab"><g:message code="label.managedsubjects" /></a></li>
 
-      <aaf:hasAnyPermission in='["app:manage:group:${groupInstance.id}:edit","app:manage:group:${groupInstance.id}:delete"]'>
+      <aaf:hasAnyPermission in='["app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:managedsubject:create, app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit","app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:delete"]'>
       <li class="dropdown pull-right">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
           <g:message code="label.actions" />
           <b class="caret"></b>
         </a>
         <ul class="dropdown-menu">
-          <li>
-            <g:link action="create" controller="managedSubject" params='['group.id':"${groupInstance.id}"]'><g:message code="label.createmanagedsubject"/></g:link>
-          </li>
-          <li>
-            <g:link action="create" controller="managedSubject" params='['group.id':"${groupInstance.id}"]'><g:message code="label.createmultiplemanagedsubject"/></g:link>
-          </li>
+          <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:managedsubject:create">
+            <li>
+              <g:link action="create" controller="managedSubject" params='['group.id':"${groupInstance.id}"]'><g:message code="label.createmanagedsubject"/></g:link>
+            </li>
+            <li>
+              <g:link action="create" controller="managedSubject" params='['group.id':"${groupInstance.id}"]'><g:message code="label.createmultiplemanagedsubject"/></g:link>
+            </li>
+            <li class="divider"></li>
+          </aaf:hasPermission>
 
-          <li class="divider"></li>
-          
-          <aaf:hasPermission target="app:manage:group:${groupInstance.id}:edit">
+          <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit">
             <li>
               <g:form action="toggleActive" method="post">
                 <g:hiddenField name="version" value="${groupInstance?.version}" />
@@ -67,7 +68,7 @@
             </li>
           </aaf:hasPermission>
 
-          <aaf:hasPermission target="app:manage:group:${groupInstance.id}:delete">
+          <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:delete">
             <li>
               <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.group.confirm.remove')}"><g:message code="label.delete"/></a>
               <g:form action="delete" method="delete">

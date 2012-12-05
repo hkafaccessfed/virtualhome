@@ -9,7 +9,7 @@
       <li><g:link controller="dashboard"><g:message code="branding.application.name"/></g:link> <span class="divider">/</span></li>
       <li class="active"><g:message code="branding.nav.breadcrumb.organization"/></li>
       
-      <aaf:hasPermission target="app:manage:organization:create">
+      <aaf:hasPermission target="app:administrator">
         <li class="pull-right"><strong><g:link action="create"><g:message code="branding.nav.breadcrumb.organization.create"/></g:link></strong></li>
       </aaf:hasPermission>
     </ul>
