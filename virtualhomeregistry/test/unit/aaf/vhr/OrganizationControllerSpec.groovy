@@ -9,7 +9,7 @@ import spock.lang.*
 import test.shared.ShiroEnvironment
 
 @TestFor(aaf.vhr.OrganizationController)
-@Build([Organization, aaf.base.identity.Subject])
+@Build([Organization, aaf.base.identity.Subject, aaf.base.identity.Role])
 class OrganizationControllerSpec  extends spock.lang.Specification {
   
   @Shared def shiroEnvironment = new ShiroEnvironment()

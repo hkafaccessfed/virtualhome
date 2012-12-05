@@ -33,6 +33,8 @@ class DashboardControllerSpec extends spock.lang.Specification {
     shiroEnvironment.setSubject(shiroSubject)
     
     controller.metaClass.getSubject = { subject }
+
+    aaf.base.identity.SessionRecord.metaClass.'static'.executeQuery = {String q, Map params -> [] as List}
   }
 
   def 'ensure subject with no organization or group roles has minimal dashboard provided'() {
@@ -168,6 +170,8 @@ class DashboardControllerSpec extends spock.lang.Specification {
       def r = Role.build(name:"organization:${o.id}:adminsters")
     }
 
+    aaf.base.identity.SessionRecord.metaClass.'static'.executeQuery = {String q, Map params -> [13,20] as List}
+
     when:
     def model = controller.dashboard()
 
@@ -181,6 +185,10 @@ class DashboardControllerSpec extends spock.lang.Specification {
     model.statistics.organizations == 50    // each 1..10 creates unique org
     model.statistics.groups == 30           // Managed Subject Build creates group plus 2 * 1..10 creating Groups
     model.statistics.managedSubjects == 10
+
+    model.statistics.last12MonthSessions.size() == 12
+    model.statistics.last12MonthSessions[10] == 13
+    model.statistics.last12MonthSessions[11] == 20
 
   }
 

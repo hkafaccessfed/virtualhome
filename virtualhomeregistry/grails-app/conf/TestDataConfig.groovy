@@ -1,5 +1,9 @@
 testDataConfig {
   sampleData {
+   'aaf.base.identity.Subject' {
+    def i = 1
+    principal = {-> "http://idp.test.com/idp!http://sp.test.com!abcdefg${i++}"}
+   }
    'aaf.vhr.ManagedSubject' {
       def i = 1
       login = {-> "loginname${i++}" }
