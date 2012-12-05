@@ -138,7 +138,7 @@ class GroupController {
         log.info "Action: delete, Subject: $subject, Object: groupInstance"
         flash.type = 'success'
         flash.message = 'controllers.aaf.vhr.group.delete.success'
-        redirect(action: "list")
+        redirect(controller:"organization", action: "show", id: groupInstance.organization.id, fragment:"tab-groups")
       }
       catch (DataIntegrityViolationException e) {
         flash.type = 'error'

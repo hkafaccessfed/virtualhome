@@ -376,7 +376,7 @@ def o = Organization.build()
     then:
     Group.count() == 0
 
-    response.redirectedUrl == "/group/list"
+    response.redirectedUrl == "/organization/show/${o.id}#tab-groups"
 
     flash.type == 'success'
     flash.message == 'controllers.aaf.vhr.group.delete.success'
