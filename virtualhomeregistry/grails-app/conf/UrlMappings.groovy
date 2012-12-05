@@ -5,11 +5,18 @@ class UrlMappings {
     "/"(controller:"dashboard", action:"welcome")
     "/dashboard"(controller:"dashboard", action:"dashboard")
 
-    "/organisation/groups/$action/$id?" {
+    "/organisations/groups/accounts/$action/$id?" {
+      controller="managedSubject"
+    }
+    "/organisations/groups/$action/$id?" {
       controller="group"
     }
-    "/organisation/$action/$id?" {
+    "/organisations/$action/$id?" {
       controller="organization"
+    }
+
+    "/backend/manageadministrators/$action/$id?" {
+      controller="manageAdministrators"
     }
   }
 
