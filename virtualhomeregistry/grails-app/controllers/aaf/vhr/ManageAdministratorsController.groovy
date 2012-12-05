@@ -7,21 +7,21 @@ import aaf.base.identity.Subject
 class ManageAdministratorsController {
   
   def search() {
-    def role = validRole()
-    if(role) {
+    def (role, instance) = validRoleInstance()
+    if(role && instance) {
       def subjects = Subject.list()
 
       if(role.subjects)
         subjects.removeAll(role.subjects)
 
-      render (template: "/templates/manageadministrators/search", model:[subjects:subjects, role:role])
+      render (template: "/templates/manageadministrators/search", model:[subjects:subjects, role:role, type:params.type, instance:instance])
     }
   }
 
   def add() {
-    def role = validRole()
+    def (role, instance) = validRoleInstance()
     def targetSubject = validSubject()
-    if(role && targetSubject) {
+    if(role && instance && targetSubject) {
       role.addToSubjects(targetSubject)
       targetSubject.addToRoles(role)
 
@@ -35,14 +35,19 @@ class ManageAdministratorsController {
         response.sendError 500
       }
 
-      render (template: "/templates/manageadministrators/administrators", model:[role:role])
+      def subjects = Subject.list()
+
+      if(role.subjects)
+        subjects.removeAll(role.subjects)
+
+      render (template: "/templates/manageadministrators/modifiedadministrators", model:[subjects:subjects, role:role, type:params.type, instance:instance])
     }
   }
 
   def remove() {
-    def role = validRole()
+    def (role, instance) = validRoleInstance()
     def targetSubject = validSubject()
-    if(role && targetSubject) {
+    if(role && instance && targetSubject) {
       role.removeFromSubjects(targetSubject)
       targetSubject.removeFromRoles(role)
 
@@ -56,7 +61,12 @@ class ManageAdministratorsController {
         response.sendError 500
       }
 
-      render (template: "/templates/manageadministrators/administrators", model:[role:role])
+      def subjects = Subject.list()
+
+      if(role.subjects)
+        subjects.removeAll(role.subjects)
+
+      render (template: "/templates/manageadministrators/modifiedadministrators", model:[subjects:subjects, role:role, type:params.type, instance:instance])
     }
   }
 
@@ -77,16 +87,16 @@ class ManageAdministratorsController {
     return targetSubject
   }
 
-  private aaf.base.identity.Role validRole() {
+  private validRoleInstance() {
     if(!params.type) {
       log.warn "Type was not present"
       response.sendError 400
-      return null
+      return [null, null]
     }
     if(!params.id) {
       log.warn "ID was not present"
       response.sendError 400
-      return null
+      return [null, null]
     }
 
 
@@ -97,22 +107,22 @@ class ManageAdministratorsController {
                           if (!organizationInstance) {
                             log.warn "organizationInstance was not a valid instance"
                             response.sendError 400
-                            return null
+                            return [null, null]
                           }
                           if(SecurityUtils.subject.isPermitted("app:manage:organization:${organizationInstance.id}:manage:administrators")) {
                             role = Role.findWhere(name:"organization:${organizationInstance.id}:administrators")
                             if (!role) {
                               log.warn "role was not a valid instance"
                               response.sendError 400
-                              return null
+                              return [null, null]
                             }
                           } else {
                             log.warn "Attempt to change administrators associated with $organizationInstance by $subject was denied - not permitted by assigned permissions"
                             response.sendError 403
-                            return null
+                            return [null, null]
                           }
 
-                          return role
+                          return [role, organizationInstance]
                           break
 
       case "group":
@@ -120,27 +130,27 @@ class ManageAdministratorsController {
                           if (!groupInstance) {
                             log.warn "groupInstance was not a valid instance"
                             response.sendError 400
-                            return null
+                            return [null, null]
                           }
                           if(SecurityUtils.subject.isPermitted("app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:manage:administrators")) {
                             role = Role.findWhere(name:"group:${groupInstance.id}:administrators")
                             if (!role) {
                               log.warn "role was not a valid instance"
                               response.sendError 400
-                              return null
+                              return [null, null]
                             }
                           } else {
                             log.warn "Attempt to change administrators associated with $groupInstance by $subject was denied - not permitted by assigned permissions"
                             response.sendError 403
-                            return null
+                            return [null, null]
                           }
 
-                          return role
+                          return [role, groupInstance]
                           break
 
       default:            log.warn "Attempt to change administrators of unknown type by $subject was denied"
                           response.sendError 403
-                          return null
+                          return [null, null]
     }
   }
 

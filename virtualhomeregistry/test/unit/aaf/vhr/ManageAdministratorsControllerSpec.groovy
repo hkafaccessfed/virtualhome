@@ -63,7 +63,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     response.status == 400
   }
 
-  def 'ensure validRole returns correct Role when valid org and valid perms'() {
+  def 'ensure validRoleInstance returns correct Role and Instance when valid org and valid perms'() {
     setup:
     def organizationTestInstance = Organization.build()
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
@@ -72,23 +72,25 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     when:
     params.type = 'organization'
     params.id = organizationTestInstance.id
-    def roleInstance = controller.validRole()
+    def (roleInstance, organizationInstance) = controller.validRoleInstance()
 
     then:
     roleInstance == roleTestInstance
+    organizationInstance == organizationTestInstance
   }
 
-  def 'ensure validRole returns 400 when invalid org'() {
+  def 'ensure validRoleInstance returns 400 when invalid org'() {
     when:
     params.type = 'organization'
-    def roleInstance = controller.validRole()
+    def (roleInstance, organizationInstance) = controller.validRoleInstance()
 
     then:
     roleInstance == null
+    organizationInstance == null
     response.status == 400
   }
 
-  def 'ensure validRole returns 403 when valid org but invalid perms'() {
+  def 'ensure validRoleInstance returns 403 when valid org but invalid perms'() {
     setup:
     def organizationTestInstance = Organization.build()
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
@@ -97,14 +99,15 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     when:
     params.type = 'organization'
     params.id = organizationTestInstance.id
-    def roleInstance = controller.validRole()
+    def (roleInstance, organizationInstance) = controller.validRoleInstance()
 
     then:
     roleInstance == null
+    organizationInstance == null
     response.status == 403
   }
 
-  def 'ensure validRole returns 400 when valid org and valid perms but non existant admin role'() {
+  def 'ensure validRoleInstance returns 400 when valid org and valid perms but non existant admin role'() {
     setup:
     def organizationTestInstance = Organization.build()
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> true
@@ -112,14 +115,15 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     when:
     params.type = 'organization'
     params.id = organizationTestInstance.id
-    def roleInstance = controller.validRole()
+    def (roleInstance, organizationInstance) = controller.validRoleInstance()
 
     then:
     roleInstance == null
+    organizationInstance == null
     response.status == 400
   }
 
-  def 'ensure validRole returns correct Role when valid group and valid perms'() {
+  def 'ensure validRoleInstance returns correct Role when valid group and valid perms'() {
     setup:
     def groupTestInstance = Group.build()
     def roleTestInstance = Role.build(name:"group:${groupTestInstance.id}:administrators")
@@ -128,23 +132,25 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     when:
     params.type = 'group'
     params.id = groupTestInstance.id
-    def roleInstance = controller.validRole()
+    def (roleInstance, groupInstance) = controller.validRoleInstance()
 
     then:
     roleInstance == roleTestInstance
+    groupInstance == groupTestInstance
   }
 
-  def 'ensure validRole returns 400 when invalid group'() {
+  def 'ensure validRoleInstance returns 400 when invalid group'() {
     when:
     params.type = 'group'
-    def roleInstance = controller.validRole()
+    def (roleInstance, groupInstance) = controller.validRoleInstance()
 
     then:
     roleInstance == null
+    groupInstance == null
     response.status == 400
   }
 
-  def 'ensure validRole returns 403 when valid group but invalid perms'() {
+  def 'ensure validRoleInstance returns 403 when valid group but invalid perms'() {
     setup:
     def groupTestInstance = Group.build()
     def roleTestInstance = Role.build(name:"group:${groupTestInstance.id}:administrators")
@@ -153,14 +159,15 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     when:
     params.type = 'group'
     params.id = groupTestInstance.id
-    def roleInstance = controller.validRole()
+    def (roleInstance, groupInstance) = controller.validRoleInstance()
 
     then:
     roleInstance == null
+    groupInstance == null
     response.status == 403
   }
 
-  def 'ensure validRole returns 400 when valid group and valid perms but non existant admin role'() {
+  def 'ensure validRoleInstance returns 400 when valid group and valid perms but non existant admin role'() {
     setup:
     def groupTestInstance = Group.build()
     shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:manage:administrators") >> true
@@ -168,20 +175,22 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     when:
     params.type = 'group'
     params.id = groupTestInstance.id
-    def roleInstance = controller.validRole()
+    def (roleInstance, groupInstance) = controller.validRoleInstance()
 
     then:
     roleInstance == null
+    groupInstance == null
     response.status == 400
   }
 
-  def 'ensure validRole returns 400 when unknown type supplied'() {
+  def 'ensure validRoleInstance returns 400 when unknown type supplied'() {
     when:
     params.type = 'something'
-    def roleInstance = controller.validRole()
+    def (roleInstance, groupInstance) = controller.validRoleInstance()
 
     then:
     roleInstance == null
+    groupInstance == null
     response.status == 400
   }
 
@@ -307,7 +316,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
       def subject = aaf.base.identity.Subject.build()
     }
 
-    views['/templates/manageadministrators/_administrators.gsp'] = "role:\${role.id} subject:\${role.subjects.toArray()[0].id}"
+    views['/templates/manageadministrators/_modifiedadministrators.gsp'] = "role:\${role.id} subject:\${role.subjects.toArray()[0].id}"
 
     expect:
     targetSubject.roles == null
@@ -374,7 +383,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     roleTestInstance.save()
     targetSubject.save()
 
-    views['/templates/manageadministrators/_administrators.gsp'] = "role:\${role.id} subjects:\${role.subjects.size()}"
+    views['/templates/manageadministrators/_modifiedadministrators.gsp'] = "role:\${role.id} subjects:\${role.subjects.size()}"
 
     expect:
     targetSubject.roles.size() == 1
