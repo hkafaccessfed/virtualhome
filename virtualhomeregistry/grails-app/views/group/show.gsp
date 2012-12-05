@@ -29,7 +29,7 @@
 
     <ul class="nav nav-tabs">
       <li class="active"><a href="#tab-overview" data-toggle="tab"><g:message code="label.overview" /></a></li>
-      <li><a href="#tab-managedsubjects" data-toggle="tab"><g:message code="label.managedsubjects" /></a></li>
+      <li><a href="#tab-accounts" data-toggle="tab"><g:message code="label.managedsubjects" /></a></li>
       <li><a href="#tab-administrators" data-toggle="tab"><g:message code="label.administrators" /></a></li>
 
       <aaf:hasAnyPermission in='["app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:managedsubject:create, app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit","app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:delete", "app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:manage:administrators"]'>
@@ -139,7 +139,7 @@
         </table>
       </div>
 
-      <div id="tab-managedsubjects" class="tab-pane">
+      <div id="tab-accounts" class="tab-pane">
         <table class="table table-borderless table-sortable">
           <thead>
             <tr>
