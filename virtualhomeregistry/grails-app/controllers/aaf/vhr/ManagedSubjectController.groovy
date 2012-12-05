@@ -50,6 +50,13 @@ class ManagedSubjectController {
         managedSubjectInstance.organization = group.organization
         sharedTokenService.generate(managedSubjectInstance)
 
+        if(!group.organization.canRegisterSubjects()) {
+          flash.type = 'error'
+          flash.message = 'controllers.aaf.vhr.managedsubject.licensing.failed'
+          render(view: "create", model: [managedSubjectInstance: managedSubjectInstance])
+          return
+        }
+
         if (!managedSubjectInstance.validate()) {
           flash.type = 'error'
           flash.message = 'controllers.aaf.vhr.managedsubject.validate.failed'

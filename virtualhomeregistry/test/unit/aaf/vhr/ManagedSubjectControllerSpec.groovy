@@ -187,7 +187,8 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from save with invalid data and when valid permission'() {
     setup:
     def sharedTokenService = Mock(aaf.vhr.SharedTokenService)
-    def group = Group.build()
+    def organization = Organization.build(active:true)
+    def group = Group.build(organization:organization)
     shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create") >> true
 
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
@@ -220,11 +221,50 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     }
   }
 
+  def 'ensure correct output from save with valid data and valid permission but licensing violation'() {
+    setup:
+    def sharedTokenService = Mock(aaf.vhr.SharedTokenService)
+    def managedSubjectService = Mock(aaf.vhr.ManagedSubjectService)
+    def organization = Organization.build(active:true, subjectLimit:5)
+    def group = Group.build(organization:organization)
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create") >> true
+
+    (1..5).each { ManagedSubject.build(group:group, organization:group.organization) }
+
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    managedSubjectTestInstance.properties.each {
+      if(it.value) {
+        if(grailsApplication.isDomainClass(it.value.getClass()))
+          params."${it.key}" = [id:"${it.value.id}"]
+        else
+          params."${it.key}" = "${it.value}"
+      }
+    }
+    managedSubjectTestInstance.delete()
+
+    controller.sharedTokenService = sharedTokenService
+    controller.managedSubjectService = managedSubjectService
+
+    expect:
+    ManagedSubject.count() == 5
+
+    when:
+    controller.save()
+
+    then:
+    1 * sharedTokenService.generate(_ as ManagedSubject) >> {ManagedSubject subject -> subject.sharedToken = '1234'}
+    0 * managedSubjectService.register(_ as ManagedSubject)>> {ManagedSubject subject -> subject.save()}
+    ManagedSubject.count() == 5
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.managedsubject.licensing.failed'
+  }
+
   def 'ensure correct output from save with valid data and when valid permission'() {
     setup:
     def sharedTokenService = Mock(aaf.vhr.SharedTokenService)
     def managedSubjectService = Mock(aaf.vhr.ManagedSubjectService)
-    def group = Group.build()
+    def organization = Organization.build(active:true)
+    def group = Group.build(organization:organization)
     shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create") >> true
 
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
@@ -454,21 +494,6 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
 
     flash.type == 'error'
     flash.message == 'controllers.aaf.vhr.managedsubject.delete.failure'
-  }
-
-  def 'ensure correct output from resend when invalid permission'() {
-    setup:
-    def group = Group.build()
-    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:edit") >> true
-
-    when:
-    params.id = managedSubjectTestInstance.id
-    def model = controller.resend()
-
-    then:
-    model == null
-    response.status == 403
   }
 
   def 'ensure correct output from resend when invalid permission'() {
