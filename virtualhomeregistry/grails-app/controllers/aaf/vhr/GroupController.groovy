@@ -21,7 +21,9 @@ class GroupController {
   def show(Long id) {
     log.info "Action: show, Subject: $subject"
     def groupInstance = Group.get(id)
-    [groupInstance: groupInstance]
+
+    def role = Role.findWhere(name:"group:${groupInstance.id}:administrators")
+    [groupInstance: groupInstance, role:role]
   }
 
   def create() {

@@ -30,8 +30,9 @@
     <ul class="nav nav-tabs">
       <li class="active"><a href="#tab-overview" data-toggle="tab"><g:message code="label.overview" /></a></li>
       <li><a href="#tab-managedsubjects" data-toggle="tab"><g:message code="label.managedsubjects" /></a></li>
+      <li><a href="#tab-administrators" data-toggle="tab"><g:message code="label.administrators" /></a></li>
 
-      <aaf:hasAnyPermission in='["app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:managedsubject:create, app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit","app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:delete"]'>
+      <aaf:hasAnyPermission in='["app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:managedsubject:create, app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit","app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:delete", "app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:manage:administrators"]'>
       <li class="dropdown pull-right">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
           <g:message code="label.actions" />
@@ -46,6 +47,15 @@
               <g:link action="create" controller="managedSubject" params='['group.id':"${groupInstance.id}"]'><g:message code="label.createmultiplemanagedsubject"/></g:link>
             </li>
             <li class="divider"></li>
+            <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:manage:administrators">
+              <li>
+                <a class="show-add-administrative-members"><g:message code="label.addadministrator"/></a>
+                <g:form controller="manageAdministrators" action="search" method="post">
+                  <g:hiddenField name="id" value="${groupInstance.id}" />
+                  <g:hiddenField name="type" value="group" />
+                </g:form>
+              </li>
+            </aaf:hasPermission>
           </aaf:hasPermission>
 
           <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit">
@@ -150,6 +160,20 @@
           </g:each>
           </tbody>
         </table>
+      </div>
+
+      <div id="tab-administrators" class="tab-pane">
+        <div id="administrative-members">
+          
+          <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:manage:administrators">
+            <g:render template="/templates/manageadministrators/administrators" model="[instance:groupInstance, type:'group']" />
+            <div id="add-administrative-members"></div>
+          </aaf:hasPermission>
+
+          <aaf:lacksPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:manage:administrators">
+            <g:render template="/templates/manageadministrators/showadministrators" />
+          </aaf:lacksPermission>
+        </div>
       </div>
 
     </div>
