@@ -51,26 +51,42 @@
       <div class="span4">
         <div class="well well-small statistic">
           <h3><g:message code="views.aaf.vhr.dashboard.total.organizations"/></h3>
+          <hr>
           <span class="lead">${statistics.organizations}</span>
         </div>
       </div>
       <div class="span4">
         <div class="well well-small statistic">
           <h3><g:message code="views.aaf.vhr.dashboard.total.groups"/></h3>
+          <hr>
           <span class="lead">${statistics.groups}</span>
         </div>
       </div>
       <div class="span4">
         <div class="well well-small statistic">
           <h3><g:message code="views.aaf.vhr.dashboard.total.managedsubjects"/></h3>
+          <hr>
           <span class="lead">${statistics.managedSubjects}</span>
         </div>
+      </div>
+    </div>
+
+    <div class="row content-spacer">
+      <div class="span12">
+        <h3><g:message code="views.aaf.vhr.dashboard.vhr.sessions"/></h3>
+        <p><g:message code="views.aaf.vhr.dashboard.vhr.sessions.detail"/></p>
+        <div id="sessionschart">
+        </div>    
       </div>
     </div>
 
     <r:script>
       $('.administering').equalizeCols();
       $('.statistic').equalizeCols();
+
+      $(function() {
+        aaf_base.administration_dashboard_sessions_report(${statistics.last12MonthSessions});      
+      });
     </r:script>
 
   </body>
