@@ -131,7 +131,7 @@ class ManagedSubjectController {
         log.info "Action: delete, Subject: $subject, Object: $managedSubjectInstance"
         flash.type = 'success'
         flash.message = 'controllers.aaf.vhr.managedsubject.delete.success'
-        redirect(action: "list")
+        redirect(controller:"group", action: "show", id: managedSubjectInstance.group.id, fragment:"tab-accounts")
       }
       catch (DataIntegrityViolationException e) {
         flash.type = 'error'

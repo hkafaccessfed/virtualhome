@@ -426,7 +426,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     then:
     ManagedSubject.count() == 0
 
-    response.redirectedUrl == "/managedSubject/list"
+    response.redirectedUrl == "/group/show/${group.id}#tab-accounts"
 
     flash.type == 'success'
     flash.message == 'controllers.aaf.vhr.managedsubject.delete.success'
