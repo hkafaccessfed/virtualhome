@@ -44,12 +44,20 @@ class GroupController {
   def save() {
     if(validOrganization()) {
       if(SecurityUtils.subject.isPermitted("app:manage:organization:${params.organization.id}:groups:create")) {
-        
+
         def groupInstance = new Group()
         bindData(groupInstance, params, [include: ['name', 'description']])
+        
         def organization = Organization.get(params.organization.id)
-
         groupInstance.organization = organization 
+        
+        if(!organization.canRegisterGroups()) {
+          flash.type = 'error'
+          flash.message = 'controllers.aaf.vhr.group.licensing.failed'
+          render(view: "create", model: [groupInstance: groupInstance])
+          return
+        }
+
         organization.addToGroups(groupInstance)
 
         if (!groupInstance.save()) {

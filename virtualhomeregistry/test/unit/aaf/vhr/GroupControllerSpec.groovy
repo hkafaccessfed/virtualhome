@@ -144,7 +144,7 @@ def o = Organization.build()
 
   def 'ensure correct output from save with invalid data and when valid permission'() {
     setup:
-    def o = Organization.build()
+    def o = Organization.build(active:true)
     shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:create") >> true
 
     def groupTestInstance = Group.build(organization: o)
@@ -173,9 +173,45 @@ def o = Organization.build()
     }
   }
 
+  def 'ensure correct output from save with valid data valid permission but licensing violation'() {
+    setup:
+    def o = Organization.build(groupLimit: 3)
+    shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:create") >> true
+
+    (1..3).each { Group.build(organization: o) }
+
+    def groupTestInstance = Group.build(organization: o)
+    groupTestInstance.properties.each {
+      if(it.value) {
+        if(grailsApplication.isDomainClass(it.value.getClass()))
+          params."${it.key}" = [id:"${it.value.id}"]
+        else
+          params."${it.key}" = "${it.value}"
+      }
+    }
+    groupTestInstance.delete()
+
+    expect:
+    Group.count() == 3
+    Role.count() == 0
+    Permission.count() == 0
+
+    when:
+    controller.save()
+
+    then:
+    Group.count() == 3
+    Role.count() == 0
+    Permission.count() == 0
+
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.group.licensing.failed'
+
+  }
+
   def 'ensure correct output from save with valid data and when valid permission'() {
     setup:
-    def o = Organization.build()
+    def o = Organization.build(active:true)
     shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:create") >> true
 
     def groupTestInstance = Group.build(organization: o)
