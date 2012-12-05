@@ -21,7 +21,7 @@
             <g:form controller="manageAdministrators" action="remove" method="post">
               <g:link controller="subject" action="show" id="${subject.id}" class="btn btn-small"><g:message code="label.view" /></g:link>
 
-              <g:hiddenField name="type" value="organization" />
+              <g:hiddenField name="type" value="${type}" />
               <g:hiddenField name="id" value="${instance?.id}" />
               <g:hiddenField name="subjectID" value="${subject.id}" />
               <a class="remove-administrative-member btn btn-small btn-danger"><g:message code="label.remove"/></a>
