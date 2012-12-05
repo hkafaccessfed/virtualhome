@@ -222,7 +222,7 @@
         <div id="administrative-members">
           
           <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:manage:administrators">
-            <g:render template="/templates/manageadministrators/administrators" model="[instance:organizationInstance]" />
+            <g:render template="/templates/manageadministrators/administrators" model="[instance:organizationInstance, type:'organization']" />
             <div id="add-administrative-members"></div>
           </aaf:hasPermission>
 
