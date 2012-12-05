@@ -3,6 +3,8 @@ package aaf.vhr
 import org.springframework.dao.DataIntegrityViolationException
 import org.apache.shiro.SecurityUtils
 
+import aaf.base.identity.Role
+
 class OrganizationController {
 
   static defaultAction = "list"
@@ -18,7 +20,9 @@ class OrganizationController {
   def show(Long id) {
     log.info "Action: show, Subject: $subject"
     def organizationInstance = Organization.get(id)
-    [organizationInstance: organizationInstance]
+
+    def role = Role.findWhere(name:"organization:${organizationInstance.id}:administrators")
+    [organizationInstance: organizationInstance, role:role]
   }
 
   def create() {
