@@ -93,8 +93,8 @@ class OrganizationService {
               }
 
               // kickoff workflow
-              def params = ['agentCN':'aaf.vhr.OrganizationService', 'agentEmail':'']
-              def(created, processInstance) = workflowProcessService.initiate(OrganizationService.CREATE_ORGANIZATION_WORKFLOW, "Approve activation of $org", ProcessPriority.LOW, params)
+              def params = ['agentCN':'aaf.vhr.OrganizationService', 'agentEmail':'', organization:org.id.toString()]
+              def(created, processInstance) = workflowProcessService.initiate(OrganizationService.CREATE_ORGANIZATION_WORKFLOW, "Approve activation of [${org.id}]${org.displayName}", ProcessPriority.LOW, params)
               if(!created)
                 log.error "Unable to create workflow process to approve creation of new $org"
               else {
