@@ -38,8 +38,10 @@
           <g:else>
             <p><g:message code="views.aaf.vhr.dashboard.nogroups"/></p>
           </g:else>
-          <br>
-          <div class="view-all"><g:link controller="group" action="list" class="btn btn-small btn-info"><g:message code="views.aaf.vhr.dashboard.groups.view"/></g:link></div>
+          <aaf:hasPermission target="app:administrator">
+            <br>
+            <div class="view-all"><g:link controller="group" action="list" class="btn btn-small btn-info"><g:message code="views.aaf.vhr.dashboard.groups.view"/></g:link></div>
+          </aaf:hasPermission>
         </div>
       </div>
     </div>

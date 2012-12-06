@@ -14,14 +14,27 @@ class ManagedSubjectController {
   def sharedTokenService
 
   def list() {
-    log.info "Action: list, Subject: $subject"
-    [managedSubjectInstanceList: ManagedSubject.list(params), managedSubjectInstanceTotal: ManagedSubject.count()]
+    if(SecurityUtils.subject.isPermitted("app:administrator")) {
+      log.info "Action: list, Subject: $subject"
+      [managedSubjectInstanceList: ManagedSubject.list(params), managedSubjectInstanceTotal: ManagedSubject.count()]
+    }
+    else {
+      log.warn "Attempt to do administrative ManagedSubject list by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
   }
 
   def show(Long id) {
-    log.info "Action: show, Subject: $subject"
     def managedSubjectInstance = ManagedSubject.get(id)
-    [managedSubjectInstance: managedSubjectInstance]
+
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:show")) {
+      log.info "Action: show, Subject: $subject, Object: $managedSubjectInstance"
+      [managedSubjectInstance: managedSubjectInstance]
+    }
+    else {
+      log.warn "Attempt to do administrative ManagedSubject show by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
   }
 
   def create() {

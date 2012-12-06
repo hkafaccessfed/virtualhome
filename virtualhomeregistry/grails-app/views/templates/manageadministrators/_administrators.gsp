@@ -12,7 +12,6 @@
     <tbody>
       <g:each in="${role.subjects.sort{it.id}}" var="subject">
         <tr>
-          <td><g:fieldValue bean="${subject}" field="id"/></td>
           <td><g:fieldValue bean="${subject}" field="cn"/></td>
           <td><a href="mailto:${subject.email}"><g:fieldValue bean="${subject}" field="email"/></a></td>
           <td class="hidden-phone"><g:fieldValue bean="${subject}" field="sharedToken"/></td>
@@ -20,8 +19,6 @@
             
             <g:form controller="manageAdministrators" action="remove" method="post">
               <g:link controller="subject" action="show" id="${subject.id}" class="btn btn-small"><g:message code="label.view" /></g:link>
-
-              <g:hiddenField name="type" value="${type}" />
               <g:hiddenField name="id" value="${instance?.id}" />
               <g:hiddenField name="subjectID" value="${subject.id}" />
               <a class="remove-administrative-member btn btn-small btn-danger"><g:message code="label.remove"/></a>

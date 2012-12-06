@@ -2,7 +2,6 @@
   <table class="table table-borderless table-sortable">
     <thead>
       <tr>
-        <th><g:message code="label.id" /></th>
         <th><g:message code="label.name" /></th>
         <th><g:message code="label.email" /></th>
       </tr>
@@ -10,7 +9,6 @@
     <tbody>
       <g:each in="${role.subjects.sort{it.id}}" var="subject">
         <tr>
-          <td><g:fieldValue bean="${subject}" field="id"/></td>
           <td><g:fieldValue bean="${subject}" field="cn"/></td>
           <td><a href="mailto:${subject.email}"><g:fieldValue bean="${subject}" field="email"/></a></td>
         </tr>

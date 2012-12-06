@@ -116,6 +116,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from list'() {
     setup:
     (1..10).each { ManagedSubject.build() }
+    shiroSubject.isPermitted("app:administrator") >> true
 
     when:
     params.max = max
@@ -131,9 +132,29 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     5 | 10 | 5
   }
 
+  def 'ensure correct output from list without permissions'() {
+    setup:
+    (1..10).each { ManagedSubject.build() }
+    shiroSubject.isPermitted("app:administrator") >> false
+
+    when:
+    params.max = max
+    def model = controller.list()
+
+    then:
+    model == null
+    response.status == 403
+
+    where:
+    max | total | expectedResult
+    0 | 10 | 10
+    5 | 10 | 5
+  }
+
   def 'ensure correct output from show'() {
     setup:
     def managedSubjectTestInstance = ManagedSubject.build()
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:show") >> true
 
     when:
     params.id = managedSubjectTestInstance.id
@@ -141,6 +162,19 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
 
     then:
     model.managedSubjectInstance == managedSubjectTestInstance
+  }
+
+  def 'ensure correct output from show when invalid permission'() {
+    setup:
+    def managedSubjectTestInstance = ManagedSubject.build()
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:show") >> false
+
+    when:
+    params.id = managedSubjectTestInstance.id
+    def model = controller.show()
+
+    then:
+    response.status == 403
   }
 
   def 'ensure correct output from create when valid permission'() {
