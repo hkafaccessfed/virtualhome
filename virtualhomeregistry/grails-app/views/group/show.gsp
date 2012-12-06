@@ -8,9 +8,7 @@
 
     <ul class="breadcrumb">
       <li><g:link controller="dashboard"><g:message code="branding.application.name"/></g:link> <span class="divider">/</span></li>
-      <li><g:link action="list" controller="organization"><g:message code="branding.nav.breadcrumb.organization"/></g:link> <span class="divider">/</span></li>
       <li><g:link action="show" controller="organization" id="${groupInstance.organization.id}"><g:fieldValue bean="${groupInstance.organization}" field="displayName"/></g:link> <span class="divider">/</span></li>
-      <li><g:link action="list"><g:message code="branding.nav.breadcrumb.group"/></g:link> <span class="divider">/</span></li>
       <li><g:fieldValue bean="${groupInstance}" field="name"/></li>
     </ul>
 
@@ -60,17 +58,17 @@
 
           <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit">
             <li>
+              <a href="#" onclick="$(this).next('form').submit();">
+                <g:if test="${groupInstance.active}">
+                  <g:message code="views.aaf.vhr.group.show.deactivate"/>
+                </g:if>
+                <g:else>
+                  <g:message code="views.aaf.vhr.group.show.activate"/>
+                </g:else>
+              </a>
               <g:form action="toggleActive" method="post">
                 <g:hiddenField name="version" value="${groupInstance?.version}" />
                 <g:hiddenField name="id" value="${groupInstance.id}" />
-                <a href="#" onclick="$(this).parents('form').submit();">
-                  <g:if test="${groupInstance.active}">
-                    <g:message code="views.aaf.vhr.group.show.deactivate"/>
-                  </g:if>
-                  <g:else>
-                    <g:message code="views.aaf.vhr.group.show.activate"/>
-                  </g:else>
-                </a>
               </g:form>
             </li>
             <li>

@@ -8,11 +8,8 @@
 
     <ul class="breadcrumb">
       <li><g:link controller="dashboard"><g:message code="branding.application.name"/></g:link> <span class="divider">/</span></li>
-      <li><g:link action="list" controller="organization"><g:message code="branding.nav.breadcrumb.organization"/></g:link> <span class="divider">/</span></li>
       <li><g:link action="show" controller="organization" id="${managedSubjectInstance.group.organization.id}"><g:fieldValue bean="${managedSubjectInstance.group.organization}" field="displayName"/></g:link> <span class="divider">/</span></li>
-      <li><g:link controller="group" action="list"><g:message code="branding.nav.breadcrumb.group"/></g:link> <span class="divider">/</span></li>
       <li><g:link controller="group" action="show" id="${managedSubjectInstance.group.id}"> <g:fieldValue bean="${managedSubjectInstance.group}" field="name"/></g:link> <span class="divider">/</span></li>
-      <li><g:link action="list"><g:message code="branding.nav.breadcrumb.managedsubject"/></g:link> <span class="divider">/</span></li>
       <li class="active"><g:fieldValue bean="${managedSubjectInstance}" field="cn"/></li>
     </ul>
 

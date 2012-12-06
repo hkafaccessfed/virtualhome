@@ -6,7 +6,8 @@
 
     <ul class="breadcrumb">
       <li><g:link controller="dashboard"><g:message code="branding.application.name"/></g:link> <span class="divider">/</span></li>
-      <li><g:link action="list"><g:message code="branding.nav.breadcrumb.managedsubject"/></g:link> <span class="divider">/</span></li>
+      <li><g:link action="show" controller="organization" id="${managedSubjectInstance.organization.id}"><g:fieldValue bean="${managedSubjectInstance.organization}" field="displayName"/></g:link> <span class="divider">/</span></li> 
+      <li><g:link action="show" controller="group" id="${managedSubjectInstance.group.id}"><g:fieldValue bean="${managedSubjectInstance.group}" field="name"/></g:link> <span class="divider">/</span></li> 
       <li class="active"><g:message code="branding.nav.breadcrumb.managedsubject.create"/></li>
     </ul>
 

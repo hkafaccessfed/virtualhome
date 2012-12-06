@@ -8,7 +8,6 @@
 
     <ul class="breadcrumb">
       <li><g:link controller="dashboard"><g:message code="branding.application.name"/></g:link> <span class="divider">/</span></li>
-      <li><g:link action="list"><g:message code="branding.nav.breadcrumb.organization"/></g:link> <span class="divider">/</span></li>
       <li><g:fieldValue bean="${organizationInstance}" field="displayName"/></li>
     </ul>
 
