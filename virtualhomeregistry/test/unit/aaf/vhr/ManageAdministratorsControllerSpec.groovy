@@ -65,7 +65,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
 
   def 'ensure validRoleInstance returns correct Role and Instance when valid org and valid perms'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> true
 
@@ -90,9 +90,44 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     response.status == 400
   }
 
+  def 'ensure validRoleInstance returns correct Role and Instance when valid but not functioning org and app:administrator perms'() {
+    setup:
+    def organizationTestInstance = Organization.build(active:false)
+    def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
+    shiroSubject.isPermitted("app:administrator") >> true
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> true
+
+    when:
+    params.type = 'organization'
+    params.id = organizationTestInstance.id
+    def (roleInstance, organizationInstance) = controller.validRoleInstance()
+
+    then:
+    roleInstance == roleTestInstance
+    organizationInstance == organizationTestInstance
+  }
+
+  def 'ensure validRoleInstance returns 400 when valid but not functioning org and not app:administrator perms'() {
+    setup:
+    def organizationTestInstance = Organization.build(active:false)
+    def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
+    shiroSubject.isPermitted("app:administrator") >> false
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> true
+    
+    when:
+    params.type = 'organization'
+    params.id = organizationTestInstance.id
+    def (roleInstance, organizationInstance) = controller.validRoleInstance()
+
+    then:
+    roleInstance == null
+    organizationInstance == null
+    response.status == 400
+  }
+
   def 'ensure validRoleInstance returns 403 when valid org but invalid perms'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> false
 
@@ -109,7 +144,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
 
   def 'ensure validRoleInstance returns 400 when valid org and valid perms but non existant admin role'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> true
 
     when:
@@ -125,7 +160,8 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
 
   def 'ensure validRoleInstance returns correct Role when valid group and valid perms'() {
     setup:
-    def groupTestInstance = Group.build()
+    def organizationTestInstance = Organization.build(active:true)
+    def groupTestInstance = Group.build(organization:organizationTestInstance, active:true)
     def roleTestInstance = Role.build(name:"group:${groupTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:manage:administrators") >> true
 
@@ -150,9 +186,45 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     response.status == 400
   }
 
+  def 'ensure validRoleInstance returns correct Role when valid but not functioning group and app:administrator perms'() {
+    setup:
+    def organizationTestInstance = Organization.build(active:true)
+    def groupTestInstance = Group.build(organization:organizationTestInstance, active:false)
+    def roleTestInstance = Role.build(name:"group:${groupTestInstance.id}:administrators")
+    shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:manage:administrators") >> true
+    shiroSubject.isPermitted("app:administrator") >> true
+    when:
+    params.type = 'group'
+    params.id = groupTestInstance.id
+    def (roleInstance, groupInstance) = controller.validRoleInstance()
+
+    then:
+    roleInstance == roleTestInstance
+    groupInstance == groupTestInstance
+  }
+
+  def 'ensure validRoleInstance returns 400 when valid but not functioning group and without app:administrator perms'() {
+    setup:
+    def organizationTestInstance = Organization.build(active:true)
+    def groupTestInstance = Group.build(organization:organizationTestInstance, active:false)
+    def roleTestInstance = Role.build(name:"group:${groupTestInstance.id}:administrators")
+    shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:manage:administrators") >> true
+    shiroSubject.isPermitted("app:administrator") >> false
+    when:
+    params.type = 'group'
+    params.id = groupTestInstance.id
+    def (roleInstance, groupInstance) = controller.validRoleInstance()
+
+    then:
+    roleInstance == null
+    groupInstance == null
+    response.status == 400
+  }
+
   def 'ensure validRoleInstance returns 403 when valid group but invalid perms'() {
     setup:
-    def groupTestInstance = Group.build()
+    def organizationTestInstance = Organization.build(active:true)
+    def groupTestInstance = Group.build(organization:organizationTestInstance, active:true)
     def roleTestInstance = Role.build(name:"group:${groupTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:manage:administrators") >> false
 
@@ -169,7 +241,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
 
   def 'ensure validRoleInstance returns 400 when valid group and valid perms but non existant admin role'() {
     setup:
-    def groupTestInstance = Group.build()
+    def groupTestInstance = Group.build(active:true)
     shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:manage:administrators") >> true
 
     when:
@@ -196,7 +268,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
 
   def 'ensure search returns all subjects when no current admins'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> true
 
@@ -217,7 +289,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
 
   def 'ensure search returns subjects that arent current admins'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> true
 
@@ -244,7 +316,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
 
   def 'ensure valid role/permissions required for search'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> false
 
@@ -271,7 +343,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
 
   def 'ensure valid role/permissions required for add'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> false
 
@@ -289,7 +361,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
 
   def 'ensure valid target subject required for add'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> true
 
@@ -307,7 +379,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
 
   def 'ensure correct output from add when all input valid'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     def targetSubject = aaf.base.identity.Subject.build()
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> true
@@ -336,7 +408,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
 
   def 'ensure valid role/permissions required for remove'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> false
 
@@ -354,7 +426,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
 
   def 'ensure valid target subject required for remove'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> true
 
@@ -372,7 +444,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
 
   def 'ensure correct output from delete when all input valid'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     def targetSubject = aaf.base.identity.Subject.build()
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> true

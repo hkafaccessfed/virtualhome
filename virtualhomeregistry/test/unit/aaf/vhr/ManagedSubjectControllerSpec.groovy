@@ -9,7 +9,7 @@ import spock.lang.*
 import test.shared.ShiroEnvironment
 
 @TestFor(aaf.vhr.ManagedSubjectController)
-@Build([ManagedSubject, aaf.base.identity.Subject])
+@Build([Organization, Group, ManagedSubject, aaf.base.identity.Subject])
 class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   
   @Shared def shiroEnvironment = new ShiroEnvironment()
@@ -29,7 +29,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     shiroSubject.principal >> subject.principal
     shiroSubject.isAuthenticated() >> true
     shiroEnvironment.setSubject(shiroSubject)
-    
+
     controller.metaClass.getSubject = { subject }
   }
 
@@ -101,9 +101,30 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     flash.message == 'controllers.aaf.vhr.managedsubject.group.notfound'
   }
 
-  def 'ensure true if no valid group found by validGroup'() {
+  def 'ensure redirect to list if group found by validGroup is not functioning'() {
     setup:
-    def group = Group.build()
+    def organization = Organization.build(active:false)
+    def group = Group.build(organization:organization, active:false)
+    shiroSubject.isPermitted("app:administrator") >> false
+
+    when:
+    params.group = [id:group.id]
+    def result = controller.validGroup()
+
+    then:
+    !result
+    response.status == 302
+
+    response.redirectedUrl== "/managedSubject/list"
+
+    flash.type == 'info'
+    flash.message == 'controllers.aaf.vhr.managedsubject.group.not.functioning'
+  }
+
+  def 'ensure true if valid group found by validGroup'() {
+    setup:
+    def organization = Organization.build(active:true)
+    def group = Group.build(organization:organization)
 
     when:
     params.group = [id:group.id]
@@ -179,7 +200,8 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from create when valid permission'() {
     setup:
-    def group = Group.build()
+    def organization = Organization.build(active:true)
+    def group = Group.build(organization:organization)
     shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create") >> true
 
     when:
@@ -192,7 +214,8 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from create when invalid permission'() {
     setup:
-    def group = Group.build()
+    def organization = Organization.build(active:true)
+    def group = Group.build(organization:organization)
     shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:create") >> true
 
     when:
@@ -206,7 +229,8 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from save when invalid permission'() {
     setup:
-    def group = Group.build()
+    def organization = Organization.build(active:true)
+    def group = Group.build(organization:organization)
     shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:create") >> true
 
     when:
@@ -488,7 +512,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:delete") >> true
+    shiroSubject.isPermitted("app:administrator") >> true
 
     expect:
     ManagedSubject.count() == 1
@@ -510,7 +534,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:delete") >> true
+    shiroSubject.isPermitted("app:administrator") >> true
 
     ManagedSubject.metaClass.delete { throw new org.springframework.dao.DataIntegrityViolationException("Thrown from test case") }
 

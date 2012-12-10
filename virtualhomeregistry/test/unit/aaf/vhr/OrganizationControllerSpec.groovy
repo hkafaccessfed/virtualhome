@@ -103,7 +103,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from create when valid permission'() {
     setup:
-    shiroSubject.isPermitted("app:manage:organization:create") >> true
+    shiroSubject.isPermitted("app:administrator") >> true
 
     when:
     def model = controller.create()
@@ -138,7 +138,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from save with invalid data and when valid permission'() {
     setup:
-    shiroSubject.isPermitted("app:manage:organization:create") >> true
+    shiroSubject.isPermitted("app:administrator") >> true
 
     def organizationTestInstance = Organization.build()
     organizationTestInstance.properties.each {
@@ -168,7 +168,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from save with valid data and when valid permission'() {
     setup:
-    shiroSubject.isPermitted("app:manage:organization:create") >> true
+    shiroSubject.isPermitted("app:administrator") >> true
 
     def organizationTestInstance = Organization.build()
     organizationTestInstance.properties.each {
@@ -214,7 +214,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from edit when valid permission'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
 
     when:
@@ -227,10 +227,11 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from update when invalid permission'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance}.id}:edit") >> false
 
     when:
+    params.id = organizationTestInstance.id
     def model = controller.update()
 
     then:
@@ -238,9 +239,39 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     response.status == 403
   }
 
+  def 'ensure correct output from edit when not functioning'() {
+    setup:
+    def organizationTestInstance = Organization.build(active:false)
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
+
+    when:
+    params.id = organizationTestInstance.id
+    def model = controller.edit()
+
+    then:
+
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.organization.edit.not.functioning'
+  }
+
+  def 'ensure correct output from update when not functioning'() {
+    setup:
+    def organizationTestInstance = Organization.build(active:false)
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
+
+    when:
+    params.id = organizationTestInstance.id
+    def model = controller.update()
+
+    then:
+
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.organization.update.not.functioning'
+  }
+
   def 'ensure correct output from update with null version but valid permission'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
     
     expect:
@@ -259,7 +290,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from update with invalid data and when valid permission'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
     organizationTestInstance.getVersion() >> 20
     
@@ -293,7 +324,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from update with valid data and when valid permission'() {
     setup:
-    def organizationTestInstance = Organization.build()
+    def organizationTestInstance = Organization.build(active:true)
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
     
     organizationTestInstance.properties.each {
@@ -343,7 +374,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from delete when valid permission'() {
     setup:
     def organizationTestInstance = Organization.build()
-    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:delete") >> true
+    shiroSubject.isPermitted("app:administrator") >> true
 
     expect:
     Organization.count() == 1
@@ -364,7 +395,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from delete when integrity violation'() {
     setup:
     def organizationTestInstance = Organization.build()
-    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:delete") >> true
+    shiroSubject.isPermitted("app:administrator") >> true
 
     Organization.metaClass.delete { throw new org.springframework.dao.DataIntegrityViolationException("Thrown from test case") }
 

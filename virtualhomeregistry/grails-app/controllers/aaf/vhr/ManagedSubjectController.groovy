@@ -63,7 +63,7 @@ class ManagedSubjectController {
         managedSubjectInstance.organization = group.organization
         sharedTokenService.generate(managedSubjectInstance)
 
-        if(!group.organization.canRegisterSubjects()) {
+        if(!group.organization.canRegisterSubjects() && !SecurityUtils.subject.isPermitted("app:administrator")) {
           flash.type = 'error'
           flash.message = 'controllers.aaf.vhr.managedsubject.licensing.failed'
           render(view: "create", model: [managedSubjectInstance: managedSubjectInstance])
@@ -144,7 +144,7 @@ class ManagedSubjectController {
 
   def delete(Long id) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:delete")) {
+    if(SecurityUtils.subject.isPermitted("app:administrator")) {
       try {
         managedSubjectInstance.delete()
 
@@ -273,6 +273,18 @@ class ManagedSubjectController {
 
       redirect action:'list'
       return false
+    }
+
+    if(!SecurityUtils.subject.isPermitted("app:administrator")) {
+      if(!groupInstance.functioning()) {
+        log.warn "groupInstance cannot be modified by non super administrator when not functioning"
+
+        flash.type = 'info'
+        flash.message = 'controllers.aaf.vhr.managedsubject.group.not.functioning'
+        
+        redirect action:'list'
+        return false
+      }
     }
 
     true

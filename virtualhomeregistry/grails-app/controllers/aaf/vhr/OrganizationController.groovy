@@ -26,7 +26,7 @@ class OrganizationController {
   }
 
   def create() {
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:create")) {
+    if(SecurityUtils.subject.isPermitted("app:administrator")) {
       log.info "Action: create, Subject: $subject"
       [organizationInstance: new Organization()]
     }
@@ -37,7 +37,7 @@ class OrganizationController {
   }
 
   def save() {
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:create")) {
+    if(SecurityUtils.subject.isPermitted("app:administrator")) {
       def organizationInstance = new Organization()
       bindData(organizationInstance, params, [include: ['name', 'displayName', 'description', 'frID', 'subjectLimit', 'groupLimit']])
 
@@ -60,9 +60,19 @@ class OrganizationController {
   }
 
   def edit(Long id) {
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:$id:edit")) {
+    def organizationInstance = Organization.get(id)
+
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${organizationInstance.id}:edit")) {
+
+      if(!organizationInstance.functioning()) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.organization.edit.not.functioning'
+
+        render(view: "show", model: [organizationInstance: organizationInstance])
+        return
+      }
+
       log.info "Action: edit, Subject: $subject, Object: organizationInstance"
-      def organizationInstance = Organization.get(id)
       [organizationInstance: organizationInstance]
     }
     else {
@@ -72,8 +82,15 @@ class OrganizationController {
   }
 
   def update(Long id, Long version) {
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:$id:edit")) {
-      def organizationInstance = Organization.get(id)
+    def organizationInstance = Organization.get(id)
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${organizationInstance.id}:edit")) {
+
+      if(!organizationInstance.functioning()) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.organization.update.not.functioning'
+        render(view: "show", model: [organizationInstance: organizationInstance])
+        return
+      }
       
       if (version == null) {
         flash.type = 'error'
@@ -112,7 +129,7 @@ class OrganizationController {
   }
 
   def delete(Long id) {
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:$id:delete")) {
+    if(SecurityUtils.subject.isPermitted("app:administrator")) {
       def organizationInstance = Organization.get(id)
       try {
         organizationInstance.delete()

@@ -30,63 +30,14 @@
       <li><a href="#tab-accounts" data-toggle="tab"><g:message code="label.managedsubjects" /></a></li>
       <li><a href="#tab-administrators" data-toggle="tab"><g:message code="label.administrators" /></a></li>
 
-      <aaf:hasAnyPermission in='["app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:managedsubject:create, app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit","app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:delete", "app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:manage:administrators"]'>
       <li class="dropdown pull-right">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
           <g:message code="label.actions" />
           <b class="caret"></b>
         </a>
-        <ul class="dropdown-menu">
-          <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:managedsubject:create">
-            <li>
-              <g:link action="create" controller="managedSubject" params='['group.id':"${groupInstance.id}"]'><g:message code="label.createmanagedsubject"/></g:link>
-            </li>
-            <li>
-              <g:link action="create" controller="managedSubject" params='['group.id':"${groupInstance.id}"]'><g:message code="label.createmultiplemanagedsubject"/></g:link>
-            </li>
-            <li class="divider"></li>
-            <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:manage:administrators">
-              <li>
-                <a class="show-add-administrative-members"><g:message code="label.addadministrator"/></a>
-                <g:form controller="manageAdministrators" action="search" method="post">
-                  <g:hiddenField name="id" value="${groupInstance.id}" />
-                  <g:hiddenField name="type" value="group" />
-                </g:form>
-              </li>
-            </aaf:hasPermission>
-          </aaf:hasPermission>
-
-          <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit">
-            <li>
-              <a href="#" onclick="$(this).next('form').submit();">
-                <g:if test="${groupInstance.active}">
-                  <g:message code="views.aaf.vhr.group.show.deactivate"/>
-                </g:if>
-                <g:else>
-                  <g:message code="views.aaf.vhr.group.show.activate"/>
-                </g:else>
-              </a>
-              <g:form action="toggleActive" method="post">
-                <g:hiddenField name="version" value="${groupInstance?.version}" />
-                <g:hiddenField name="id" value="${groupInstance.id}" />
-              </g:form>
-            </li>
-            <li>
-              <g:link action="edit" id="${groupInstance.id}"><g:message code="label.edit"/></g:link>
-            </li>
-          </aaf:hasPermission>
-
-          <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:delete">
-            <li>
-              <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.group.confirm.remove')}"><g:message code="label.delete"/></a>
-              <g:form action="delete" method="delete">
-                <g:hiddenField name="id" value="${groupInstance.id}" />
-              </g:form>
-            </li>
-          </aaf:hasPermission>
-        </ul>
+        <g:render template="show_breadcrumb"/>
       </li>
-      </aaf:hasAnyPermission>
+
     </ul>
 
     <div class="tab-content">

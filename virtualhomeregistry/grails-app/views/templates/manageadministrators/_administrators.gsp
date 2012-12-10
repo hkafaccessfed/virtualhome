@@ -2,7 +2,6 @@
   <table class="table table-borderless table-sortable">
     <thead>
       <tr>
-        <th><g:message code="label.id" /></th>
         <th><g:message code="label.name" /></th>
         <th><g:message code="label.email" /></th>
         <th><g:message code="label.sharedtoken" /></th>
@@ -15,10 +14,10 @@
           <td><g:fieldValue bean="${subject}" field="cn"/></td>
           <td><a href="mailto:${subject.email}"><g:fieldValue bean="${subject}" field="email"/></a></td>
           <td class="hidden-phone"><g:fieldValue bean="${subject}" field="sharedToken"/></td>
-          <td class="pull-right">
-            
+          <td class="pull-right">         
             <g:form controller="manageAdministrators" action="remove" method="post">
               <g:link controller="subject" action="show" id="${subject.id}" class="btn btn-small"><g:message code="label.view" /></g:link>
+              <g:hiddenField name="type" value="${type}" />
               <g:hiddenField name="id" value="${instance?.id}" />
               <g:hiddenField name="subjectID" value="${subject.id}" />
               <a class="remove-administrative-member btn btn-small btn-danger"><g:message code="label.remove"/></a>

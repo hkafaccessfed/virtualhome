@@ -43,72 +43,13 @@
     <ul class="nav nav-tabs">
       <li class="active"><a href="#tab-overview" data-toggle="tab"><g:message code="label.overview" /></a></li>
 
-      <aaf:hasAnyPermission in='["app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit","app:manage:group:${managedSubjectInstance.group.id}:managedsubject:delete"]'>
       <li class="dropdown pull-right">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
           <g:message code="label.actions" />
           <b class="caret"></b>
         </a>
-        <ul class="dropdown-menu">
-          <aaf:hasPermission target="app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit">
-            <g:if test="${managedSubjectInstance.login == null}">
-              <g:form action="resend" method="post">
-                <g:hiddenField name="id" value="${managedSubjectInstance.id}" />
-                <a href="#" onclick="$(this).parents('form').submit();"><g:message code="views.aaf.vhr.managedsubject.show.resend.welcome"/></a>
-              </g:form>
-
-              <li class="divider"></li>
-            </g:if>
-
-            <li>
-              <g:form action="toggleActive" method="post">
-                <g:hiddenField name="version" value="${managedSubjectInstance?.version}" />
-                <g:hiddenField name="id" value="${managedSubjectInstance.id}" />
-                <a href="#" onclick="$(this).parents('form').submit();">
-                  <g:if test="${managedSubjectInstance.active}">
-                    <g:message code="views.aaf.vhr.managedsubject.show.deactivate"/>
-                  </g:if>
-                  <g:else>
-                    <g:message code="views.aaf.vhr.managedsubject.show.activate"/>
-                  </g:else>
-                </a>
-              </g:form>
-            </li>
-
-            <li>
-              <g:link action="edit" id="${managedSubjectInstance.id}"><g:message code="label.edit"/></g:link>
-            </li>
-          </aaf:hasPermission>
-
-          <aaf:hasPermission target="app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:delete">
-            <li>
-              <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.managedsubject.confirm.remove')}"><g:message code="label.delete"/></a>
-              <g:form action="delete" method="delete">
-                <g:hiddenField name="id" value="${managedSubjectInstance.id}" />
-              </g:form>
-            </li>
-          </aaf:hasPermission>
-
-          <aaf:hasPermission target="app:administrator">
-            <li class="divider"></li>
-            <li>
-              <g:form action="toggleLock" method="post">
-                <g:hiddenField name="version" value="${managedSubjectInstance?.version}" />
-                <g:hiddenField name="id" value="${managedSubjectInstance.id}" />
-                <a href="#" onclick="$(this).parents('form').submit();">
-                  <g:if test="${managedSubjectInstance.locked}">
-                    <g:message code="views.aaf.vhr.managedsubject.show.admin.unlock"/>
-                  </g:if>
-                  <g:else>
-                    <g:message code="views.aaf.vhr.managedsubject.show.admin.lock"/>
-                  </g:else>
-                </a>
-              </g:form>
-            </li>
-          </aaf:hasPermission>
-        </ul>
+        <g:render template="show_breadcrumb"/>
       </li>
-      </aaf:hasAnyPermission>
     </ul>
 
     <div class="tab-content">

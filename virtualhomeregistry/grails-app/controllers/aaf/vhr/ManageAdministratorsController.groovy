@@ -109,6 +109,15 @@ class ManageAdministratorsController {
                             response.sendError 400
                             return [null, null]
                           }
+
+                          if(!SecurityUtils.subject.isPermitted("app:administrator")) {
+                            if(!organizationInstance.functioning()) {
+                              log.warn "organizationInstance cannot be modified by non super administrator when not functioning"
+                              response.sendError 400
+                              return [null, null]
+                            }
+                          }
+
                           if(SecurityUtils.subject.isPermitted("app:manage:organization:${organizationInstance.id}:manage:administrators")) {
                             role = Role.findWhere(name:"organization:${organizationInstance.id}:administrators")
                             if (!role) {
@@ -132,6 +141,15 @@ class ManageAdministratorsController {
                             response.sendError 400
                             return [null, null]
                           }
+
+                          if(!SecurityUtils.subject.isPermitted("app:administrator")) {
+                            if(!groupInstance.functioning()) {
+                              log.warn "groupInstance cannot be modified by non super administrator when not functioning"
+                              response.sendError 400
+                              return [null, null]
+                            }
+                          }
+
                           if(SecurityUtils.subject.isPermitted("app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:manage:administrators")) {
                             role = Role.findWhere(name:"group:${groupInstance.id}:administrators")
                             if (!role) {

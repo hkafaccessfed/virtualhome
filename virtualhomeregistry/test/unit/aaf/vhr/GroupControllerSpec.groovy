@@ -11,7 +11,7 @@ import test.shared.ShiroEnvironment
 import aaf.base.identity.*
 
 @TestFor(aaf.vhr.GroupController)
-@Build([ManagedSubject, Group, aaf.base.identity.Subject, aaf.base.identity.Role, aaf.base.identity.Permission])
+@Build([ManagedSubject, Organization, Group, aaf.base.identity.Subject, aaf.base.identity.Role, aaf.base.identity.Permission])
 class GroupControllerSpec  extends spock.lang.Specification {
   
   @Shared def shiroEnvironment = new ShiroEnvironment()
@@ -73,6 +73,131 @@ class GroupControllerSpec  extends spock.lang.Specification {
     flash.message == 'controllers.aaf.vhr.group.notfound'
   }
 
+  def 'ensure redirect to list if valid instance found by beforeInterceptor but not functioning and not app admin'() {
+    setup:
+    def organizationTestInstance = Organization.build(active:true)
+    def groupTestInstance = Group.build(organization:organizationTestInstance, active:false)
+
+    shiroSubject.isPermitted("app:administrator") >> false
+
+    when:
+    params.id = groupTestInstance.id
+    def result = controller.validGroup()
+
+    then:
+    !result
+    response.status == 302
+
+    response.redirectedUrl== "/group/list"
+
+    flash.type == 'info'
+    flash.message == 'controllers.aaf.vhr.group.validgroup.not.functioning'
+  }
+
+  def 'ensure true if valid instance found by beforeInterceptor but not functioning and app admin'() {
+    setup:
+    def organizationTestInstance = Organization.build(active:true)
+    def groupTestInstance = Group.build(organization:organizationTestInstance, active:false)
+
+    shiroSubject.isPermitted("app:administrator") >> true
+
+    when:
+    params.id = groupTestInstance.id
+    def result = controller.validGroup()
+
+    then:
+    result
+  }
+
+  def 'ensure true if valid instance found by beforeInterceptor and functioning and not app admin'() {
+    setup:
+    def organizationTestInstance = Organization.build(active:true)
+    def groupTestInstance = Group.build(organization:organizationTestInstance, active:true)
+
+    shiroSubject.isPermitted("app:administrator") >> false
+
+    when:
+    params.id = groupTestInstance.id
+    def result = controller.validGroup()
+
+    then:
+    result
+  }
+
+  def 'ensure redirect to list if no id presented to validOrganization'() {
+    when:
+    params.organization = [:]
+    def result = controller.validOrganization()
+
+    then:
+    !result
+    response.status == 302
+
+    response.redirectedUrl == "/group/list"
+
+    flash.type == 'info'
+    flash.message == 'controllers.aaf.vhr.groups.organization.no.id'
+  }
+
+  def 'ensure redirect to list if no valid instance found by validOrganization'() {
+    when:
+    params.organization = [id:1]
+    def result = controller.validOrganization()
+
+    then:
+    !result
+    response.status == 302
+
+    response.redirectedUrl== "/group/list"
+
+    flash.type == 'info'
+    flash.message == 'controllers.aaf.vhr.groups.organization.notfound'
+  }
+
+  def 'ensure redirect to list if organization found by validOrganization is not functioning'() {
+    setup:
+    def organization = Organization.build(active:false)
+    shiroSubject.isPermitted("app:administrator") >> false
+
+    when:
+    params.organization = [id:organization.id]
+    def result = controller.validOrganization()
+
+    then:
+    !result
+    response.status == 302
+
+    response.redirectedUrl== "/group/list"
+
+    flash.type == 'info'
+    flash.message == 'controllers.aaf.vhr.groups.organization.not.functioning'
+  }
+
+  def 'ensure true if valid organization found by validOrganization when not functioning but administrator'() {
+    setup:
+    def organization = Organization.build(active:false)
+     shiroSubject.isPermitted("app:administrator") >> true
+
+    when:
+    params.organization = [id:organization.id]
+    def result = controller.validOrganization()
+
+    then:
+    result
+  }
+
+  def 'ensure true if valid organization found by validOrganization and functioning'() {
+    setup:
+    def organization = Organization.build(active:true)
+
+    when:
+    params.organization = [id:organization.id]
+    def result = controller.validOrganization()
+
+    then:
+    result
+  }
+
   def 'ensure correct output from list'() {
     setup:
     (1..10).each { Group.build() }
@@ -105,7 +230,7 @@ class GroupControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from create when valid permission'() {
     setup:
-    def o = Organization.build()
+    def o = Organization.build(active:true)
     shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:create") >> true
 
     when:
@@ -117,7 +242,7 @@ class GroupControllerSpec  extends spock.lang.Specification {
   }
 
   def 'ensure correct output from create when invalid permission'() {
-def o = Organization.build()
+    def o = Organization.build(active:true)
     shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:create") >> false
 
     when:
@@ -130,7 +255,7 @@ def o = Organization.build()
   }
 
   def 'ensure correct output from save when invalid permission'() {
-    def o = Organization.build()
+    def o = Organization.build(active:true)
     shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:create") >> false
 
     when:
@@ -175,7 +300,7 @@ def o = Organization.build()
 
   def 'ensure correct output from save with valid data valid permission but licensing violation'() {
     setup:
-    def o = Organization.build(groupLimit: 3)
+    def o = Organization.build(groupLimit: 3, active:true)
     shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:create") >> true
 
     (1..3).each { Group.build(organization: o) }
@@ -400,7 +525,7 @@ def o = Organization.build()
     setup:
     def o = Organization.build()
     def groupTestInstance = Group.build(organization:o)
-    shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:delete") >> true
+    shiroSubject.isPermitted("app:administrator") >> true
 
     expect:
     Group.count() == 1
@@ -422,7 +547,7 @@ def o = Organization.build()
     setup:
     def o = Organization.build()
     def groupTestInstance = Group.build(organization:o)
-    shiroSubject.isPermitted("app:manage:organization:${o.id}:groups:delete") >> true
+    shiroSubject.isPermitted("app:administrator") >> true
 
     Group.metaClass.delete { throw new org.springframework.dao.DataIntegrityViolationException("Thrown from test case") }
 
