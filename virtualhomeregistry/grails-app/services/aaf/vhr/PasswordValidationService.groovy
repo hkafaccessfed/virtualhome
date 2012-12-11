@@ -66,12 +66,14 @@ class PasswordValidationService {
     if(subject.plainPassword != subject.plainPasswordConfirmation) {
       log.warn("The submitted plaintext passwords for $subject don't match, rejecting.")
       subject.errors.rejectValue('plainPassword', 'aaf.vhr.passwordvalidationservice.notmatching')
+      subject.discard()
       return [false, ['aaf.vhr.passwordvalidationservice.notmatching'], subject]
     }
 
     if(subject.plainPassword.toLowerCase().contains(subject.login.toLowerCase())) {
       log.warn("The submitted plaintext passwords for $subject don't match, rejecting.")
       subject.errors.rejectValue('plainPassword', 'aaf.vhr.passwordvalidationservice.containslogin')
+      subject.discard()
       return [false, ['aaf.vhr.passwordvalidationservice.containslogin'], subject]
     }
 
@@ -79,6 +81,7 @@ class PasswordValidationService {
       if(cryptoService.verifyPasswordHash(subject.plainPassword, subject)) {
         log.warn("The submitted plaintext password for $subject is the same as the current value, rejecting.")
         subject.errors.rejectValue('plainPassword', 'aaf.vhr.passwordvalidationservice.reused')
+        subject.discard()
         return [false, ['aaf.vhr.passwordvalidationservice.reused'], subject]
       }
     }
@@ -137,6 +140,7 @@ class PasswordValidationService {
       validator.getMessages(result).each { e ->
         subject.errors.rejectValue('plainPassword', e)
       }
+      subject.discard()
       [false, validator.getMessages(result), subject]
     }
   }
