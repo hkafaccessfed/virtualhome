@@ -1,8 +1,25 @@
 class UrlMappings {
 
   static mappings = {
-    // Public Welcome, Internal Dashboard
+
     "/"(controller:"dashboard", action:"welcome")
+
+    "/myaccount/setup/login-available" {
+      controller="finalization"
+      action="loginAvailable"
+    }
+    "/myaccount/setup/complete" {
+      controller="finalization"
+      action="complete"
+    }
+    "/myaccount/setup/used" {
+      controller="finalization"
+      action="used"
+    }
+    "/myaccount/setup/$inviteCode" {
+      controller="finalization"
+    }
+
     "/dashboard"(controller:"dashboard", action:"dashboard")
 
     "/organisations/groups/accounts/$action/$id?" {
