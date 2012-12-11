@@ -43,7 +43,7 @@ class ManagedSubject {
                       group:Group]
 
   static constraints = {
-    login nullable:true, blank: false, unique: true, size: 5..100
+    login nullable:true, blank: false, unique: true, size: 3..100,  validator: { val -> if (val?.contains(' ')) return 'value.contains.space' }
     hash nullable:true, blank:false, minSize:60, maxSize:60
     email blank:false, unique:true, email:true
     cn validator: {val, obj ->
