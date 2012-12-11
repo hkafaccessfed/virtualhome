@@ -5,7 +5,7 @@ import groovy.transform.ToString
 
 import aaf.base.identity.Role
 
-@ToString(includeNames=true, includeFields=true, excludes="description, url, frURL")
+@ToString(includeNames=true, includes="id, name, frID")
 @EqualsAndHashCode
 class Organization  {
   static auditable = true

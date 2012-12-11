@@ -3,7 +3,7 @@ package aaf.vhr
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
-@ToString(includeNames=true, includeFields=true)
+@ToString(includeNames=true, includes="id, name")
 @EqualsAndHashCode
 class Group {
   static auditable = true

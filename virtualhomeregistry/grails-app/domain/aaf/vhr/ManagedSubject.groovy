@@ -5,7 +5,7 @@ import groovy.transform.ToString
 
 import aaf.base.identity.Subject
 
-@ToString(includeNames=true, includeFields=true, excludes="pii, hash, plainPassword, plainPasswordConfirmation")
+@ToString(includeNames=true, includes="id, login, cn, email")
 @EqualsAndHashCode
 class ManagedSubject {
   static auditable = true
