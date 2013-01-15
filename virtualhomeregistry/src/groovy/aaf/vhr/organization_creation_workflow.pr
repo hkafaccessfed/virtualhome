@@ -1,0 +1,14 @@
+process(name:'Organization Creation Process', description: 'Executed when a new Organization is added via the FR REST API') {
+
+  task(name: 'task1', description: 'Email AAF staff about the new Organization') {
+    execute(script: 'organization_approval')
+    outcome(name: 'organizationactivated', description:'The Organization has successfully completed the registration process') {
+      start ('task2')
+    }
+  }
+
+  task(name: 'task2', description: 'Finalize workflow') {
+    finish()
+  }
+}
+

@@ -1,0 +1,29 @@
+import aaf.vhr.*
+import aaf.base.identity.*
+import aaf.base.admin.EmailTemplate
+
+workflowTaskService = ctx.getBean("workflowTaskService")
+emailManagerService = ctx.getBean("emailManagerService")
+
+def org = Organization.get(env.organization.toLong())
+
+if(org) {
+
+  log.info "Activating ${org.displayName}. Workflow indicates it is valid and accepted for operation."
+  
+  org.undergoingWorkflow = false
+  org.active = true
+  org.save()
+  
+  if(org.hasErrors()) {
+    throw new RuntimeException("Attempt to process activate in script organization_approval. Failed due to ${org.displayName} fault on save")
+  }
+
+  def emailTemplate = EmailTemplate.findWhere(name:"approved_new_organization")
+  emailManagerService.send('support@aaf.edu.au', "New VHR Organization: ${org.displayName}", emailTemplate, [organization:org])
+
+  workflowTaskService.complete(env.taskInstanceID.toLong(), 'organizationactivated')
+}
+else {
+  throw new RuntimeException("Attempt to process activate in script organization_approval. Failed because referenced organization does not exist")
+}
