@@ -35,6 +35,10 @@ class UrlMappings {
     "/backend/manageadministrators/$action/$id?" {
       controller="manageAdministrators"
     }
+
+    "/api/v1/managedsubject/$action" {
+      controller="managedSubjectApi"
+    }
   }
 
 }
