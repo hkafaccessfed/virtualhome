@@ -29,6 +29,11 @@
   </table>
 </g:if>
 <g:else>
-  <p class="alert alert-info"><g:message code="templates.aaf.vhr.manageadministrators.role.members.none"/></p>
+  <g:if test="${type == 'group'}">
+    <p class="alert alert-info"><g:message code="templates.aaf.vhr.manageadministrators.group.role.members.none" args="[createLink(controller:'organization', action:'show', id:instance.organization.id, absolute:true, fragment:'tab-administrators'), instance.organization.displayName]"/></p>
+  </g:if>
+  <g:else>
+    <p class="alert alert-info"><g:message code="templates.aaf.vhr.manageadministrators.role.members.none"/></p>
+  </g:else>
 </g:else>
 
