@@ -1,6 +1,6 @@
 package aaf.vhr
 
-import org.codehaus.groovy.runtime.TimeCategory
+import groovy.time.TimeCategory
 import aaf.base.identity.SessionRecord
 
 class FinalizationController {
