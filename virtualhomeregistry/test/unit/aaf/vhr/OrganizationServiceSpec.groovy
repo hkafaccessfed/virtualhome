@@ -11,7 +11,7 @@ import aaf.base.identity.*
 
 @TestFor(aaf.vhr.OrganizationService)
 @Build([aaf.vhr.Organization, aaf.vhr.Group, ProcessInstance, Role, Permission])
-class OrganizationServiceSpec extends UnitSpec {
+class OrganizationServiceSpec extends spock.lang.Specification  {
 
   def os
   def wts
@@ -69,7 +69,7 @@ class OrganizationServiceSpec extends UnitSpec {
 
     wps.metaClass {
       initiate = { String processName, String instanceDescription, ProcessPriority priority, Map params ->
-        def instance = Mock(ProcessInstance)
+        aaf.base.workflow.ProcessInstance instance = new aaf.base.workflow.ProcessInstance()
         [true, instance]
       }
       run = {ProcessInstance processInstance -> 
