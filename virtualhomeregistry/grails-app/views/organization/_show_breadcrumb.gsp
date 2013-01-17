@@ -12,14 +12,14 @@
     </li>
     <li class="divider"></li>
     <li>
-      <g:link action="edit" id="${organizationInstance.id}"><g:message code="label.edit"/></g:link>
+      <g:link action="edit" id="${organizationInstance.id}"><g:message code="label.editorganization"/></g:link>
     </li>
     <li>
       <g:render template="show_breadcrumb_toggle"/>
     </li>
     </li>
     <li>
-      <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.organization.confirm.remove')}"><g:message code="label.delete"/></a>
+      <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.organization.confirm.remove')}"><g:message code="label.deleteorganization"/></a>
       <g:form action="delete" method="delete">
         <g:hiddenField name="id" value="${organizationInstance.id}" />
       </g:form>
@@ -44,7 +44,7 @@
       
         <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:edit">
           <li>
-            <g:link action="edit" id="${organizationInstance.id}"><g:message code="label.edit"/></g:link>
+            <g:link action="edit" id="${organizationInstance.id}"><g:message code="label.editorganization"/></g:link>
           </li>
         </aaf:hasPermission>
       </g:if>

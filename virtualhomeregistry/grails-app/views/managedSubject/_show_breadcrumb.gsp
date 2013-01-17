@@ -3,7 +3,7 @@
     <g:render template="show_breadcrumb_resend"/>
 
     <li>
-      <g:link action="edit" id="${managedSubjectInstance.id}"><g:message code="label.edit"/></g:link>
+      <g:link action="edit" id="${managedSubjectInstance.id}"><g:message code="label.editmanagedsubject"/></g:link>
     </li>
 
     <li>
@@ -30,7 +30,7 @@
     <li class="divider"></li>
 
     <li>
-      <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.managedsubject.confirm.remove')}"><g:message code="label.delete"/></a>
+      <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.managedsubject.confirm.remove')}"><g:message code="label.deletemanagedsubject"/></a>
       <g:form action="delete" method="delete">
         <g:hiddenField name="id" value="${managedSubjectInstance.id}" />
       </g:form>
@@ -42,7 +42,7 @@
       <g:render template="show_breadcrumb_resend"/>
       <g:if test="${managedSubjectInstance.functioning()}">
         <li>
-          <g:link action="edit" id="${managedSubjectInstance.id}"><g:message code="label.edit"/></g:link>
+          <g:link action="edit" id="${managedSubjectInstance.id}"><g:message code="label.editmanagedsubject"/></g:link>
         </li>
       </g:if>
       <g:render template="show_breadcrumb_toggle"/>

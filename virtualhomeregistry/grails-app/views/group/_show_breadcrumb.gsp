@@ -17,13 +17,13 @@
     <li class="divider"></li>
 
     <li>
-      <g:link action="edit" id="${groupInstance.id}"><g:message code="label.edit"/></g:link>
+      <g:link action="edit" id="${groupInstance.id}"><g:message code="label.editgroup"/></g:link>
     </li>
     <li>
       <g:render template="show_breadcrumb_toggle"/>
     </li>
     <li>
-      <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.group.confirm.remove')}"><g:message code="label.delete"/></a>
+      <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.group.confirm.remove')}"><g:message code="label.deletegroup"/></a>
       <g:form action="delete" method="delete">
         <g:hiddenField name="id" value="${groupInstance.id}" />
       </g:form>
@@ -55,7 +55,7 @@
         
         <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit">
           <li>
-            <g:link action="edit" id="${groupInstance.id}"><g:message code="label.edit"/></g:link>
+            <g:link action="edit" id="${groupInstance.id}"><g:message code="label.editgroup"/></g:link>
           </li>
         </aaf:hasPermission>
       </g:if>
