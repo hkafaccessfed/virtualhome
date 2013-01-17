@@ -1,4 +1,4 @@
-<legend><g:message code="label.addmembers"/></legend>
+<legend><g:message code="label.addadministrator"/></legend>
 <table class="table table-borderless table-sortable">
   <thead>
     <tr>
