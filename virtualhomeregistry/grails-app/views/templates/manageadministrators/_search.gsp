@@ -2,7 +2,6 @@
 <table class="table table-borderless table-sortable">
   <thead>
     <tr>
-      <th><g:message code="label.id" /></th>
       <th><g:message code="label.name" /></th>
       <th><g:message code="label.sharedtoken" /></th>
       <th/>
@@ -11,7 +10,6 @@
   <tbody>
     <g:each in="${subjects}" var="subject">
       <tr>
-        <td><g:fieldValue bean="${subject}" field="id"/></td>
         <td><g:fieldValue bean="${subject}" field="cn"/></td>
         <td><g:fieldValue bean="${subject}" field="sharedToken"/></td>
         <td class="pull-right">
