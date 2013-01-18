@@ -48,7 +48,7 @@
           <g:message code="label.actions" />
           <b class="caret"></b>
         </a>
-        <g:render template="show_breadcrumb"/>
+        <g:render template="show_actions"/>
       </li>
     </ul>
 

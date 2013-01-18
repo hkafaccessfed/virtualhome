@@ -8,14 +8,14 @@
     <li class="divider"></li>
     
     <li>
-      <g:render template="show_breadcrumb_admin"/>
+      <g:render template="show_actions_admin"/>
     </li>
     <li class="divider"></li>
     <li>
       <g:link action="edit" id="${organizationInstance.id}"><g:message code="label.editorganization"/></g:link>
     </li>
     <li>
-      <g:render template="show_breadcrumb_toggle"/>
+      <g:render template="show_actions_toggle"/>
     </li>
     </li>
     <li>
@@ -36,7 +36,7 @@
         </aaf:hasPermission>
         <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:manage:administrators">
           <li>
-            <g:render template="show_breadcrumb_admin"/>
+            <g:render template="show_actions_admin"/>
           </li>
         </aaf:hasPermission> 
 
@@ -50,7 +50,7 @@
       </g:if>
       <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:edit">
         <li>
-          <g:render template="show_breadcrumb_toggle"/>
+          <g:render template="show_actions_toggle"/>
         </li>
       </aaf:hasPermission>
     </aaf:hasAnyPermission>

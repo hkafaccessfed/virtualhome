@@ -11,7 +11,7 @@
     <li class="divider"></li>
     
     <li>
-      <g:render template="show_breadcrumb_admin"/>
+      <g:render template="show_actions_admin"/>
     </li>
 
     <li class="divider"></li>
@@ -20,7 +20,7 @@
       <g:link action="edit" id="${groupInstance.id}"><g:message code="label.editgroup"/></g:link>
     </li>
     <li>
-      <g:render template="show_breadcrumb_toggle"/>
+      <g:render template="show_actions_toggle"/>
     </li>
     <li>
       <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.group.confirm.remove')}"><g:message code="label.deletegroup"/></a>
@@ -47,7 +47,7 @@
 
         <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:manage:administrators">
           <li>
-            <g:render template="show_breadcrumb_admin"/>
+            <g:render template="show_actions_admin"/>
           </li>
         </aaf:hasPermission>
 
@@ -62,7 +62,7 @@
 
       <aaf:hasPermission target="app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit">
         <li>
-          <g:render template="show_breadcrumb_toggle"/>
+          <g:render template="show_actions_toggle"/>
         </li>
       </aaf:hasPermission>
 

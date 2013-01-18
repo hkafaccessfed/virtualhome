@@ -1,13 +1,13 @@
 <ul class="dropdown-menu">
   <aaf:hasPermission target="app:administrator">
-    <g:render template="show_breadcrumb_resend"/>
+    <g:render template="show_actions_resend"/>
 
     <li>
       <g:link action="edit" id="${managedSubjectInstance.id}"><g:message code="label.editmanagedsubject"/></g:link>
     </li>
 
     <li>
-       <g:render template="show_breadcrumb_toggle"/>
+       <g:render template="show_actions_toggle"/>
     </li>
 
     <li class="divider"></li>
@@ -39,14 +39,14 @@
 
   <aaf:lacksPermission target="aaf:administrator">
     <aaf:hasPermission target="app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit">
-      <g:render template="show_breadcrumb_resend"/>
+      <g:render template="show_actions_resend"/>
       <g:if test="${managedSubjectInstance.functioning()}">
         <li class="divider"></li>
         <li>
           <g:link action="edit" id="${managedSubjectInstance.id}"><g:message code="label.editmanagedsubject"/></g:link>
         </li>
       </g:if>
-      <g:render template="show_breadcrumb_toggle"/>
+      <g:render template="show_actions_toggle"/>
     </aaf:hasPermission>
   </aaf:lacksPermission>
 
