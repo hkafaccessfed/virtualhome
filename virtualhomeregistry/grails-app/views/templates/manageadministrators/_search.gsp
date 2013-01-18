@@ -20,8 +20,10 @@
         </aaf:hasPermission>
         <td class="pull-right">
           <g:form controller="manageAdministrators" action="add" method="post">
-            <a href="#" class="btn btn-small ajax-modal" data-load="${createLink(controller:'subject', action:'showpublic', id:subject.id, absolute:true)}" ><g:message code="label.quickview" /></a>
-            <g:link controller="subject" action="show" id="${subject.id}" class="btn btn-small"><g:message code="label.view" /></g:link>
+            <aaf:hasPermission target="app:administrator">
+              <a href="#" class="btn btn-small ajax-modal" data-load="${createLink(controller:'subject', action:'showpublic', id:subject.id, absolute:true)}" ><g:message code="label.quickview" /></a>
+              <g:link controller="subject" action="show" id="${subject.id}" class="btn btn-small"><g:message code="label.view" /></g:link>
+            </aaf:hasPermission>
 
             <g:hiddenField name="type" value="${type}" />
             <g:hiddenField name="id" value="${instance?.id}" />

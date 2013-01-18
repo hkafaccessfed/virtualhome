@@ -20,7 +20,9 @@
           </aaf:hasPermission>
           <td class="pull-right">         
             <g:form controller="manageAdministrators" action="remove" method="post">
-              <g:link controller="subject" action="show" id="${subject.id}" class="btn btn-small"><g:message code="label.view" /></g:link>
+              <aaf:hasPermission target="app:administrator">
+                <g:link controller="subject" action="show" id="${subject.id}" class="btn btn-small"><g:message code="label.view" /></g:link>
+              </aaf:hasPermission>
               <g:hiddenField name="type" value="${type}" />
               <g:hiddenField name="id" value="${instance?.id}" />
               <g:hiddenField name="subjectID" value="${subject.id}" />
