@@ -1,5 +1,5 @@
 <g:if test="${role.subjects}">  
-  <table class="table table-borderless table-sortable">
+  <table class="table table-borderless">
     <thead>
       <tr>
         <th><g:message code="label.name" /></th>

@@ -1,10 +1,12 @@
 <g:if test="${role.subjects}">  
-  <table class="table table-borderless table-sortable">
+  <table class="table table-borderless">
     <thead>
       <tr>
         <th><g:message code="label.name" /></th>
         <th><g:message code="label.email" /></th>
-        <th><g:message code="label.sharedtoken" /></th>
+        <aaf:hasPermission target="app:administrator">
+          <th><g:message code="label.sharedtoken" /></th>
+        </aaf:hasPermission>
         <th/>
       </tr>
     </thead>
@@ -13,7 +15,9 @@
         <tr>
           <td><g:fieldValue bean="${subject}" field="cn"/></td>
           <td><a href="mailto:${subject.email}"><g:fieldValue bean="${subject}" field="email"/></a></td>
-          <td class="hidden-phone"><g:fieldValue bean="${subject}" field="sharedToken"/></td>
+          <aaf:hasPermission target="app:administrator">
+            <td><g:fieldValue bean="${subject}" field="sharedToken"/></td>
+          </aaf:hasPermission>
           <td class="pull-right">         
             <g:form controller="manageAdministrators" action="remove" method="post">
               <g:link controller="subject" action="show" id="${subject.id}" class="btn btn-small"><g:message code="label.view" /></g:link>

@@ -18,8 +18,10 @@
           <tr>
             <th><g:message code="label.login" /></th> 
             <th><g:message code="label.cn" /></th> 
-            <th><g:message code="label.email" /></th> 
-            <th><g:message code="label.sharedtoken" /></th>
+            <th><g:message code="label.email" /></th>
+            <aaf:hasPermission target="app:administrator">
+              <th><g:message code="label.sharedtoken" /></th>
+            </aaf:hasPermission>
             <th><g:message code="label.functioning" /></th> 
             <th><g:message code="label.group" /></th> 
             <th/>
@@ -31,7 +33,9 @@
             <td>${fieldValue(bean: managedSubjectInstance, field: "login")}</td>
             <td>${fieldValue(bean: managedSubjectInstance, field: "cn")}</td>
             <td>${fieldValue(bean: managedSubjectInstance, field: "email")}</td>  
-            <td>${fieldValue(bean: managedSubjectInstance, field: "sharedToken")}</td>
+            <aaf:hasPermission target="app:administrator">
+              <td>${fieldValue(bean: managedSubjectInstance, field: "sharedToken")}</td>
+            </aaf:hasPermission>
             <td><g:formatBoolean boolean="${managedSubjectInstance.functioning()}"/></td>
             <td><g:link action="show" controller="group" id="${managedSubjectInstance.group.id}">${fieldValue(bean: managedSubjectInstance, field: "group.name")}</g:link></td>
             <td><g:link action="show" id="${managedSubjectInstance.id}" class="btn btn-small"><g:message code="label.view"/></g:link></td>

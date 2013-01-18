@@ -63,32 +63,37 @@
             
             <tr>
               <th class="span4"><span id="cn-label"><strong><g:message code="label.cn" /></strong></span></th>
-              <td><span aria-labelledby="cn-label"><g:fieldValue bean="${managedSubjectInstance}" field="cn"/></span>
+              <td><span aria-labelledby="cn-label"><g:fieldValue bean="${managedSubjectInstance}" field="cn"/></span></td>
             </tr>
           
             <tr>
               <th class="span4"><span id="email-label"><strong><g:message code="label.email" /></strong></span></th>
-              <td><span aria-labelledby="email-label"><g:fieldValue bean="${managedSubjectInstance}" field="email"/></span>
+              <td><span aria-labelledby="email-label"><g:fieldValue bean="${managedSubjectInstance}" field="email"/></span></td>
             </tr>
 
             <tr>
               <th class="span4"><span id="sharedtoken-label"><strong><g:message code="label.sharedtoken" /></strong></span></th>
-              <td><span aria-labelledby="sharedtoken-label"><g:fieldValue bean="${managedSubjectInstance}" field="sharedToken"/></span>
+              <aaf:hasPermission target="app:administrator">
+                <td><span aria-labelledby="sharedtoken-label"><g:fieldValue bean="${managedSubjectInstance}" field="sharedToken"/></span></td>
+              </aaf:hasPermission>
+              <aaf:lacksPermission target="app:administrator">
+                <td><span aria-labelledby="sharedtoken-label" class="label label-warning"><g:message code="label.obfuscated"/></span></td>
+              </aaf:lacksPermission>
             </tr>
           
             <tr>
               <th class="span4"><span id="edupersonassurance-label"><strong><g:message code="label.edupersonassurance" /></strong></span></th>
-              <td><span aria-labelledby="edupersonassurance-label"><g:fieldValue bean="${managedSubjectInstance}" field="eduPersonAssurance"/></span>
+              <td><span aria-labelledby="edupersonassurance-label"><g:fieldValue bean="${managedSubjectInstance}" field="eduPersonAssurance"/></span></td>
             </tr>
           
             <tr>
               <th class="span4"><span id="edupersonaffiliation-label"><strong><g:message code="label.edupersonaffiliation" /></strong></span></th>
-              <td><span aria-labelledby="edupersonaffiliation-label"><g:fieldValue bean="${managedSubjectInstance}" field="eduPersonAffiliation"/></span>
+              <td><span aria-labelledby="edupersonaffiliation-label"><g:fieldValue bean="${managedSubjectInstance}" field="eduPersonAffiliation"/></span></td>
             </tr>
 
             <tr>
               <th class="span4"><span id="displayname-label"><strong><g:message code="label.displayname" /></strong></span></th>
-              <td><span aria-labelledby="displayname-label"><g:fieldValue bean="${managedSubjectInstance}" field="displayName"/></span>
+              <td><span aria-labelledby="displayname-label"><g:fieldValue bean="${managedSubjectInstance}" field="displayName"/></span></td>
             </tr>
           </tbody>
           </table>
