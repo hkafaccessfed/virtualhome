@@ -35,7 +35,9 @@
     <ul class="nav nav-tabs">
       <li class="active"><a href="#tab-overview" data-toggle="tab"><g:message code="label.overview" /></a></li>
       <li><a href="#tab-groups" data-toggle="tab"><g:message code="label.groups" /></a></li>
-      <li><a href="#tab-managedsubjects" data-toggle="tab"><g:message code="label.managedsubjects" /></a></li>
+      <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:manage:administrators">
+        <li><a href="#tab-managedsubjects" data-toggle="tab"><g:message code="label.managedsubjects" /></a></li>
+      </aaf:hasPermission>
       <li><a href="#tab-administrators" data-toggle="tab"><g:message code="label.administrators" /></a></li>
 
 
@@ -145,34 +147,36 @@
         </table>
       </div>
 
-      <div id="tab-managedsubjects" class="tab-pane">
-        <table class="table table-borderless table-sortable">
-          <thead>
-            <tr>
-                <th><g:message code="label.login" /></th> 
-                <th><g:message code="label.cn" /></th> 
-                <th><g:message code="label.email" /></th>
-                <th><g:message code="label.group" /></th> 
-                <th/>
-            </tr>
-          </thead>
-          <tbody>
-          <g:each in="${organizationInstance.subjects}" status="i" var="managedSubjectInstance">
-            <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-              <td>${fieldValue(bean: managedSubjectInstance, field: "login")}</td>
-              <td>${fieldValue(bean: managedSubjectInstance, field: "cn")}</td>
-              <td>${fieldValue(bean: managedSubjectInstance, field: "email")}</td>
-              <td><g:link action="show" controller="group" id="${managedSubjectInstance.group.id}">${fieldValue(bean: managedSubjectInstance, field: "group.name")}</g:link></td>
-              <td>
-                <aaf:hasPermission target="app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:show">
-                  <g:link action="show" controller="managedSubject" id="${managedSubjectInstance.id}" class="btn btn-small"><g:message code="label.view"/></g:link>
-                </aaf:hasPermission>
-              </td>
-            </tr>
-          </g:each>
-          </tbody>
-        </table>
-      </div>
+      <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:manage:administrators">
+        <div id="tab-managedsubjects" class="tab-pane">
+          <table class="table table-borderless table-sortable">
+            <thead>
+              <tr>
+                  <th><g:message code="label.login" /></th> 
+                  <th><g:message code="label.cn" /></th> 
+                  <th><g:message code="label.email" /></th>
+                  <th><g:message code="label.group" /></th> 
+                  <th/>
+              </tr>
+            </thead>
+            <tbody>
+            <g:each in="${organizationInstance.subjects}" status="i" var="managedSubjectInstance">
+              <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+                <td>${fieldValue(bean: managedSubjectInstance, field: "login")}</td>
+                <td>${fieldValue(bean: managedSubjectInstance, field: "cn")}</td>
+                <td>${fieldValue(bean: managedSubjectInstance, field: "email")}</td>
+                <td><g:link action="show" controller="group" id="${managedSubjectInstance.group.id}">${fieldValue(bean: managedSubjectInstance, field: "group.name")}</g:link></td>
+                <td>
+                  <aaf:hasPermission target="app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:show">
+                    <g:link action="show" controller="managedSubject" id="${managedSubjectInstance.id}" class="btn btn-small"><g:message code="label.view"/></g:link>
+                  </aaf:hasPermission>
+                </td>
+              </tr>
+            </g:each>
+            </tbody>
+          </table>
+        </div>
+      </aaf:hasPermission>
 
       <div id="tab-administrators" class="tab-pane">
         <div id="administrative-members">
