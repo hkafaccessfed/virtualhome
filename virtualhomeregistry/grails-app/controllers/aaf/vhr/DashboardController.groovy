@@ -16,6 +16,7 @@ class DashboardController {
   def dashboard = {
     def organizationInstanceList = [] as List
     def groupInstanceList = [] as List
+    def collatedGroupInstanceList = [:]
     def statistics = [:]
       
     use(TimeCategory) {
@@ -25,13 +26,19 @@ class DashboardController {
           if(components.size() == 3) {
             def organization = Organization.get(components[1])
             organizationInstanceList << organization
+
+            organization.groups.each { group ->
+              groupInstanceList << group
+            }
           }
         }
         if(role.name.startsWith('group:')) {
           def components = role.name.split(':')
           if(components.size() == 3) {
             def group = Group.get(components[1])
-            groupInstanceList << group
+            if(!groupInstanceList.contains(group)){
+              groupInstanceList << group
+            }
           }
         }
       }
@@ -55,7 +62,14 @@ class DashboardController {
       statistics.last12MonthSessions = last12MonthSessions
     }
 
-    [organizationInstanceList:organizationInstanceList, groupInstanceList: groupInstanceList, statistics:statistics]
+    groupInstanceList.each {
+      if(collatedGroupInstanceList."${it.organization.displayName}" == null) {
+        collatedGroupInstanceList."${it.organization.displayName}" = [] as List
+      }
+      collatedGroupInstanceList."${it.organization.displayName}" << it
+    }
+
+    [organizationInstanceList:organizationInstanceList, groupInstanceList: collatedGroupInstanceList, statistics:statistics]
   }
 
 }

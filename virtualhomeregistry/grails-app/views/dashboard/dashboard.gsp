@@ -10,12 +10,12 @@
       <div class="span6">
         <div class="well well-small administering">
           <h2><g:message code="views.aaf.vhr.dashboard.myorganizations"/></h2>
-          <g:if test="${organizationInstanceList}">
-            <ol>
+          <g:if test="${organizationInstanceList.sort{it.displayName}}">
+            <ul class="unstyled">
             <g:each in="${organizationInstanceList.sort{it.displayName}}" var="org">
               <li><g:link controller="organization" action="show" id="${org.id}"><g:fieldValue bean="${org}" field="displayName"/></g:link></li>
             </g:each>
-            </ol>
+            </ul>
           </g:if>
           <g:else>
             <p><g:message code="views.aaf.vhr.dashboard.noorganizations"/></p>
@@ -29,11 +29,16 @@
         <div class="well well-small administering">
           <h2><g:message code="views.aaf.vhr.dashboard.mygroups"/></h2>
           <g:if test="${groupInstanceList}">
-            <ol>
-            <g:each in="${groupInstanceList.sort{it.organization.displayName}}" var="group">
-              <li><g:link controller="group" action="show" id="${group.id}"><g:fieldValue bean="${group}" field="name"/></g:link> (<g:fieldValue bean="${group.organization}" field="displayName"/>)</li>
+            
+            <g:each in="${groupInstanceList.sort{it.key}}" var="entry">
+              <strong class="muted">${entry.key}</strong>
+              <ul class="unstyled">
+                <g:each in="${entry.value.sort{it.name}}" var="group">
+                  <li><g:link controller="group" action="show" id="${group.id}"><g:fieldValue bean="${group}" field="name"/></g:link></li>
+                </g:each>
+              </ul>
             </g:each>
-            </ol>
+            
           </g:if>
           <g:else>
             <p><g:message code="views.aaf.vhr.dashboard.nogroups"/></p>
