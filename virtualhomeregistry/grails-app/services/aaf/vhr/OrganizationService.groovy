@@ -58,49 +58,7 @@ class OrganizationService {
             }
           } else {
             if(result.functioning) {
-              org = new Organization(name:result.name, displayName: result.displayName, frID: result.id)
-              org.description = !result.description.equals(null) ? result.description:null
-              org.undergoingWorkflow = true
-
-              def group = new Group(name:"Default Group", description:"Default group for accounts belonging to ${org.displayName}", active:true, organization:org)
-              org.addToGroups(group)
-
-              if(!org.save()) {
-                log.error "Unable to save new Organization instance to represent ${result.name}"
-                org.errors.each { error ->
-                  log.error error
-                }
-              }
-
-              def orgRole = new Role(name:"organization:${org.id}:administrators", description: "Administrators for the Organization ${org.displayName}")
-              def orgPermission = new Permission(type: Permission.wildcardPerm, target: "app:manage:organization:${org.id}:*", role:orgRole)
-              orgRole.addToPermissions(orgPermission)
-              if(!orgRole.save()) {
-                log.error "Unable to save new Role instance to represent admin rights for ${org}"
-                org.errors.each { error ->
-                  log.error error
-                }
-              }
-
-              def groupRole = new Role(name:"group:${group.id}:administrators", description: "Administrators for the default group of Organization ${org.displayName}")
-              def groupPermission = new Permission(type: Permission.wildcardPerm, target: "app:manage:organization:${org.id}:group:${group.id}:*", role:groupRole)
-              groupRole.addToPermissions(groupPermission)
-              if(!groupRole.save()) {
-                log.error "Unable to save new Role instance to represent admin rights for ${group}"
-                org.errors.each { error ->
-                  log.error error
-                }
-              }
-
-              // kickoff workflow
-              def params = ['agentCN':'aaf.vhr.OrganizationService', 'agentEmail':'', organization:org.id.toString()]
-              def(created, processInstance) = workflowProcessService.initiate(OrganizationService.CREATE_ORGANIZATION_WORKFLOW, "Approve activation of [${org.id}]${org.displayName}", ProcessPriority.LOW, params)
-              if(!created)
-                log.error "Unable to create workflow process to approve creation of new $org"
-              else {
-                log.info "Created workflow process to approve creation of new $org"
-                workflowProcessService.run(processInstance)
-              }
+              create(result.name, result.displayName, result.description, result.id)
             } else {
               log.warn "Not creating new Organization instance to represent ${result.name} as currently not functioning in Federation Registry"
             }
@@ -108,6 +66,56 @@ class OrganizationService {
         }
       }
     }
+  }
+
+  public def create(String name, String displayName, def description, long frID) {
+    Organization org = new Organization(name:name, displayName: displayName, frID: frID)
+    org.description = !description.equals(null) ? description:null  // handle JSON null
+    org.undergoingWorkflow = true
+
+    def group = new Group(name:"Default Group", description:"Default group for accounts belonging to ${org.displayName}", active:true, organization:org)
+    org.addToGroups(group)
+
+    if(!org.save()) {
+      log.error "Unable to save new Organization instance to represent ${name}"
+      org.errors.each { error ->
+        log.error error
+      }
+    }
+
+    def orgRole = new Role(name:"organization:${org.id}:administrators", description: "Administrators for the Organization ${org.displayName}")
+    def orgPermission = new Permission(type: Permission.wildcardPerm, target: "app:manage:organization:${org.id}:*", role:orgRole)
+    orgRole.addToPermissions(orgPermission)
+    if(!orgRole.save()) {
+      log.error "Unable to save new Role instance to represent admin rights for ${org}"
+      org.errors.each { error ->
+        log.error error
+      }
+    }
+
+    def groupRole = new Role(name:"group:${group.id}:administrators", description: "Administrators for the default group of Organization ${org.displayName}")
+    def groupPermission = new Permission(type: Permission.wildcardPerm, target: "app:manage:organization:${org.id}:group:${group.id}:*", role:groupRole)
+    groupRole.addToPermissions(groupPermission)
+    if(!groupRole.save()) {
+      log.error "Unable to save new Role instance to represent admin rights for ${group}"
+      org.errors.each { error ->
+        log.error error
+      }
+    }
+
+    // kickoff workflow
+    def params = ['agentCN':'aaf.vhr.OrganizationService', 'agentEmail':'', organization:org.id.toString()]
+    def(created, processInstance) = workflowProcessService.initiate(OrganizationService.CREATE_ORGANIZATION_WORKFLOW, "Approve activation of [${org.id}]${org.displayName}", ProcessPriority.LOW, params)
+    if(!created)
+      log.error "Unable to create workflow process to approve creation of new $org"
+    else {
+      log.info "Created workflow process to approve creation of new $org"
+      workflowProcessService.run(processInstance)
+
+      return [true, org]
+    }
+
+    [false, org]
   }
 
   private def queryOrganizations(server, api) {

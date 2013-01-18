@@ -138,6 +138,8 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from save with invalid data and when valid permission'() {
     setup:
+    def organizationService = Mock(aaf.vhr.OrganizationService)
+
     shiroSubject.isPermitted("app:administrator") >> true
 
     def organizationTestInstance = Organization.build()
@@ -152,6 +154,13 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     organizationTestInstance.delete()
 
     Organization.metaClass.save { null }
+
+    organizationService.metaClass.create { name, displayName, description, frID ->
+      organizationTestInstance.errors.reject("error", "error")
+      [false, organizationTestInstance]
+    }
+
+    controller.organizationService = organizationService
     
     when:
     controller.save()
@@ -166,8 +175,10 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     }
   }
 
-  def 'ensure correct output from save with valid data and when valid permission'() {
+  def 'ensure correct output from save with invalid workflow or other non instance errors and when valid permission'() {
     setup:
+    def organizationService = Mock(aaf.vhr.OrganizationService)
+
     shiroSubject.isPermitted("app:administrator") >> true
 
     def organizationTestInstance = Organization.build()
@@ -181,14 +192,48 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     }
     organizationTestInstance.delete()
 
-    expect:
-    Organization.count() == 0
+    Organization.metaClass.save { null }
+
+    organizationService.metaClass.create { name, displayName, description, frID ->
+      [false, organizationTestInstance]
+    }
+
+    controller.organizationService = organizationService
+    
+    when:
+    println params
+    controller.save()
+
+    then:
+    response.status == 500
+  }
+
+  def 'ensure correct output from save with valid data and when valid permission'() {
+    setup:
+    def organizationService = Mock(aaf.vhr.OrganizationService)
+
+    shiroSubject.isPermitted("app:administrator") >> true
+
+    def organizationTestInstance = Organization.build()
+    organizationTestInstance.properties.each {
+      if(it.value) {
+        if(it.value.hasProperty('id'))
+          params."${it.key}" = [id:"${it.value.id}"]
+        else
+          params."${it.key}" = "${it.value}"
+      }
+    }
+
+    organizationService.metaClass.create { name, displayName, description, frID ->
+      [true, organizationTestInstance]
+    }
+
+    controller.organizationService = organizationService
 
     when:
     controller.save()
 
     then:
-    Organization.count() == 1
     flash.type == 'success'
     flash.message == 'controllers.aaf.vhr.organization.save.success'
 

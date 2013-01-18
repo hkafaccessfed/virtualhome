@@ -12,6 +12,8 @@ class OrganizationController {
 
   def beforeInterceptor = [action: this.&validOrganization, except: ['list', 'create', 'save']]
 
+  def organizationService
+
   def list() {
     log.info "Action: list, Subject: $subject"
     [organizationInstanceList: Organization.list(params), organizationInstanceTotal: Organization.count()]
@@ -38,14 +40,22 @@ class OrganizationController {
 
   def save() {
     if(SecurityUtils.subject.isPermitted("app:administrator")) {
-      def organizationInstance = new Organization()
-      bindData(organizationInstance, params, [include: ['name', 'displayName', 'description', 'frID', 'subjectLimit', 'groupLimit']])
+      def frID = params.frID
+      if(frID instanceof String)
+        frID = frID.toLong()
 
-      if (!organizationInstance.save()) {
+      def (created, organizationInstance) = organizationService.create(params.name, params.displayName, params.description, frID)
+
+      if (!created && organizationInstance.hasErrors()) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.organization.save.failed'
         render(view: "create", model: [organizationInstance: organizationInstance])
         return
+      } else {
+        if(!created) {
+          response.sendError 500
+          return
+        }
       }
 
       log.info "Action: save, Subject: $subject, Object: $organizationInstance"
