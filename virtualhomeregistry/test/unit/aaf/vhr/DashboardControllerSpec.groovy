@@ -113,13 +113,15 @@ class DashboardControllerSpec extends spock.lang.Specification {
 
     model.groupInstanceList != null
     model.groupInstanceList.size() == 1
-    model.groupInstanceList[0] == g
+    model.groupInstanceList."${g.organization.displayName}"[0] == g
   }
 
   def 'ensure subject administering multiple groups has correct data supplied'() {
     setup:
+    def organizationTestInstance = Organization.build()
+
     (1..10).each {
-      def g = Group.build()
+      def g = Group.build(organization:organizationTestInstance)
       def r = Role.build(name:"group:${g.id}:adminsters")
       
       subject.addToRoles(r)
@@ -139,7 +141,8 @@ class DashboardControllerSpec extends spock.lang.Specification {
     model.organizationInstanceList.size() == 0
 
     model.groupInstanceList != null
-    model.groupInstanceList.size() == 10
+    model.groupInstanceList.size() == 1
+    model.groupInstanceList."${organizationTestInstance.displayName}".size() == 10
   }
 
   def 'ensure statistics are correctly populated'() {
@@ -180,7 +183,6 @@ class DashboardControllerSpec extends spock.lang.Specification {
     model.organizationInstanceList.size() == 10
 
     model.groupInstanceList != null
-    model.groupInstanceList.size() == 10
 
     model.statistics.organizations == 50    // each 1..10 creates unique org
     model.statistics.groups == 30           // Managed Subject Build creates group plus 2 * 1..10 creating Groups

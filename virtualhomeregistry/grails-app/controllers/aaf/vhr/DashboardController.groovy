@@ -66,7 +66,8 @@ class DashboardController {
       if(collatedGroupInstanceList."${it.organization.displayName}" == null) {
         collatedGroupInstanceList."${it.organization.displayName}" = [] as List
       }
-      collatedGroupInstanceList."${it.organization.displayName}" << it
+      if(!collatedGroupInstanceList."${it.organization.displayName}".contains(it))
+        collatedGroupInstanceList."${it.organization.displayName}" << it
     }
 
     [organizationInstanceList:organizationInstanceList, groupInstanceList: collatedGroupInstanceList, statistics:statistics]
