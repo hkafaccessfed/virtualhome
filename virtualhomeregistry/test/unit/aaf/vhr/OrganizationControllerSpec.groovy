@@ -9,7 +9,7 @@ import spock.lang.*
 import test.shared.ShiroEnvironment
 
 @TestFor(aaf.vhr.OrganizationController)
-@Build([Organization, aaf.base.identity.Subject, aaf.base.identity.Role])
+@Build([Organization, Group, aaf.base.identity.Subject, aaf.base.identity.Role])
 class OrganizationControllerSpec  extends spock.lang.Specification {
   
   @Shared def shiroEnvironment = new ShiroEnvironment()
@@ -512,4 +512,37 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     flash.type == 'success'
     flash.message == 'controllers.aaf.vhr.organization.toggleactive.success'
   }
+
+  def 'ensure correct output from createAccount when invalid permission'() {
+    setup:
+    def organizationTestInstance = Organization.build()
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance}.id}:edit") >> false
+
+    when:
+    params.id = organizationTestInstance.id
+    def model = controller.createaccount()
+
+    then:
+    model == null
+    response.status == 403
+  }
+
+  def 'ensure correct output from createAccount'() {
+    setup:
+    def organizationTestInstance = Organization.build()
+
+    (1..10).each { Group.build(organization:organizationTestInstance)}
+
+    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
+
+    when:
+    params.id = organizationTestInstance.id
+    def model = controller.createaccount()
+
+    then:
+    model.organizationInstance == organizationTestInstance
+    model.groupInstanceList.size() == 10
+    model.managedSubjectInstance != null
+  }
+
 }

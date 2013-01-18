@@ -198,6 +198,20 @@ class OrganizationController {
     }
   }
 
+  def createaccount(Long id) {
+    def organizationInstance = Organization.get(params.id)
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:$id:edit")) {
+
+      def managedSubjectInstance = new ManagedSubject(organization:organizationInstance)
+
+      [organizationInstance: organizationInstance, groupInstanceList: organizationInstance.groups, managedSubjectInstance: managedSubjectInstance]
+    }
+    else {
+      log.warn "Attempt to create ManagedSubject at Organization level for $organizationInstance by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
+  }
+
   private validOrganization() {
     if(!params.id) {
       log.warn "ID was not present"
