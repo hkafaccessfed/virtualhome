@@ -5,4 +5,5 @@
       <g:hiddenField name="id" value="${managedSubjectInstance.id}" />
     </g:form>
   </li>
+  <li class="divider"></li>
 </g:if>

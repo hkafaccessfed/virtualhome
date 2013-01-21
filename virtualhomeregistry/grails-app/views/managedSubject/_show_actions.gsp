@@ -41,7 +41,6 @@
     <aaf:hasPermission target="app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit">
       <g:render template="show_actions_resend"/>
       <g:if test="${managedSubjectInstance.functioning()}">
-        <li class="divider"></li>
         <li>
           <g:link action="edit" id="${managedSubjectInstance.id}"><g:message code="label.editmanagedsubject"/></g:link>
         </li>
