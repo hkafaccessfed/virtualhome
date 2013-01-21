@@ -57,11 +57,16 @@ class ManagedSubjectController {
       def group = Group.get(params.group.id)
       if(SecurityUtils.subject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create")) {
         def managedSubjectInstance = new ManagedSubject()
-        bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance', 'eduPersonAffiliation']])
+        bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance']])
         managedSubjectInstance.displayName = managedSubjectInstance.cn
         managedSubjectInstance.group = group
         managedSubjectInstance.organization = group.organization
         sharedTokenService.generate(managedSubjectInstance)
+
+        if(params.eduPersonAffiliation instanceof String)
+          managedSubjectInstance.eduPersonAffiliation = params.eduPersonAffiliation
+        else
+          managedSubjectInstance.eduPersonAffiliation = params.eduPersonAffiliation.join(';')
 
         if(!group.organization.canRegisterSubjects() && !SecurityUtils.subject.isPermitted("app:administrator")) {
           flash.type = 'error'
@@ -120,13 +125,18 @@ class ManagedSubjectController {
         return
       }
 
-      bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance', 'eduPersonAffiliation', 'displayName', 
+      bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance', 'displayName', 
                                                           'givenName', 'surname', 'mobileNumber', 'telephoneNumber', 'postalAddress', 
                                                           'organizationalUnit']])
 
       if(SecurityUtils.subject.isPermitted("app:administrator")) {
         bindData(managedSubjectInstance, params, [include: 'sharedToken'])
       }
+
+      if(params.eduPersonAffiliation instanceof String)
+        managedSubjectInstance.eduPersonAffiliation = params.eduPersonAffiliation
+      else
+        managedSubjectInstance.eduPersonAffiliation = params.eduPersonAffiliation.join(';')
 
       if (!managedSubjectInstance.save()) {
         flash.type = 'error'

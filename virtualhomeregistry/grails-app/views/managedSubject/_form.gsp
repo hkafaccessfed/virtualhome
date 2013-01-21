@@ -37,7 +37,9 @@
   <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'eduPersonAffiliation', 'error')}">
     <label class="control-label" for="eduPersonAffiliation"><g:message code="label.edupersonaffiliation"/></label>
     <div class="controls">
-      <g:select name="eduPersonAffiliation" from="${managedSubjectInstance.constraints.eduPersonAffiliation.inList}" value="${managedSubjectInstance?.eduPersonAffiliation ?:'member'}" valueMessagePrefix="managedSubject.eduPersonAffiliation"/>
+      <g:select name="eduPersonAffiliation" from="${managedSubjectInstance.affiliations}" 
+      value="${managedSubjectInstance?.eduPersonAffiliation ?managedSubjectInstance?.eduPersonAffiliation.split(';') as List : 'member'}" 
+      valueMessagePrefix="managedSubject.eduPersonAffiliation" multiple="multiple" id="edupersonaffiliation" required="required"/>
 
       <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.managedsubject.edupersonaffiliation')}"><i class="icon icon-question-sign"></i></a>
     </div>
@@ -113,3 +115,9 @@
   </g:if>
 
 </fieldset>
+
+<r:script>
+  $(document).ready(function() {
+    $('#edupersonaffiliation').multiselect();
+  });
+</r:script>

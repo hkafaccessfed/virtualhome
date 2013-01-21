@@ -1,6 +1,7 @@
 <html>
   <head>
     <meta name="layout" content="internal" />
+    <r:require modules="bootstrap-multiselect"/>
   </head>
   <body>
 

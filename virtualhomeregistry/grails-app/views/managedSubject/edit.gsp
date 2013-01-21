@@ -1,6 +1,7 @@
 <html>
   <head>
     <meta name="layout" content="internal" />
+    <r:require modules="bootstrap-multiselect"/>
   </head>
   <body>
 
@@ -26,7 +27,7 @@
         <g:link class="btn" action="show" id="${managedSubjectInstance?.id}"><g:message code="label.cancel"/></g:link>
       </div>
     </g:form>
-    
+
   </body>
 </html>
 

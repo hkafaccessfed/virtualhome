@@ -10,6 +10,15 @@ import aaf.base.identity.Subject
 class ManagedSubject {
   static auditable = true
 
+  static final affiliations = ['affiliate',
+                        'alum',
+                        'employee',
+                        'faculty',
+                        'library-walk-in',
+                        'member',
+                        'staff',
+                        'student'] as List
+
   String login
   String hash
 
@@ -56,14 +65,7 @@ class ManagedSubject {
                                 'urn:mace:aaf.edu.au:iap:id:3',
                                 'urn:mace:aaf.edu.au:iap:id:4']
 
-    eduPersonAffiliation inList: ['faculty',
-                                  'student',
-                                  'staff',
-                                  'employee',
-                                  'member',
-                                  'affiliate',
-                                  'alum',
-                                  'library-walk-in']
+    eduPersonAffiliation nullable:false, blank:false, maxSize: 255
 
     mobileNumber nullable: true, blank: false
     givenName nullable: true, blank: false          
