@@ -24,14 +24,16 @@
   </div>
 
   <aaf:hasPermission target="app:administrator">
-    <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'sharedToken', 'error')}">
-      <label class="control-label" for="sharedToken"><g:message code="label.sharedtoken"/></label>
-      <div class="controls">
-        <g:textField name="sharedToken" required="" value="${managedSubjectInstance?.sharedToken}"/>
+    <g:if test="${actionName != 'create'}">
+      <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'sharedToken', 'error')}">
+        <label class="control-label" for="sharedToken"><g:message code="label.sharedtoken"/></label>
+        <div class="controls">
+          <g:textField name="sharedToken" required="" value="${managedSubjectInstance?.sharedToken}"/>
 
-        <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.managedsubject.sharedtoken')}"><i class="icon icon-question-sign"></i></a>
+          <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.managedsubject.sharedtoken')}"><i class="icon icon-question-sign"></i></a>
+        </div>
       </div>
-    </div>
+    </g:if>
   </aaf:hasPermission>
 
   <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'eduPersonAffiliation', 'error')}">
