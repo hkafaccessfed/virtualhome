@@ -20,4 +20,12 @@
     </div>
   </div>
 
+  <div class="control-group ${hasErrors(bean: groupInstance, field: 'welcomeMessage', 'error')}">
+    <label class="control-label" for="welcomeMessage"><g:message code="label.welcomemessage"/></label>
+    <div class="controls">
+      <g:textArea name="welcomeMessage" value="${groupInstance?.welcomeMessage}" rows="20" class="input-xxlarge"/>
+      <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.group.welcomemessage')}"><i class="icon icon-question-sign"></i></a>
+    </div>
+  </div>
+
 </fieldset>

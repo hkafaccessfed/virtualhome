@@ -11,6 +11,8 @@ class Group {
   String name
   String description
 
+  String welcomeMessage
+
   boolean active = true
   
   Date dateCreated
@@ -25,10 +27,13 @@ class Group {
     description (nullable: false, blank:false)
     dateCreated(nullable:true)
     lastUpdated(nullable:true)
+
+    welcomeMessage(nullable:true, markup:true)
   }
 
   static mapping = {
     table 'vhr_group'
+    welcomeMessage type: "text"
   }
 
   public boolean functioning() {

@@ -331,7 +331,6 @@ class GroupControllerSpec  extends spock.lang.Specification {
 
     flash.type == 'error'
     flash.message == 'controllers.aaf.vhr.group.licensing.failed'
-
   }
 
   def 'ensure correct output from save with valid data and when valid permission'() {

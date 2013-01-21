@@ -80,6 +80,20 @@
         text-align:left;
       }
 
+      h5, .h5{
+        color:#666666;
+        display:block;
+        font-family:Arial;
+        font-size:16px;
+        font-weight:bold;
+        line-height:100%;
+        margin-top:0;
+        margin-right:0;
+        margin-bottom:8px;
+        margin-left:0;
+        text-align:left;
+      }
+
       #templatePreheader{
         background-color:#FAFAFA;
       }

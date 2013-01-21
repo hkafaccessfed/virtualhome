@@ -1,7 +1,13 @@
-G'day ${managedSubject.cn},<br><br>
+Hello ${managedSubject.cn},<br><br>
 
-Your brand new account to access a range of online services connected to the Australian Access Federation is nearly ready to go.<br><br>
+You have been provided with new account that allows you to access the wide range of online services connected to the Australian Access Federation.<br><br>
 
-<strong>Your action is required</strong><br>
+<g:if test="${managedSubject.group.welcomeMessage}">
+  <h5>A message from your account administrator</h5>
+  ${managedSubject.group.welcomeMessage}
+  <br><br>
+</g:if>
 
-To finish setting your account up please <a href="${g.createLink(controller:'finalization', action:'index', params:['inviteCode':invitation.inviteCode], absolute:true)}">access ${g.createLink(controller:'finalization', action:'index', params:['inviteCode':invitation.inviteCode], absolute:true)}</a>.
+<h5>Your action is now required</h5>
+
+To finish setting your account up please <a href="${g.createLink(controller:'finalization', action:'index', params:['inviteCode':invitation.inviteCode], absolute:true)}">access your unique account finalisation page by clicking this link</a> and follow the instructions provided.

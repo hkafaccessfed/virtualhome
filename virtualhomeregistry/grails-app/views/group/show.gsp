@@ -65,6 +65,11 @@
               <td><span aria-labelledby="organization-label"><g:link controller="organization" action="show" id="${groupInstance?.organization?.id}"><g:fieldValue bean="${groupInstance.organization}" field="displayName"/></g:link></span>
             </tr>
 
+            <tr>
+              <th class="span4"><span id="organization-welcomemessage"><strong><g:message code="label.welcomemessage" /></strong></span></th>
+              <td><pre><g:fieldValue bean="${groupInstance}" field="welcomeMessage"/></pre></td>
+            </tr>
+
             <tr><td colspan="2"><hr></tr></td>
             <tr><td colspan="2"><strong><g:message code="label.internaldata"/></tr></td>
 

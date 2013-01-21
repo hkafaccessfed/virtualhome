@@ -46,10 +46,19 @@ class GroupController {
       if(SecurityUtils.subject.isPermitted("app:manage:organization:${params.organization.id}:groups:create")) {
 
         def groupInstance = new Group()
-        bindData(groupInstance, params, [include: ['name', 'description']])
-        
+        bindData(groupInstance, params, [include: ['name', 'description', 'welcomeMessage']])
+
         def organization = Organization.get(params.organization.id)
         groupInstance.organization = organization 
+
+        if (!groupInstance.validate()) {
+          flash.type = 'error'
+          flash.message = 'controllers.aaf.vhr.group.validate.failed'
+          render(view: "create", model: [groupInstance: groupInstance])
+          return
+        }
+
+        groupInstance.welcomeMessage = params.welcomeMessage?.encodeAsSanitizedMarkup()
         
         if(!organization.canRegisterGroups()) {
           flash.type = 'error'
@@ -117,7 +126,15 @@ class GroupController {
         return
       }
 
-      bindData(groupInstance, params, [include: ['name', 'description']])
+      bindData(groupInstance, params, [include: ['name', 'description', 'welcomeMessage']])
+      if (!groupInstance.validate()) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.group.validate.failed'
+        render(view: "edit", model: [groupInstance: groupInstance])
+        return
+      }
+
+      groupInstance.welcomeMessage = params.welcomeMessage?.encodeAsSanitizedMarkup()
 
       if (!groupInstance.save()) {
         flash.type = 'error'
