@@ -460,7 +460,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from update with valid data and when valid permission'() {
     setup:
     def group = Group.build()
-    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization, sharedToken:'abcd1234')
     shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
     
     managedSubjectTestInstance.properties.each {
@@ -476,6 +476,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     ManagedSubject.count() == 1
 
     when:
+    params.sharedToken = 'efgh5678'
     params.id = managedSubjectTestInstance.id
     params.version = 0
     controller.update()
@@ -491,6 +492,48 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     savedManagedSubjectTestInstance.properties.each {
       it.value == managedSubjectTestInstance.getProperty(it.key)
     }
+
+    savedManagedSubjectTestInstance.sharedToken == 'abcd1234'
+  }
+
+  def 'ensure correct output from update including sharedToken update with valid data and when super admin'() {
+    setup:
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization, sharedToken:'abcd1234')
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:administrator") >> true
+
+    managedSubjectTestInstance.properties.each {
+      if(it.value) {
+        if(grailsApplication.isDomainClass(it.value.getClass()))
+          params."${it.key}" = [id:"${it.value.id}"]
+        else
+          params."${it.key}" = "${it.value}"
+      }
+    }
+
+    expect:
+    ManagedSubject.count() == 1
+
+    when:
+    params.sharedToken = 'efgh5678'
+    params.id = managedSubjectTestInstance.id
+    params.version = 0
+    controller.update()
+
+    then:
+    ManagedSubject.count() == 1
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.managedsubject.update.success'
+
+    def savedManagedSubjectTestInstance = ManagedSubject.first()
+    savedManagedSubjectTestInstance == managedSubjectTestInstance
+
+    savedManagedSubjectTestInstance.properties.each {
+      it.value == managedSubjectTestInstance.getProperty(it.key)
+    }
+
+    savedManagedSubjectTestInstance.sharedToken == 'efgh5678'
   }
 
   def 'ensure correct output from delete when invalid permission'() {

@@ -124,6 +124,10 @@ class ManagedSubjectController {
                                                           'givenName', 'surname', 'mobileNumber', 'telephoneNumber', 'postalAddress', 
                                                           'organizationalUnit']])
 
+      if(SecurityUtils.subject.isPermitted("app:administrator")) {
+        bindData(managedSubjectInstance, params, [include: 'sharedToken'])
+      }
+
       if (!managedSubjectInstance.save()) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.managedsubject.update.failed'
