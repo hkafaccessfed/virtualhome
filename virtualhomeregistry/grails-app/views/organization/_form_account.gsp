@@ -15,9 +15,9 @@
 
   <h4><g:message code="label.coreattributes"/></h4>
   <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'cn', 'error')}">
+    <label class="control-label" for="cn"><g:message code="label.cn"/></label>
     <div class="controls">
       <g:textField name="cn" required="" value="${managedSubjectInstance?.cn}"/>
-
       <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.managedsubject.cn')}"><i class="icon icon-question-sign"></i></a>
     </div>
   </div>
