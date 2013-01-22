@@ -13,6 +13,7 @@ class FinalizationController {
     if(!invitationInstance) {
       log.error "no such invitation exists"
       response.sendError 500
+      return
     }
 
     if(invitationInstance.utilized) {
@@ -24,8 +25,10 @@ class FinalizationController {
   }
 
   def loginAvailable(String login) {
-    if(login.contains(' '))
+    if(login.contains(' ')) {
       render "false"
+      return
+    }
 
     def managedSubjectInstance = ManagedSubject.findWhere(login:login)
     if(managedSubjectInstance)
@@ -40,6 +43,7 @@ class FinalizationController {
     if(!invitationInstance) {
       log.error "no such invitation exists"
       response.sendError 500
+      return
     }
 
     def (outcome, managedSubjectInstance) = managedSubjectService.finalize(invitationInstance, login, plainPassword, plainPasswordConfirmation, mobileNumber)
@@ -47,10 +51,8 @@ class FinalizationController {
       render (view: 'index', model:[managedSubjectInstance:managedSubjectInstance, invitationInstance:invitationInstance])
       return
     }
-    
   }
 
   def used() {
   }
-
 }
