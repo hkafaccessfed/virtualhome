@@ -62,7 +62,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     g.subjects.size() == 1
 
     when:
-    def (result, managedSubject) = managedSubjectService.finalize(inv, 'usert', 'thisisalongpasswordtotest', 'thisisalongpasswordtotest')
+    def (result, managedSubject) = managedSubjectService.finalize(inv, 'usert', 'thisisalongpasswordtotest', 'thisisalongpasswordtotest', '0413123456')
     def invitation = ManagedSubjectInvitation.get(inv.id)
 
     then:
@@ -71,6 +71,38 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     managedSubject != null
     managedSubject.hasErrors() == false
     managedSubject.login == 'usert'
+    managedSubject.mobileNumber == '0413123456'
+    cryptoService.verifyPasswordHash('thisisalongpasswordtotest', managedSubject)
+    ms.functioning()
+  }
+
+  def 'ensure successful finalize for ManagedSubject with no mobile'() {
+    setup:
+    def o = Organization.build(active: true)
+    def g = Group.build(active:true, organization: o)
+    def ms = ManagedSubject.build(login:null, hash:null, organization:o, group:g, active:false)
+    def inv = ManagedSubjectInvitation.build(managedSubject: ms)
+
+    expect:
+    ManagedSubject.count() == 1
+    ManagedSubjectInvitation.count() == 1
+    !ms.functioning()
+    ms.login == null
+    ms.hash == null
+    o.subjects.size() == 1
+    g.subjects.size() == 1
+
+    when:
+    def (result, managedSubject) = managedSubjectService.finalize(inv, 'usert', 'thisisalongpasswordtotest', 'thisisalongpasswordtotest', null)
+    def invitation = ManagedSubjectInvitation.get(inv.id)
+
+    then:
+    result
+    invitation.utilized
+    managedSubject != null
+    managedSubject.hasErrors() == false
+    managedSubject.login == 'usert'
+    managedSubject.mobileNumber == null
     cryptoService.verifyPasswordHash('thisisalongpasswordtotest', managedSubject)
     ms.functioning()
   }
@@ -89,7 +121,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     g.subjects.size() == 1
 
     when:
-    def (result, managedSubject) = managedSubjectService.finalize(inv, 'usert', 'insecurepw', 'insecurepw')
+    def (result, managedSubject) = managedSubjectService.finalize(inv, 'usert', 'insecurepw', 'insecurepw', '0413123456')
     inv.refresh()
 
     then:
@@ -115,7 +147,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     g.subjects.size() == 1
 
     when:
-    def (result, managedSubject) = managedSubjectService.finalize(inv, 'usert', 'inzecurepW1!', 'inzecurepW1')
+    def (result, managedSubject) = managedSubjectService.finalize(inv, 'usert', 'inzecurepW1!', 'inzecurepW1', '0413123456')
     inv.refresh()
 
     then:

@@ -30,7 +30,7 @@ class ManagedSubjectService {
 
   public static final String DEFAULT_ASSURANCE = 'urn:mace:aaf.edu.au:iap:id:1'
 
-  def finalize(ManagedSubjectInvitation invitation, String login, String plainPassword, String plainPasswordConfirmation) {
+  def finalize(ManagedSubjectInvitation invitation, String login, String plainPassword, String plainPasswordConfirmation, String mobileNumber) {
     if(invitation.utilized)
       return [false, messageSource.getMessage(INVITATION_INVALID, [] as Object[], INVITATION_INVALID, LocaleContextHolder.locale)]
 
@@ -38,6 +38,7 @@ class ManagedSubjectService {
     managedSubject.login = login
     managedSubject.plainPassword = plainPassword
     managedSubject.plainPasswordConfirmation = plainPasswordConfirmation
+    managedSubject.mobileNumber = mobileNumber
     
     def (valid, errors) = passwordValidationService.validate(managedSubject)
     if(!valid) {

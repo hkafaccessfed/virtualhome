@@ -34,7 +34,7 @@ class FinalizationController {
       render "true"
   }
 
-  def complete(String inviteCode, String login, String plainPassword, String plainPasswordConfirmation) {
+  def complete(String inviteCode, String login, String plainPassword, String plainPasswordConfirmation, String mobileNumber) {
     def invitationInstance = ManagedSubjectInvitation.findWhere(inviteCode:inviteCode)
 
     if(!invitationInstance) {
@@ -42,9 +42,10 @@ class FinalizationController {
       response.sendError 500
     }
 
-    def (outcome, managedSubjectInstance) = managedSubjectService.finalize(invitationInstance, login, plainPassword, plainPasswordConfirmation)
+    def (outcome, managedSubjectInstance) = managedSubjectService.finalize(invitationInstance, login, plainPassword, plainPasswordConfirmation, mobileNumber)
     if(!outcome) {
-      render (view: 'index', model:[managedSubjectInstance:invitationInstance.managedSubject, invitationInstance:invitationInstance])
+      render (view: 'index', model:[managedSubjectInstance:managedSubjectInstance, invitationInstance:invitationInstance])
+      return
     }
     
   }

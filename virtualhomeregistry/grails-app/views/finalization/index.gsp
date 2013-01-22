@@ -10,7 +10,7 @@
       <div class="span12">
        <div class="page-header">
         <h1>Welcome <g:fieldValue bean="${managedSubjectInstance}" field="cn"/> <small> Your account is nearly ready....</small></h1>
-        <p class="lead">Please choose a username, a <strong>secure</strong> password and provide password recovery questions and answers below.</p>
+        <p class="lead">Please choose a username, a <strong>secure</strong> password and provide your mobile phone number below.</p>
       </div>
 
       <g:render template="/templates/flash" plugin="aafApplicationBase"/>
@@ -25,7 +25,7 @@
           <label class="control-label" for="login">Username</label>
           <div class="controls">
             <div class="span5">
-              <input class="required span5" name="login" id="login" type="text" autofocus="autofocus" autocomplete="off">
+              <input class="required span5" name="login" id="login" type="text" autofocus="autofocus" autocomplete="off" value="${managedSubjectInstance.login}">
             </div>
             <div class="span4">
               <span class="help-block">
@@ -94,21 +94,17 @@
         <hr>
 
         <div class="control-group">
-          <label class="control-label" for="plainPasswordConfirmation">Password Recovery</label>
+          <label class="control-label" for="plainPasswordConfirmation">Mobile Number</label>
           <div class="controls">
             <div class="span5">
-              <label class="muted">Question 1</label> <input class="span5" name="challenge.question.1" type="text" autocomplete="off">
-              <label class="muted">Answer 1</label> <input class="span5" name="challenge.answer.1" type="text" autocomplete="off">
-
-              <br><br><br>
-              <label class="muted">Question 2</label> <input class="span5" name="challenge.question.2" type="text" autocomplete="off">
-              <label class="muted">Answer 2</label> <input class="span5" name="challenge.answer.2" type="text" autocomplete="off">
+              <input class="span5" name="mobileNumber" type="text" autocomplete="off" value="${managedSubjectInstance.mobileNumber}">
             </div>
             <div class="span4">
               <div class="help-block">
-                <p>Please provide two questions and answers that only you would know.</p>
-                <p>You will need to answer these questions if you ever forget your password and need to recover it.</p>
-                <p>All answers are <strong>case sensitive</strong></p>
+                <p>Please provide your mobile number.</p>
+                <p>We <strong>only use</strong> your mobile number to assist in ensuring security if you forget your password and need to reset it.</p>
+                <p>International numbers are supported. If you're located outside Australia please be sure to add your <a href="http://en.wikipedia.org/wiki/List_of_mobile_phone_number_series_by_country" target="_blank">international prefix</a> to the start of your number.
+                <p>If you elect not to supply your mobile number and forget your password you'll need to manually contact administrators which may take some time to complete preventing your access to AAF connected services in the interim.</p>
               </div>
             </div>
           </div>
