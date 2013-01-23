@@ -158,7 +158,7 @@
             required: true,
             minlength: 3,
             noSpace:true,
-            remote: { url:"login-available", async:false }
+            remote: { url:"login-available", async:true }
           },
           plainPassword: {
             minlength: 8,
@@ -193,6 +193,8 @@
           }
         },
         keyup: true,
+        focusout: false,
+        focusInvalid:true
       });
 
     </r:script>
