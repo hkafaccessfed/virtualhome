@@ -22,6 +22,8 @@ class ManagedSubject {
   String login
   String hash
 
+  String apiKey               // Use for local account management context
+
   // AAF Core
   String cn                   // oid:2.5.4.3
   String email                // oid:0.9.2342.19200300.100.1.3
@@ -81,6 +83,11 @@ class ManagedSubject {
   String plainPassword
   String plainPasswordConfirmation
   static transients = ['plainPassword', 'plainPasswordConfirmation']
+
+  public ManagedSubject() {
+    if(!this.apiKey)
+      this.apiKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(16)
+  }
 
   public boolean functioning() {
     active && !locked && organization?.functioning() && group?.functioning()

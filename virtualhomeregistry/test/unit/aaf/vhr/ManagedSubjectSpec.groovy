@@ -300,4 +300,14 @@ class ManagedSubjectSpec extends UnitSpec {
     !s.functioning()
   }
 
+  def 'ensure apiKey is always created'() {
+    when:
+    def s = ManagedSubject.build()
+
+    then:
+    s.validate()
+    s.apiKey != null
+    s.apiKey.size() == 16
+  }
+
 }
