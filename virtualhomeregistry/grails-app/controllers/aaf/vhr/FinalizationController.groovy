@@ -46,7 +46,7 @@ class FinalizationController {
       return
     }
 
-    def (outcome, managedSubjectInstance) = managedSubjectService.finalize(invitationInstance, login, plainPassword, plainPasswordConfirmation, mobileNumber)
+    def (outcome, managedSubjectInstance) = managedSubjectService.finalize(invitationInstance, login, plainPassword, plainPasswordConfirmation, mobileNumber ?:null)
     if(!outcome) {
       render (view: 'index', model:[managedSubjectInstance:managedSubjectInstance, invitationInstance:invitationInstance])
       return
