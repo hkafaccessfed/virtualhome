@@ -10,14 +10,14 @@ import aaf.base.identity.Subject
 class ManagedSubject {
   static auditable = true
 
-  static final affiliations = ['affiliate',
-                        'alum',
-                        'employee',
-                        'faculty',
-                        'library-walk-in',
-                        'member',
-                        'staff',
-                        'student'] as List
+  static final affiliations = [ 'affiliate',
+                                'alum',
+                                'employee',
+                                'faculty',
+                                'library-walk-in',
+                                'member',
+                                'staff',
+                                'student'] as List
 
   String login
   String hash
