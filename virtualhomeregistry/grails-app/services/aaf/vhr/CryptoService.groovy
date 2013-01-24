@@ -77,7 +77,7 @@ class CryptoService {
     @pre: emailReset is non null
   */
   public void generateEmailResetHash(EmailReset emailReset) {
-    emailReset.code = org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(24)
+    emailReset.code = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(24)
     // We use BCrypt salt generation for convenience
     emailReset.salt = BCrypt.gensalt(grailsApplication.config.aaf.vhr.crypto.log_rounds)
     def hash = new Sha512Hash(emailReset.code, emailReset.salt, grailsApplication.config.aaf.vhr.crypto.sha_rounds)  
@@ -94,5 +94,4 @@ class CryptoService {
     def hash = new Sha512Hash(code, emailReset.salt, grailsApplication.config.aaf.vhr.crypto.sha_rounds)  
     emailReset.hash == hash.toString()
   }
-
 }

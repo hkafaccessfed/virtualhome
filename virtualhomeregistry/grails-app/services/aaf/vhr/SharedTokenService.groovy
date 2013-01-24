@@ -8,7 +8,7 @@ class SharedTokenService {
 
   public String generate(ManagedSubject subject) {
     String entityID = grailsApplication.config.aaf.vhr.sharedtoken.idp_entityid
-    String salt = org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(24)
+    String salt = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(24)
 
     String input = "${subject.login}/$entityID"
     def hash = new Sha1Hash(input, salt, grailsApplication.config.aaf.vhr.sharedtoken.sha_rounds)

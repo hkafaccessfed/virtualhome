@@ -17,7 +17,7 @@ class ManagedSubjectInvitation {
   static belongsTo = [managedSubject:ManagedSubject]
 
   public ManagedSubjectInvitation() {
-    this.inviteCode = org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(24)
+    this.inviteCode = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(24)
     this.utilized = false
   }
   
