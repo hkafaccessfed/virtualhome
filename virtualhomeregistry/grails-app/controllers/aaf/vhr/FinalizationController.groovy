@@ -51,6 +51,7 @@ class FinalizationController {
       render (view: 'index', model:[managedSubjectInstance:managedSubjectInstance, invitationInstance:invitationInstance])
       return
     }
+    [managedSubjectInstance: managedSubjectInstance]
   }
 
   def used() {
