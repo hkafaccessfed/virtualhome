@@ -357,6 +357,52 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
       it.value == managedSubjectTestInstance.getProperty(it.key)
     }
   }
+
+  def 'ensure correct output from save with valid data incl entitlements and when valid permission'() {
+    setup:
+    def sharedTokenService = Mock(aaf.vhr.SharedTokenService)
+    def managedSubjectService = Mock(aaf.vhr.ManagedSubjectService)
+    def organization = Organization.build(active:true)
+    def group = Group.build(organization:organization)
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create") >> true
+
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    managedSubjectTestInstance.properties.each {
+      if(it.value) {
+        if(grailsApplication.isDomainClass(it.value.getClass()))
+          params."${it.key}" = [id:"${it.value.id}"]
+        else
+          params."${it.key}" = "${it.value}"
+      }
+    }
+
+    params.eduPersonEntitlement = "some:urn:value\nsome:other:urn:value"
+
+    managedSubjectTestInstance.delete()
+
+    controller.sharedTokenService = sharedTokenService
+    controller.managedSubjectService = managedSubjectService
+
+    expect:
+    ManagedSubject.count() == 0
+
+    when:
+    controller.save()
+
+    then:
+    1 * sharedTokenService.generate(_ as ManagedSubject) >> {ManagedSubject subject -> subject.sharedToken = '1234'}
+    1 * managedSubjectService.register(_ as ManagedSubject)>> {ManagedSubject subject -> subject.save()}
+    ManagedSubject.count() == 1
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.managedsubject.save.success'
+
+    def savedManagedSubjectTestInstance = ManagedSubject.first()
+    savedManagedSubjectTestInstance.properties.each {
+      it.value == managedSubjectTestInstance.getProperty(it.key)
+    }
+
+    savedManagedSubjectTestInstance.eduPersonEntitlement == "some:urn:value;some:other:urn:value"
+  }
   
   def 'ensure correct output from save with valid data, multiple eduPersonAffilliation and when valid permission'() {
     setup:
@@ -539,6 +585,49 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
 
     savedManagedSubjectTestInstance.sharedToken == 'abcd1234'
   }
+
+  def 'ensure correct output from update with valid data including entitlements and when valid permission'() {
+    setup:
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization, sharedToken:'abcd1234', eduPersonEntitlement:'initial:urn;initial:urn:2')
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
+    
+    managedSubjectTestInstance.properties.each {
+      if(it.value) {
+        if(grailsApplication.isDomainClass(it.value.getClass()))
+          params."${it.key}" = [id:"${it.value.id}"]
+        else
+          params."${it.key}" = "${it.value}"
+      }
+    }
+
+    expect:
+    ManagedSubject.count() == 1
+    managedSubjectTestInstance.eduPersonEntitlement == 'initial:urn;initial:urn:2'
+
+    when:
+    params.eduPersonEntitlement = "some:urn:value\nsome:other:urn:value"
+    params.sharedToken = 'efgh5678'
+    params.id = managedSubjectTestInstance.id
+    params.version = 0
+    controller.update()
+
+    then:
+    ManagedSubject.count() == 1
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.managedsubject.update.success'
+
+    def savedManagedSubjectTestInstance = ManagedSubject.first()
+    savedManagedSubjectTestInstance == managedSubjectTestInstance
+
+    savedManagedSubjectTestInstance.properties.each {
+      it.value == managedSubjectTestInstance.getProperty(it.key)
+    }
+
+    savedManagedSubjectTestInstance.sharedToken == 'abcd1234'
+    managedSubjectTestInstance.eduPersonEntitlement == 'some:urn:value;some:other:urn:value'
+  }
+
 
   def 'ensure correct output from update with valid data containing multiple eduPersonAffiliation and when valid permission'() {
     setup:

@@ -46,6 +46,16 @@
     </div>
   </div>
 
+  <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'eduPersonEntitlement', 'error')}">
+    <label class="control-label" for="eduPersonEntitlement"><g:message code="label.edupersonentitlement"/></label>
+    <div class="controls">
+      <g:textArea name="eduPersonEntitlement" value="${managedSubjectInstance?.eduPersonEntitlement?.replace(';', '\n')}"
+      class="input-xxlarge" rows="10" placeholder="urn:mace:aaf.edu.au:domain.edu.au:registered:delegation"/>
+
+      <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.managedsubject.edupersonentitlement')}"><i class="icon icon-question-sign"></i></a>
+    </div>
+  </div>
+
   <g:if test="${actionName == 'edit' || actionName == 'update'}">
     <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'displayName', 'error')}">
       <label class="control-label" for="displayName"><g:message code="label.displayname"/></label>

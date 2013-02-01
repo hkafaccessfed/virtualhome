@@ -30,7 +30,8 @@ class ManagedSubject {
   String sharedToken          // oid:1.3.6.1.4.1.27856.1.2.5
   String displayName          // oid:2.16.840.1.113730.3.1.241
   String eduPersonAssurance   // oid:1.3.6.1.4.1.5923.1.1.1.11
-  String eduPersonAffiliation // oid:1.3.6.1.4.1.5923.1.1.1.1
+  String eduPersonAffiliation // oid:1.3.6.1.4.1.5923.1.1.1.1 - stored seperated by ; for IdP resolver simplification
+  String eduPersonEntitlement // oid:1.3.6.1.4.1.5923.1.1.1.7 - stored seperated by ; for IdP resolver simplification
   
   // AAF Optional
   String givenName            // oid:2.5.4.42
@@ -61,6 +62,7 @@ class ManagedSubject {
       return (val != null && val != '' && (val.count(' ') == 0 || val.count(' ') == 1))
     }
     sharedToken nullable:false, blank: false, unique: true
+    eduPersonEntitlement nullable:true
 
     eduPersonAssurance inList: ['urn:mace:aaf.edu.au:iap:id:1',
                                 'urn:mace:aaf.edu.au:iap:id:2',
@@ -78,6 +80,10 @@ class ManagedSubject {
 
     organization nullable: false
     group nullable: false
+  }
+
+  static mapping = {
+    eduPersonEntitlement type: "text"
   }
 
   String plainPassword

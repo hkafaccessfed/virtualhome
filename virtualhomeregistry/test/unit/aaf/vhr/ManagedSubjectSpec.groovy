@@ -208,6 +208,28 @@ class ManagedSubjectSpec extends UnitSpec {
     'unique' == s.errors['sharedToken']
   }
 
+  def 'ensure eduPersonEntitlement can be null not be blank'() {
+    setup:
+    def s = ManagedSubject.build()
+    mockForConstraintsTests(ManagedSubject, [s])
+
+    expect:
+    s.validate()
+
+    when:
+    s.mobileNumber = val
+
+    then:
+    expected == s.validate()
+    if(!expected)
+     reason == s.errors['eduPersonEntitlement']
+
+    where:
+    val << [null, '', 'some:entitlement:val;another:entitlement:val']
+    reason << ['', 'blank', '']
+    expected << [true, false, true]
+  }
+
   def 'ensure mobileNumber can be null not be blank'() {
     setup:
     def s = ManagedSubject.build()

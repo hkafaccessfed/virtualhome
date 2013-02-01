@@ -57,7 +57,7 @@ class ManagedSubjectController {
       def group = Group.get(params.group.id)
       if(SecurityUtils.subject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create")) {
         def managedSubjectInstance = new ManagedSubject()
-        bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance']])
+        bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance', 'eduPersonEntitlement']])
         managedSubjectInstance.displayName = managedSubjectInstance.cn
         managedSubjectInstance.group = group
         managedSubjectInstance.organization = group.organization
@@ -67,6 +67,10 @@ class ManagedSubjectController {
           managedSubjectInstance.eduPersonAffiliation = params.eduPersonAffiliation
         else
           managedSubjectInstance.eduPersonAffiliation = params.eduPersonAffiliation.join(';')
+
+        if(params.eduPersonEntitlement) {
+          managedSubjectInstance.eduPersonEntitlement = params.eduPersonEntitlement.replaceAll("\r\n|\n\r|\n|\r",";")
+        }
 
         if(!group.organization.canRegisterSubjects() && !SecurityUtils.subject.isPermitted("app:administrator")) {
           flash.type = 'error'
@@ -137,6 +141,10 @@ class ManagedSubjectController {
         managedSubjectInstance.eduPersonAffiliation = params.eduPersonAffiliation
       else
         managedSubjectInstance.eduPersonAffiliation = params.eduPersonAffiliation.join(';')
+
+      if(params.eduPersonEntitlement) {
+        managedSubjectInstance.eduPersonEntitlement = params.eduPersonEntitlement.replaceAll("\r\n|\n\r|\n|\r",";")
+      }
 
       if (!managedSubjectInstance.save()) {
         flash.type = 'error'

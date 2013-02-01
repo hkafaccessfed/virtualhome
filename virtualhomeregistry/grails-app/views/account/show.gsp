@@ -36,6 +36,11 @@
             <th class="span4"><span id="email-label"><strong><g:message code="label.email" /></strong></span></th>
             <td><span aria-labelledby="email-label"><g:fieldValue bean="${managedSubjectInstance}" field="email"/></span></td>
           </tr>
+
+          <tr>
+            <th class="span4"><span id="displayname-label"><strong><g:message code="label.displayname" /></strong></span></th>
+            <td><span aria-labelledby="displayname-label"><g:fieldValue bean="${managedSubjectInstance}" field="displayName"/></span></td>
+          </tr>
         
           <tr>
             <th class="span4"><span id="edupersonassurance-label"><strong><g:message code="label.edupersonassurance" /></strong></span></th>
@@ -43,13 +48,29 @@
           </tr>
         
           <tr>
-            <th class="span4"><span id="edupersonaffiliation-label"><strong><g:message code="label.edupersonaffiliation" /></strong></span></th>
-            <td><span aria-labelledby="edupersonaffiliation-label"><g:fieldValue bean="${managedSubjectInstance}" field="eduPersonAffiliation"/></span></td>
-          </tr>
+              <th class="span4"><span id="edupersonaffiliation-label"><strong><g:message code="label.edupersonaffiliation" /></strong></span></th>
+              <td>
+                <span aria-labelledby="edupersonaffiliation-label">
+                  <ol>
+                  <g:each in="${managedSubjectInstance.eduPersonAffiliation.split(';')}" var='aff'>
+                    <li>${aff.encodeAsHTML()}</li>
+                  </g:each>
+                  </ol>
+                </span>
+              </td>
+            </tr>
 
           <tr>
-            <th class="span4"><span id="displayname-label"><strong><g:message code="label.displayname" /></strong></span></th>
-            <td><span aria-labelledby="displayname-label"><g:fieldValue bean="${managedSubjectInstance}" field="displayName"/></span></td>
+            <th class="span4"><span id="edupersonentitlement-label"><strong><g:message code="label.edupersonentitlement" /></strong></span></th>
+            <td>
+              <span aria-labelledby="edupersonentitlement-label">
+                <ol>
+                <g:each in="${managedSubjectInstance.eduPersonEntitlement.split(';')}" var='ent'>
+                  <li>${ent.encodeAsHTML()}</li>
+                </g:each>
+                </ol>
+              </span>
+            </td>
           </tr>
 
           <tr>
