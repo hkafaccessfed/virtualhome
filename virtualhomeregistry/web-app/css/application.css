@@ -23,11 +23,23 @@
 
 form.finalize label
 {
-    font-size:24px;
+    font-size: 20px;
     margin-top: 6px;
 }
 
 form.finalize input[type="text"], input[type="password"]
+{
+    font-size: 40px;
+    height: 100%;
+}
+
+form.myaccount label
+{
+    font-size: 20px;
+    margin-top: 6px;
+}
+
+form.myaccount input[type="text"], input[type="password"]
 {
     font-size:40px;
     height: 100%;

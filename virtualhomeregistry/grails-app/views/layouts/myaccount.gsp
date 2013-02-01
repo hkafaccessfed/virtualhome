@@ -32,6 +32,14 @@
               <li><a href="http://support.aaf.edu.au" target="_blank"><g:message code="branding.nav.support" /></a></li>
             </ul>
 
+            <g:if test="${managedSubjectInstance}">
+              <ul class="nav pull-right">
+                <li>
+                  <g:link action="logout"><g:message code="branding.nav.logout" /></g:link>
+                </li>
+              </ul>
+            </g:if>
+
           </div>
         </div>
       </div>

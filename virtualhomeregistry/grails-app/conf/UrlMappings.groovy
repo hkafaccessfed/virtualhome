@@ -19,6 +19,26 @@ class UrlMappings {
     "/myaccount/setup/$inviteCode" {
       controller="finalization"
     }
+    "/myaccount" {
+      controller="account"
+      action="index"
+    }
+    "/myaccount/logout" {
+      controller="account"
+      action="logout"
+    }
+    "/myaccount/details" {
+      controller="account"
+      action="show"
+    }
+    "/myaccount/changepassword" {
+      controller="account"
+      action="changepassword"
+    }
+    "/myaccount/completepasswordchange" {
+      controller="account"
+      action="completepasswordchange"
+    }
 
     "/dashboard"(controller:"dashboard", action:"dashboard")
 
