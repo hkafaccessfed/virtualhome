@@ -19,7 +19,7 @@
           <li>No QWERTY sequences; and</li>
           <li>No more than 3 repeat characters.</li>
         </ul>
-        <p>The AAF <a href="http://xkcd.com/936/" target="_blank" tabindex="-1">and others</a> recommend you use a random password (passphrase) of <strong>greater then 16 characters</strong>. A phrase unique to you is the easiest way to achieve this: e.g. <em>'IbackedHorsenumber46intheMelbournecup!' or 'ilovedvisitingIcelandin2012'</em>. Don't use a famous quotation from literature. Capitalisation and non alphabetic characters as shown make your phrase even better.
+        <p>The AAF <a href="http://xkcd.com/936/" target="_blank" tabindex="-1">and others</a> recommend you use a passphrase of <strong>greater then 16 characters</strong>. A phrase unique to you is the easiest way to achieve this: e.g. <em>'IbackedHorsenumber46intheMelbournecup!' or 'ilovedvisitingIcelandin2012'</em>. Don't use a famous quotation from literature. Capitalisation and non alphabetic characters as shown make your phrase even better.
         <p>If you wish to use a password between 8 and 16 characters in length the following requirements <strong>also apply</strong>:</p>
         <ul>
           <li>At least 1 number</li>
