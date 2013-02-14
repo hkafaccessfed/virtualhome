@@ -219,13 +219,10 @@ class ManagedSubjectController {
         return
       }
 
-      managedSubjectInstance.locked = !managedSubjectInstance.locked
-
-      if (!managedSubjectInstance.save()) {
-        flash.type = 'error'
-        flash.message = 'controllers.aaf.vhr.managedsubject.togglelock.failed'
-        render(view: "show", model:[managedSubjectInstance: managedSubjectInstance])
-        return
+      if(managedSubjectInstance.locked) {
+        managedSubjectInstance.unlock("Unlocked by administrator", "vhr_management_portal", null, subject)
+      } else {
+        managedSubjectInstance.lock("Locked by administrator", "vhr_management_portal", null, subject)
       }
 
       log.info "Action: toggleLock, Subject: $subject, Object: $managedSubjectInstance"
@@ -255,13 +252,10 @@ class ManagedSubjectController {
         return
       }
 
-      managedSubjectInstance.active = !managedSubjectInstance.active
-
-      if (!managedSubjectInstance.save()) {
-        flash.type = 'error'
-        flash.message = 'controllers.aaf.vhr.managedsubject.toggleactive.failed'
-        render(view: "show", model:[managedSubjectInstance: managedSubjectInstance])
-        return
+      if(managedSubjectInstance.active) {
+        managedSubjectInstance.deactivate("Deactivated by administrator", "vhr_management_portal", null, subject)
+      } else {
+        managedSubjectInstance.activate("Activated by administrator", "vhr_management_portal", null, subject)
       }
 
       log.info "Action: toggleActive, Subject: $subject, Object: $managedSubjectInstance"
