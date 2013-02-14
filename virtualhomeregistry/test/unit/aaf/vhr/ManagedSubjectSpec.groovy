@@ -368,7 +368,7 @@ class ManagedSubjectSpec extends UnitSpec {
     then:
     s.locked
     s.lockedChanges.size() == 1
-    s.lockedChanges.toArray()[0].event == ManagedSubjectStateChange.Type.LOCKED
+    s.lockedChanges.toArray()[0].event == StateChangeType.LOCKED
   }
 
   def 'ensure accounts are correctly unlocked'() {
@@ -379,7 +379,7 @@ class ManagedSubjectSpec extends UnitSpec {
     expect:
     s.locked
     s.lockedChanges.size() == 1
-    s.lockedChanges.toArray()[0].event == ManagedSubjectStateChange.Type.LOCKED
+    s.lockedChanges.toArray()[0].event == StateChangeType.LOCKED
 
     when:
     s.unlock("reason2", "category2", "environment2", null)
@@ -388,7 +388,7 @@ class ManagedSubjectSpec extends UnitSpec {
     !s.locked
     s.failedResets == 0
     s.lockedChanges.size() == 2
-    s.lockedChanges.toArray()[1].event == ManagedSubjectStateChange.Type.UNLOCKED
+    s.lockedChanges.toArray()[1].event == StateChangeType.UNLOCKED
   }
 
 
@@ -406,7 +406,7 @@ class ManagedSubjectSpec extends UnitSpec {
     then:
     !s.active
     s.activeChanges.size() == 1
-    s.activeChanges.toArray()[0].event == ManagedSubjectStateChange.Type.DEACTIVATE
+    s.activeChanges.toArray()[0].event == StateChangeType.DEACTIVATE
   }
 
   def 'ensure accounts are correctly activated'() {
@@ -417,7 +417,7 @@ class ManagedSubjectSpec extends UnitSpec {
     expect:
     !s.active
     s.activeChanges.size() == 1
-    s.activeChanges.toArray()[0].event == ManagedSubjectStateChange.Type.DEACTIVATE
+    s.activeChanges.toArray()[0].event == StateChangeType.DEACTIVATE
 
     when:
     s.activate("reason2", "category2", "environment2", null)
@@ -425,7 +425,7 @@ class ManagedSubjectSpec extends UnitSpec {
     then:
     s.active
     s.failedLogins == 0
-    s.activeChanges.toArray()[1].event == ManagedSubjectStateChange.Type.ACTIVATE
+    s.activeChanges.toArray()[1].event == StateChangeType.ACTIVATE
   }
 
 }

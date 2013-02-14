@@ -14,7 +14,7 @@ class ManagedSubjectStateChangeSpec extends spock.lang.Specification {
   def 'ensure creation of basic state active change'() {
     setup:
     def managedSubjectTestInstance = ManagedSubject.build()
-    def change = new ManagedSubjectStateChange(event: ManagedSubjectStateChange.Type.DEACTIVATE, reason:'system deactivated account')
+    def change = new ManagedSubjectStateChange(event: StateChangeType.DEACTIVATE, reason:'system deactivated account')
 
     when:
     managedSubjectTestInstance.addToActiveChanges(change)
@@ -30,7 +30,7 @@ class ManagedSubjectStateChangeSpec extends spock.lang.Specification {
   def 'ensure creation of basic state locked change'() {
     setup:
     def managedSubjectTestInstance = ManagedSubject.build()
-    def change = new ManagedSubjectStateChange(event: ManagedSubjectStateChange.Type.LOCKED, reason:'system locked account')
+    def change = new ManagedSubjectStateChange(event: StateChangeType.LOCKED, reason:'system locked account')
 
     when:
     managedSubjectTestInstance.addToLockedChanges(change)
@@ -47,7 +47,7 @@ class ManagedSubjectStateChangeSpec extends spock.lang.Specification {
     setup:
     def administrator = aaf.base.identity.Subject.build()
     def managedSubjectTestInstance = ManagedSubject.build()
-    def change = new ManagedSubjectStateChange(event: ManagedSubjectStateChange.Type.DEACTIVATE, reason:'admin deactivated account', actionedBy:administrator)
+    def change = new ManagedSubjectStateChange(event: StateChangeType.DEACTIVATE, reason:'admin deactivated account', actionedBy:administrator)
 
     when:
     managedSubjectTestInstance.addToActiveChanges(change)
@@ -64,7 +64,7 @@ class ManagedSubjectStateChangeSpec extends spock.lang.Specification {
     setup:
     def administrator = aaf.base.identity.Subject.build()
     def managedSubjectTestInstance = ManagedSubject.build()
-    def change = new ManagedSubjectStateChange(event: ManagedSubjectStateChange.Type.LOCKED, reason:'admin locked account', actionedBy:administrator)
+    def change = new ManagedSubjectStateChange(event: StateChangeType.LOCKED, reason:'admin locked account', actionedBy:administrator)
 
     when:
     managedSubjectTestInstance.addToLockedChanges(change)
@@ -81,7 +81,7 @@ class ManagedSubjectStateChangeSpec extends spock.lang.Specification {
     setup:
     def administrator = aaf.base.identity.Subject.build()
     def managedSubjectTestInstance = ManagedSubject.build()
-    def change = new ManagedSubjectStateChange(event: ManagedSubjectStateChange.Type.DEACTIVATE, reason:'admin deactivated account', actionedBy:administrator)
+    def change = new ManagedSubjectStateChange(event: StateChangeType.DEACTIVATE, reason:'admin deactivated account', actionedBy:administrator)
     change.category = 'failed_lost_password'
     change.environment = """IP: 1.2.3.4
     Hostname: CPE-121-222-.lnse2.woo.bigpond.com

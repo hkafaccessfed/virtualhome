@@ -117,17 +117,23 @@ class ManagedSubject {
   }
 
   public void setResetCode(String resetCode) {
-    this.resetCode = cleanCode(resetCode)
+    if(resetCode)
+      this.resetCode = cleanCode(resetCode)
+    else
+      this.resetCode = null
   }
 
   public void setResetCodeExternal(String resetCodeExternal) {
-    this.resetCodeExternal = cleanCode(resetCodeExternal)
+    if(resetCodeExternal)
+      this.resetCodeExternal = cleanCode(resetCodeExternal)
+    else
+      this.resetCodeExternal = null
   }
 
   public lock(String reason, String category, String environment, Subject actionedBy) {
     this.locked = true
 
-    def lockChange = new ManagedSubjectStateChange(event: ManagedSubjectStateChange.Type.LOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    def lockChange = new ManagedSubjectStateChange(event:StateChangeType.LOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
     this.addToLockedChanges(lockChange)
 
     if(!this.save(flush:true)) {
@@ -143,7 +149,7 @@ class ManagedSubject {
     this.locked = false
     this.failedResets = 0
 
-    def lockChange = new ManagedSubjectStateChange(event: ManagedSubjectStateChange.Type.UNLOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    def lockChange = new ManagedSubjectStateChange(event:StateChangeType.UNLOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
     this.addToLockedChanges(lockChange)
 
     if(!this.save(flush:true)) {
@@ -159,7 +165,7 @@ class ManagedSubject {
     this.active = true
     this.failedLogins = 0
 
-    def change = new ManagedSubjectStateChange(event: ManagedSubjectStateChange.Type.ACTIVATE, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    def change = new ManagedSubjectStateChange(event:StateChangeType.ACTIVATE, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
     this.addToActiveChanges(change)
 
     if(!this.save(flush:true)) {
@@ -174,7 +180,7 @@ class ManagedSubject {
   public deactivate(String reason, String category, String environment, Subject actionedBy) {
     this.active = false
 
-    def change = new ManagedSubjectStateChange(event: ManagedSubjectStateChange.Type.DEACTIVATE, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    def change = new ManagedSubjectStateChange(event:StateChangeType.DEACTIVATE, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
     this.addToActiveChanges(change)
 
     if(!this.save(flush:true)) {

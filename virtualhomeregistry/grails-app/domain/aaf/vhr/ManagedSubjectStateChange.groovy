@@ -1,5 +1,6 @@
 package aaf.vhr
 
+import javax.persistence.*;
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
@@ -8,10 +9,8 @@ import aaf.base.identity.Subject
 @ToString(includeNames=true, includes="id, reason")
 @EqualsAndHashCode
 class ManagedSubjectStateChange {
+  StateChangeType event
 
-  static enum Type {LOCKED, UNLOCKED, ACTIVATE, DEACTIVATE}
-
-  Type event
   String reason
 
   String category
@@ -34,3 +33,10 @@ class ManagedSubjectStateChange {
     environment type: "text"
   }
 }
+
+  public enum StateChangeType {
+    LOCKED,
+    UNLOCKED, 
+    ACTIVATE, 
+    DEACTIVATE
+  }
