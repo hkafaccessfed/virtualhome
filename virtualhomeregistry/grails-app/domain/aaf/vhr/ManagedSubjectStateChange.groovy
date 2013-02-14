@@ -9,6 +9,9 @@ import aaf.base.identity.Subject
 @EqualsAndHashCode
 class ManagedSubjectStateChange {
 
+  static enum Type {LOCKED, UNLOCKED, ACTIVATE, DEACTIVATE}
+
+  Type event
   String reason
 
   String category
