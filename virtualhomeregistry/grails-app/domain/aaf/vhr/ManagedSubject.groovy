@@ -124,6 +124,68 @@ class ManagedSubject {
     this.resetCodeExternal = cleanCode(resetCodeExternal)
   }
 
+  public lock(String reason, String category, String environment, Subject actionedBy) {
+    this.locked = true
+
+    def lockChange = new ManagedSubjectStateChange(event: ManagedSubjectStateChange.Type.LOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToLockedChanges(lockChange)
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when setting locked state"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when setting locked state")
+    }
+  }
+
+  public unlock(String reason, String category, String environment, Subject actionedBy) {
+    this.locked = false
+    this.failedResets = 0
+
+    def lockChange = new ManagedSubjectStateChange(event: ManagedSubjectStateChange.Type.UNLOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToLockedChanges(lockChange)
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when setting unlocked state"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when setting unlocked state")
+    }
+  }
+
+  public activate(String reason, String category, String environment, Subject actionedBy) {
+    this.active = true
+    this.failedLogins = 0
+
+    def change = new ManagedSubjectStateChange(event: ManagedSubjectStateChange.Type.ACTIVATE, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToActiveChanges(change)
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when setting active state"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when setting active state")
+    }
+  }
+
+  public deactivate(String reason, String category, String environment, Subject actionedBy) {
+    this.active = false
+
+    def change = new ManagedSubjectStateChange(event: ManagedSubjectStateChange.Type.DEACTIVATE, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToActiveChanges(change)
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when setting deactive state"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when setting deactive state")
+    }
+  }
+
   private String cleanCode(String code) {
     // Ensure no confusion on SMS/Email codes between
     // characters that look the same - extend as

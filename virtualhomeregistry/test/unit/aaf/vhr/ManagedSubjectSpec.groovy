@@ -354,4 +354,78 @@ class ManagedSubjectSpec extends UnitSpec {
     s.resetCodeExternal == 'abciLo9'
   }
 
+  def 'ensure accounts are correctly locked'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    expect:
+    s.lockedChanges == null
+    !s.locked
+
+    when:
+    s.lock("reason", "category", "environment", null)
+
+    then:
+    s.locked
+    s.lockedChanges.size() == 1
+    s.lockedChanges.toArray()[0].event == ManagedSubjectStateChange.Type.LOCKED
+  }
+
+  def 'ensure accounts are correctly unlocked'() {
+    setup:
+    def s = ManagedSubject.build(failedResets:2)
+    s.lock("reason", "category", "environment", null)
+
+    expect:
+    s.locked
+    s.lockedChanges.size() == 1
+    s.lockedChanges.toArray()[0].event == ManagedSubjectStateChange.Type.LOCKED
+
+    when:
+    s.unlock("reason2", "category2", "environment2", null)
+
+    then:
+    !s.locked
+    s.failedResets == 0
+    s.lockedChanges.size() == 2
+    s.lockedChanges.toArray()[1].event == ManagedSubjectStateChange.Type.UNLOCKED
+  }
+
+
+  def 'ensure accounts are correctly deactivated'() {
+    setup:
+    def s = ManagedSubject.build(active:true)
+
+    expect:
+    s.activeChanges == null
+    s.active
+
+    when:
+    s.deactivate("reason", "category", "environment", null)
+
+    then:
+    !s.active
+    s.activeChanges.size() == 1
+    s.activeChanges.toArray()[0].event == ManagedSubjectStateChange.Type.DEACTIVATE
+  }
+
+  def 'ensure accounts are correctly activated'() {
+    setup:
+    def s = ManagedSubject.build(failedLogins:2)
+    s.deactivate("reason", "category", "environment", null)
+
+    expect:
+    !s.active
+    s.activeChanges.size() == 1
+    s.activeChanges.toArray()[0].event == ManagedSubjectStateChange.Type.DEACTIVATE
+
+    when:
+    s.activate("reason2", "category2", "environment2", null)
+
+    then:
+    s.active
+    s.failedLogins == 0
+    s.activeChanges.toArray()[1].event == ManagedSubjectStateChange.Type.ACTIVATE
+  }
+
 }
