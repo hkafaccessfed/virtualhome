@@ -71,7 +71,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     managedSubject != null
     managedSubject.hasErrors() == false
     managedSubject.login == 'usert'
-    managedSubject.mobileNumber == '0413123456'
+    managedSubject.mobileNumber == '+61413123456'
     cryptoService.verifyPasswordHash('thisisalongpasswordtotest', managedSubject)
     ms.functioning()
   }
@@ -188,9 +188,6 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     message.subject == 'Action Required: Your new AAF VHR account is almost ready!'
     GreenMailUtil.getBody(message).contains("This is an email for ${managedSubject.cn} telling them")
     GreenMailUtil.getAddressList(message.getRecipients(Message.RecipientType.TO)) == managedSubject.email
-
-    //o.subjects.size() == 1
-    //g.subjects.size() == 1
 
     managedSubject.organization == o
     managedSubject.group == g
