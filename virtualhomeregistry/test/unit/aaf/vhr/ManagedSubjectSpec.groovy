@@ -217,7 +217,7 @@ class ManagedSubjectSpec extends UnitSpec {
     s.validate()
 
     when:
-    s.mobileNumber = val
+    s.eduPersonEntitlement = val
 
     then:
     expected == s.validate()
@@ -330,6 +330,28 @@ class ManagedSubjectSpec extends UnitSpec {
     s.validate()
     s.apiKey != null
     s.apiKey.size() == 16
+  }
+
+  def 'ensure resetCode is sanitized'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    when:
+    s.resetCode = 'abcIlO0'
+
+    then:
+    s.resetCode == 'abciLo9'
+  }
+
+  def 'ensure resetCodeExternal is sanitized'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    when:
+    s.resetCodeExternal = 'abcIlO0'
+
+    then:
+    s.resetCodeExternal == 'abciLo9'
   }
 
 }

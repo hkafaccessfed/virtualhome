@@ -24,6 +24,10 @@ class ManagedSubject {
 
   String apiKey               // Use for local account management context
 
+  // Password reset. Both codes required to be input, second provided via SMS or administrator
+  String resetCode
+  String resetCodeExternal           
+
   // AAF Core
   String cn                   // oid:2.5.4.3
   String email                // oid:0.9.2342.19200300.100.1.3
@@ -44,12 +48,17 @@ class ManagedSubject {
   boolean active = false
   boolean locked = false
 
+  int failedLogins = 0
+  int failedResets = 0
+
   List challengeResponse
   List emailReset
 
   static hasMany = [challengeResponse: ChallengeResponse,
                     emailReset: EmailReset,
-                    invitations: ManagedSubjectInvitation]  
+                    invitations: ManagedSubjectInvitation,
+                    activeChanges: ManagedSubjectStateChange,
+                    lockedChanges: ManagedSubjectStateChange]  
 
   static belongsTo = [organization:Organization,
                       group:Group]
@@ -57,12 +66,16 @@ class ManagedSubject {
   static constraints = {
     login nullable:true, blank: false, unique: true, size: 3..100,  validator: { val -> if (val?.contains(' ')) return 'value.contains.space' }
     hash nullable:true, blank:false, minSize:60, maxSize:60
+    
+    resetCode nullable:true
+    resetCodeExternal nullable:true
+
     email blank:false, unique:true, email:true
     cn validator: {val, obj ->
       return (val != null && val != '' && (val.count(' ') == 0 || val.count(' ') == 1))
     }
     sharedToken nullable:false, blank: false, unique: true
-    eduPersonEntitlement nullable:true
+    eduPersonEntitlement nullable:true, blank:false
 
     eduPersonAssurance inList: ['urn:mace:aaf.edu.au:iap:id:1',
                                 'urn:mace:aaf.edu.au:iap:id:2',
@@ -71,7 +84,7 @@ class ManagedSubject {
 
     eduPersonAffiliation nullable:false, blank:false, maxSize: 255
 
-    mobileNumber nullable: true, blank: false
+    mobileNumber nullable: true, blank: false, validator: validMobileNumber
     givenName nullable: true, blank: false          
     surname nullable: true, blank: false            
     telephoneNumber nullable: true, blank: false   
@@ -95,7 +108,61 @@ class ManagedSubject {
       this.apiKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(16)
   }
 
+  public canChangePassword() {
+    !locked && organization?.functioning() && group?.functioning()
+  }
+
   public boolean functioning() {
     active && !locked && organization?.functioning() && group?.functioning()
+  }
+
+  public void setResetCode(String resetCode) {
+    this.resetCode = cleanCode(resetCode)
+  }
+
+  public void setResetCodeExternal(String resetCodeExternal) {
+    this.resetCodeExternal = cleanCode(resetCodeExternal)
+  }
+
+  private String cleanCode(String code) {
+    // Ensure no confusion on SMS/Email codes between
+    // characters that look the same - extend as
+
+    if (code.contains('I')) {
+      code = code.replace('I', 'i')
+    }
+    if(code.contains('l')) {
+      code = code.replace('l', 'L')
+    }
+    if(code.contains('O')) {
+      code = code.replace('O', 'o')
+    }
+    if(code.contains('0')) {
+      code = code.replace('0', '9')
+    }
+
+    code
+  }
+
+  static validMobileNumber = { value, obj ->
+    if(value == "" || value == null) {
+      obj.mobileNumber = null
+      return true
+    }
+
+    def checkedNumber = value
+
+    // Translate Australian numbers to international format
+    if(checkedNumber.startsWith('04')) {
+      checkedNumber = checkedNumber[1..-1]
+      checkedNumber = "+61$checkedNumber"
+    }
+
+    if(!checkedNumber.startsWith('+')) {
+      return false
+    } else {
+      obj.mobileNumber = checkedNumber
+      return true
+    }
   }
 }
