@@ -7,7 +7,7 @@
   <body>
     <div class="hero-unit">
       <h1>You're ready to go!</h1>
-      <p>To login to select <strong>Virtual Home Registry</strong> from the list of available organisations when requested.</p>
+      <p>To login to services simply select <strong>Virtual Home Registry</strong> from the list of available organisations when requested.</p>
       <a href="http://www.aaf.edu.au/servicecatalogue/" class="btn btn-info btn-large pull-right"><i class="icon-globe icon-white"></i> Show me the services!</a>
     </div>
 
