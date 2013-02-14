@@ -96,7 +96,7 @@
               <td>
                 <span aria-labelledby="edupersonaffiliation-label">
                   <ol>
-                  <g:each in="${managedSubjectInstance.eduPersonAffiliation.split(';')}" var='aff'>
+                  <g:each in="${managedSubjectInstance.eduPersonAffiliation?.split(';')}" var='aff'>
                     <li>${aff.encodeAsHTML()}</li>
                   </g:each>
                   </ol>
@@ -109,7 +109,7 @@
               <td>
                 <span aria-labelledby="edupersonentitlement-label">
                   <ol>
-                  <g:each in="${managedSubjectInstance.eduPersonEntitlement.split(';')}" var='ent'>
+                  <g:each in="${managedSubjectInstance.eduPersonEntitlement?.split(';')}" var='ent'>
                     <li>${ent.encodeAsHTML()}</li>
                   </g:each>
                   </ol>
