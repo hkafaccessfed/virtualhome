@@ -391,7 +391,6 @@ class ManagedSubjectSpec extends UnitSpec {
     s.lockedChanges.toArray()[1].event == StateChangeType.UNLOCKED
   }
 
-
   def 'ensure accounts are correctly deactivated'() {
     setup:
     def s = ManagedSubject.build(active:true)
@@ -426,6 +425,22 @@ class ManagedSubjectSpec extends UnitSpec {
     s.active
     s.failedLogins == 0
     s.activeChanges.toArray()[1].event == StateChangeType.ACTIVATE
+  }
+
+  def 'ensure accounts are correctly incremented when failed password reset occurs'() {
+    setup:
+    def s = ManagedSubject.build(active:true)
+
+    expect:
+    s.failedResets == 0
+    s.active
+
+    when:
+    s.increaseFailedResets()
+
+    then:
+    s.failedResets == 1
+    s.active
   }
 
 }

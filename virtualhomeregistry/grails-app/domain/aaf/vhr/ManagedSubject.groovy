@@ -192,6 +192,18 @@ class ManagedSubject {
     }
   }
 
+  public increaseFailedResets() {
+    this.failedResets++
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when increasing failed logins"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when increasing failed logins")
+    }
+  }
+
   private String cleanCode(String code) {
     // Ensure no confusion on SMS/Email codes between
     // characters that look the same - extend as

@@ -39,6 +39,9 @@ class UrlMappings {
       controller="account"
       action="completepasswordchange"
     }
+    "/lostpassword/$action" {
+      controller="lostPassword"
+    }
 
     "/dashboard"(controller:"dashboard", action:"dashboard")
 

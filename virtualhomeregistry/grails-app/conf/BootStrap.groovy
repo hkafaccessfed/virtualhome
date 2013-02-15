@@ -81,6 +81,18 @@ class BootStrap {
           }
         }
       }
+
+      def email_password_code = EmailTemplate.findWhere(name:'email_password_code') 
+      if(!email_password_code) {
+        def templateMarkup = grailsApplication.parentContext.getResource("classpath:aaf/vhr/email_password_code.gsp").inputStream.text
+        email_password_code = new EmailTemplate(name:'email_password_code', content: templateMarkup)
+        if(!email_password_code.save()) {
+          email_password_code.errors.each {
+            println it
+          }
+          throw new RuntimeException("Unable to populate initial user registration email template email_password_code")
+        }
+      }
     }
 
     def destroy = {

@@ -51,6 +51,7 @@ grails.project.dependency.resolution = {
     compile ":rest:0.7"
     compile ":csv:0.3.1"
     compile ":sanitizer:0.8.0"
+    compile ":recaptcha:0.5.3"
   }
 }
 
