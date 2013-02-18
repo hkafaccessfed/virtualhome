@@ -48,6 +48,7 @@ class ManagedSubject {
   boolean active = false
   boolean locked = false
   boolean blocked = false
+  boolean archived = false
 
   int failedLogins = 0
   int failedResets = 0
@@ -60,6 +61,7 @@ class ManagedSubject {
                     invitations: ManagedSubjectInvitation,
                     activeChanges: ManagedSubjectStateChange,
                     lockedChanges: ManagedSubjectStateChange,
+                    archivedChanges: ManagedSubjectStateChange,
                     blockedChanges: ManagedSubjectStateChange]  
 
   static belongsTo = [organization:Organization,
@@ -111,11 +113,11 @@ class ManagedSubject {
   }
 
   public canChangePassword() {
-    !locked && !blocked && organization?.functioning() && group?.functioning()
+    !locked && !blocked && !archived && organization?.functioning() && group?.functioning()
   }
 
   public boolean functioning() {
-    active && !locked && !blocked && organization?.functioning() && group?.functioning()
+    active && !locked && !blocked && !archived && organization?.functioning() && group?.functioning()
   }
 
   public void setResetCode(String resetCode) {
@@ -215,6 +217,36 @@ class ManagedSubject {
 
     def change = new ManagedSubjectStateChange(event:StateChangeType.DEACTIVATE, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
     this.addToActiveChanges(change)
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when setting deactive state"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when setting deactive state")
+    }
+  }
+
+  public archive(String reason, String category, String environment, Subject actionedBy) {
+    this.archived = true
+
+    def change = new ManagedSubjectStateChange(event:StateChangeType.ARCHIVED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToArchivedChanges(change)
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when setting archive state"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when setting archive state")
+    }
+  }
+
+  public unarchive(String reason, String category, String environment, Subject actionedBy) {
+    this.archived = false
+
+    def change = new ManagedSubjectStateChange(event:StateChangeType.UNARCHIVED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToArchivedChanges(change)
 
     if(!this.save(flush:true)) {
       log.error "Unable to save $this when setting deactive state"

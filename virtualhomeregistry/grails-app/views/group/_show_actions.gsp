@@ -22,6 +22,8 @@
     <li>
       <g:render template="show_actions_toggle"/>
     </li>
+
+    <li class="divider"></li>
     <li>
       <a href="#" onclick="$(this).next('form').submit();">
       <g:if test="${groupInstance.archived}">
@@ -36,6 +38,7 @@
         <g:hiddenField name="id" value="${groupInstance.id}" />
       </g:form>
     </li>
+
     <li>
       <a href="#" onclick="$(this).next('form').submit();">
       <g:if test="${groupInstance.blocked}">

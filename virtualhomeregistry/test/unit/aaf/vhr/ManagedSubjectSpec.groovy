@@ -484,4 +484,44 @@ class ManagedSubjectSpec extends UnitSpec {
     s.active
   }
 
+  def 'ensure accounts are correctly archived'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    expect:
+    s.archivedChanges == null
+    !s.archived
+
+    when:
+    s.archive("reason", "category", "environment", null)
+
+    then:
+    s.archived
+    !s.functioning()
+    s.archivedChanges.size() == 1
+    s.archivedChanges.toArray()[0].event == StateChangeType.ARCHIVED
+  }
+
+  def 'ensure accounts are correctly unarchived'() {
+    setup:
+    def s = ManagedSubject.build(active:true)
+    s.organization.active = true
+    s.archive("reason", "category", "environment", null)
+
+    expect:
+    s.archived
+    !s.functioning()
+    s.archivedChanges.size() == 1
+    s.archivedChanges.toArray()[0].event == StateChangeType.ARCHIVED
+
+    when:
+    s.unarchive("reason2", "category2", "environment2", null)
+
+    then:
+    !s.archived
+    s.functioning()
+    s.archivedChanges.size() == 2
+    s.archivedChanges.toArray()[1].event == StateChangeType.UNARCHIVED
+  }
+
 }

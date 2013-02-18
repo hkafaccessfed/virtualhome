@@ -980,4 +980,62 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     flash.type == 'success'
     flash.message == 'controllers.aaf.vhr.managedsubject.toggleactive.success'
   }
+
+    def 'ensure correct output from toggleArchive when invalid permission'() {
+    setup:
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> false
+    
+    when:
+    params.id = managedSubjectTestInstance.id
+    def model = controller.toggleArchive()
+
+    then:
+    model == null
+    response.status == 403
+  }
+
+  def 'ensure correct output from toggleArchive with null version but valid permission'() {
+    setup:
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
+    
+    expect:
+    ManagedSubject.count() == 1
+
+    when:
+    params.id = managedSubjectTestInstance.id
+    params.version = null
+    controller.toggleArchive()
+
+    then:
+    ManagedSubject.count() == 1
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.managedsubject.togglearchive.noversion'
+  }
+
+  def 'ensure correct output from toggleArchive with valid permission'() {
+    setup:
+    def group = Group.build()
+    def managedSubjectTestInstance = ManagedSubject.build(archived:false, group:group, organization:group.organization)
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
+    
+    expect:
+    ManagedSubject.count() == 1
+    !managedSubjectTestInstance.archived
+
+    when:
+    params.id = managedSubjectTestInstance.id
+    params.version = 1
+    controller.toggleArchive()
+    managedSubjectTestInstance.refresh()
+
+    then:   
+    managedSubjectTestInstance.archived
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.managedsubject.togglearchive.success'
+  }
+
 }

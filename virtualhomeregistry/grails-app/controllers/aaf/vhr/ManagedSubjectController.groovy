@@ -323,6 +323,39 @@ class ManagedSubjectController {
     }
   }
 
+  def toggleArchive(Long id, Long version) {
+    def managedSubjectInstance = ManagedSubject.get(id)
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+      if (version == null) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.managedsubject.togglearchive.noversion'
+        render(view: "show", model:[managedSubjectInstance: managedSubjectInstance])
+        return
+      }
+
+      if (managedSubjectInstance.version > version) {
+        managedSubjectInstance.errors.rejectValue("version", "controllers.aaf.vhr.managedsubject.togglearchive.optimistic.locking.failure")
+        render(view: "show", model:[managedSubjectInstance: managedSubjectInstance])
+        return
+      }
+
+      if(managedSubjectInstance.archived) {
+        managedSubjectInstance.unarchive("Unarchived by administrator", "vhr_management_portal", null, subject)
+      } else {
+        managedSubjectInstance.archive("Archived by administrator", "vhr_management_portal", null, subject)
+      }
+
+      log.info "Action: toggleActive, Subject: $subject, Object: $managedSubjectInstance"
+      flash.type = 'success'
+      flash.message = 'controllers.aaf.vhr.managedsubject.togglearchive.success'
+      redirect(action: "show", id: managedSubjectInstance.id)
+    }
+    else {
+      log.warn "Attempt to do administrative ManagedSubject togglearchive by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
+  }
+
   private validGroup() {
     if(!params.group?.id) {
       log.warn "Group ID was not present"

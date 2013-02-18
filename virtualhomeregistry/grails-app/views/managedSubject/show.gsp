@@ -23,6 +23,14 @@
         <h4><g:message code="views.aaf.vhr.managedsubject.show.blocked.heading"/></h4>
         <p><g:message code="views.aaf.vhr.managedsubject.show.blocked.reason"/></p>
         <p><g:message code="views.aaf.vhr.managedsubject.show.blocked.correct"/></p>
+        <p><g:message code="views.aaf.vhr.managedsubject.show.unable.to.login"/></p>
+      </div>
+    </g:if>
+    <g:if test="${managedSubjectInstance.archived}">
+      <div class="alert alert-block">
+        <h4><g:message code="views.aaf.vhr.managedsubject.show.archived.heading"/></h4>
+        <p><g:message code="views.aaf.vhr.managedsubject.show.archived.reason"/></p>
+        <p><g:message code="views.aaf.vhr.managedsubject.show.unable.to.login"/></p>
       </div>
     </g:if>
     <g:if test="${managedSubjectInstance.locked}">
@@ -30,6 +38,7 @@
         <h4><g:message code="views.aaf.vhr.managedsubject.show.locked.heading"/></h4>
         <p><g:message code="views.aaf.vhr.managedsubject.show.locked.reason"/></p>
         <p><g:message code="views.aaf.vhr.managedsubject.show.locked.correct"/></p>
+        <p><g:message code="views.aaf.vhr.managedsubject.show.unable.to.login"/></p>
       </div>
     </g:if>
     <g:if test="${managedSubjectInstance.login == null}">
@@ -39,7 +48,7 @@
         <p><g:message code="views.aaf.vhr.managedsubject.show.finalized.correct"/></p>
       </div>
     </g:if>
-    <g:if test="${!(managedSubjectInstance.functioning()) && managedSubjectInstance.login != null}">
+    <g:if test="${!(managedSubjectInstance.functioning()) && managedSubjectInstance.login != null && !managedSubjectInstance.blocked && !managedSubjectInstance.locked && !managedSubjectInstance.archived}">
       <div class="alert alert-block alert-info">
         <h4><g:message code="views.aaf.vhr.managedsubject.show.functioning.heading"/></h4>
         <p><g:message code="views.aaf.vhr.managedsubject.show.functioning.reason"/></p>
@@ -198,8 +207,13 @@
             </tr>
 
             <tr>
-              <th class="span4"><span id="locked-label"><strong><g:message code="label.blocked" /></strong></span></th>
-              <td><span aria-labelledby="locked-label"><g:formatBoolean boolean="${managedSubjectInstance?.blocked}" /></span>
+              <th class="span4"><span id="archived-label"><strong><g:message code="label.archived" /></strong></span></th>
+              <td><span aria-labelledby="archived-label"><g:formatBoolean boolean="${managedSubjectInstance?.archived}" /></span>
+            </tr>
+
+            <tr>
+              <th class="span4"><span id="blocked-label"><strong><g:message code="label.blocked" /></strong></span></th>
+              <td><span aria-labelledby="blocked-label"><g:formatBoolean boolean="${managedSubjectInstance?.blocked}" /></span>
             </tr>
 
             <tr>

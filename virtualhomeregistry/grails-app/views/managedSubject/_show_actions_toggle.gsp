@@ -29,3 +29,18 @@
     <g:hiddenField name="id" value="${managedSubjectInstance.id}" />
   </g:form>
 </li>
+
+<li>
+  <a href="#" onclick="$(this).next('form').submit();">
+    <g:if test="${managedSubjectInstance.archived}">
+      <g:message code="views.aaf.vhr.managedsubject.show.unarchive"/>
+    </g:if>
+    <g:else>
+      <g:message code="views.aaf.vhr.managedsubject.show.archive"/>
+    </g:else>
+  </a>
+  <g:form action="toggleArchive" method="post">
+    <g:hiddenField name="version" value="${managedSubjectInstance?.version}" />
+    <g:hiddenField name="id" value="${managedSubjectInstance.id}" />
+  </g:form>
+<li>

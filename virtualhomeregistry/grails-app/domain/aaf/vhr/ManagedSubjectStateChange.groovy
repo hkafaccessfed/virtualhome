@@ -40,5 +40,7 @@ class ManagedSubjectStateChange {
     LOCKED,
     UNLOCKED, 
     ACTIVATE, 
-    DEACTIVATE
+    DEACTIVATE,
+    ARCHIVED,
+    UNARCHIVED
   }
