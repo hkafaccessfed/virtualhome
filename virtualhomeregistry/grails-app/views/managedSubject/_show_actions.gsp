@@ -5,6 +5,9 @@
     <li>
       <g:link action="edit" id="${managedSubjectInstance.id}"><g:message code="label.editmanagedsubject"/></g:link>
     </li>
+    <li>
+      <g:link action="admincode" id="${managedSubjectInstance.id}"><g:message code="label.generatepasswordresetcode"/></g:link>
+    </li>
 
     <li>
        <g:render template="show_actions_toggle"/>
@@ -14,14 +17,14 @@
 
     <li>
       <a href="#" onclick="$(this).next('form').submit();">
-        <g:if test="${managedSubjectInstance.locked}">
-          <g:message code="views.aaf.vhr.managedsubject.show.admin.unlock"/>
+        <g:if test="${managedSubjectInstance.blocked}">
+          <g:message code="views.aaf.vhr.managedsubject.show.admin.unblock"/>
         </g:if>
         <g:else>
-          <g:message code="views.aaf.vhr.managedsubject.show.admin.lock"/>
+          <g:message code="views.aaf.vhr.managedsubject.show.admin.block"/>
         </g:else>
       </a>
-      <g:form action="toggleLock" method="post">
+      <g:form action="toggleBlock" method="post">
         <g:hiddenField name="version" value="${managedSubjectInstance?.version}" />
         <g:hiddenField name="id" value="${managedSubjectInstance.id}" />
       </g:form>
@@ -43,6 +46,9 @@
       <g:if test="${managedSubjectInstance.functioning()}">
         <li>
           <g:link action="edit" id="${managedSubjectInstance.id}"><g:message code="label.editmanagedsubject"/></g:link>
+        </li>
+        <li>
+          <g:link action="admincode" id="${managedSubjectInstance.id}"><g:message code="label.generatepasswordresetcode"/></g:link>
         </li>
       </g:if>
       <g:render template="show_actions_toggle"/>

@@ -47,6 +47,7 @@ class ManagedSubject {
 
   boolean active = false
   boolean locked = false
+  boolean blocked = false
 
   int failedLogins = 0
   int failedResets = 0
@@ -58,7 +59,8 @@ class ManagedSubject {
                     emailReset: EmailReset,
                     invitations: ManagedSubjectInvitation,
                     activeChanges: ManagedSubjectStateChange,
-                    lockedChanges: ManagedSubjectStateChange]  
+                    lockedChanges: ManagedSubjectStateChange,
+                    blockedChanges: ManagedSubjectStateChange]  
 
   static belongsTo = [organization:Organization,
                       group:Group]
@@ -109,11 +111,11 @@ class ManagedSubject {
   }
 
   public canChangePassword() {
-    !locked && organization?.functioning() && group?.functioning()
+    !locked && !blocked && organization?.functioning() && group?.functioning()
   }
 
   public boolean functioning() {
-    active && !locked && organization?.functioning() && group?.functioning()
+    active && !locked && !blocked && organization?.functioning() && group?.functioning()
   }
 
   public void setResetCode(String resetCode) {
@@ -158,6 +160,37 @@ class ManagedSubject {
         log.error it
       }
       throw new RuntimeException ("Unable to save $this when setting unlocked state")
+    }
+  }
+
+  public block(String reason, String category, String environment, Subject actionedBy) {
+    this.blocked = true
+
+    def blockChange = new ManagedSubjectStateChange(event:StateChangeType.BLOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToBlockedChanges(blockChange)
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when setting blocked state"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when setting blocked state")
+    }
+  }
+
+  public unblock(String reason, String category, String environment, Subject actionedBy) {
+    this.blocked = false
+    this.failedResets = 0
+
+    def blockChange = new ManagedSubjectStateChange(event:StateChangeType.UNBLOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToBlockedChanges(blockChange)
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when setting unblocked state"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when setting unblocked state")
     }
   }
 

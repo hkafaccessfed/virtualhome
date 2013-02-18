@@ -35,6 +35,8 @@ class ManagedSubjectStateChange {
 }
 
   public enum StateChangeType {
+    BLOCKED,
+    UNBLOCKED, 
     LOCKED,
     UNLOCKED, 
     ACTIVATE, 

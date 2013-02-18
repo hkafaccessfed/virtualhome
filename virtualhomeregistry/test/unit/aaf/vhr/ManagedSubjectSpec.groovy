@@ -391,6 +391,47 @@ class ManagedSubjectSpec extends UnitSpec {
     s.lockedChanges.toArray()[1].event == StateChangeType.UNLOCKED
   }
 
+  def 'ensure accounts are correctly blocked'() {
+    setup:
+    def s = ManagedSubject.build()
+
+    expect:
+    s.blockedChanges == null
+    !s.blocked
+
+    when:
+    s.block("reason", "category", "environment", null)
+
+    then:
+    s.blocked
+    !s.functioning()
+    s.blockedChanges.size() == 1
+    s.blockedChanges.toArray()[0].event == StateChangeType.BLOCKED
+  }
+
+  def 'ensure accounts are correctly unblocked'() {
+    setup:
+    def s = ManagedSubject.build(failedResets:2, active:true)
+    s.organization.active = true
+    s.block("reason", "category", "environment", null)
+
+    expect:
+    s.blocked
+    !s.functioning()
+    s.blockedChanges.size() == 1
+    s.blockedChanges.toArray()[0].event == StateChangeType.BLOCKED
+
+    when:
+    s.unblock("reason2", "category2", "environment2", null)
+
+    then:
+    !s.blocked
+    s.functioning()
+    s.failedResets == 0
+    s.blockedChanges.size() == 2
+    s.blockedChanges.toArray()[1].event == StateChangeType.UNBLOCKED
+  }
+
   def 'ensure accounts are correctly deactivated'() {
     setup:
     def s = ManagedSubject.build(active:true)

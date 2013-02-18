@@ -18,8 +18,15 @@
 
     <h2><g:message code="views.aaf.vhr.managedsubject.show.heading" args="${[managedSubjectInstance.cn]}"/></h2>
 
+    <g:if test="${managedSubjectInstance.blocked}">
+      <div class="alert alert-block alert-error">
+        <h4><g:message code="views.aaf.vhr.managedsubject.show.blocked.heading"/></h4>
+        <p><g:message code="views.aaf.vhr.managedsubject.show.blocked.reason"/></p>
+        <p><g:message code="views.aaf.vhr.managedsubject.show.blocked.correct"/></p>
+      </div>
+    </g:if>
     <g:if test="${managedSubjectInstance.locked}">
-      <div class="alert alert-block alert-warning">
+      <div class="alert alert-block">
         <h4><g:message code="views.aaf.vhr.managedsubject.show.locked.heading"/></h4>
         <p><g:message code="views.aaf.vhr.managedsubject.show.locked.reason"/></p>
         <p><g:message code="views.aaf.vhr.managedsubject.show.locked.correct"/></p>
@@ -32,8 +39,8 @@
         <p><g:message code="views.aaf.vhr.managedsubject.show.finalized.correct"/></p>
       </div>
     </g:if>
-    <g:if test="${!(managedSubjectInstance.functioning()) && managedSubjectInstance.login != null && !managedSubjectInstance.locked}">
-      <div class="alert alert-block alert-error">
+    <g:if test="${!(managedSubjectInstance.functioning()) && managedSubjectInstance.login != null}">
+      <div class="alert alert-block alert-info">
         <h4><g:message code="views.aaf.vhr.managedsubject.show.functioning.heading"/></h4>
         <p><g:message code="views.aaf.vhr.managedsubject.show.functioning.reason"/></p>
         <p><g:message code="views.aaf.vhr.managedsubject.show.unable.to.login"/></p>
@@ -188,6 +195,11 @@
             <tr>
               <th class="span4"><span id="locked-label"><strong><g:message code="label.locked" /></strong></span></th>
               <td><span aria-labelledby="locked-label"><g:formatBoolean boolean="${managedSubjectInstance?.locked}" /></span>
+            </tr>
+
+            <tr>
+              <th class="span4"><span id="locked-label"><strong><g:message code="label.blocked" /></strong></span></th>
+              <td><span aria-labelledby="locked-label"><g:formatBoolean boolean="${managedSubjectInstance?.blocked}" /></span>
             </tr>
 
             <tr>
