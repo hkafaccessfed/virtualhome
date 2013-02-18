@@ -23,6 +23,34 @@
       <g:render template="show_actions_toggle"/>
     </li>
     <li>
+      <a href="#" onclick="$(this).next('form').submit();">
+      <g:if test="${groupInstance.archived}">
+        <g:message code="views.aaf.vhr.group.show.unarchive"/>
+      </g:if>
+      <g:else>
+        <g:message code="views.aaf.vhr.group.show.archive"/>
+      </g:else>
+      </a>
+      <g:form action="toggleArchived" method="post">
+        <g:hiddenField name="version" value="${groupInstance?.version}" />
+        <g:hiddenField name="id" value="${groupInstance.id}" />
+      </g:form>
+    </li>
+    <li>
+      <a href="#" onclick="$(this).next('form').submit();">
+      <g:if test="${groupInstance.blocked}">
+        <g:message code="views.aaf.vhr.group.show.unblock"/>
+      </g:if>
+      <g:else>
+        <g:message code="views.aaf.vhr.group.show.block"/>
+      </g:else>
+      </a>
+      <g:form action="toggleBlocked" method="post">
+        <g:hiddenField name="version" value="${groupInstance?.version}" />
+        <g:hiddenField name="id" value="${groupInstance.id}" />
+      </g:form>
+    </li>
+    <li>
       <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.group.confirm.remove')}"><g:message code="label.deletegroup"/></a>
       <g:form action="delete" method="delete">
         <g:hiddenField name="id" value="${groupInstance.id}" />

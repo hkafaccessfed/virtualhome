@@ -17,8 +17,22 @@
 
     <h2><g:message code="views.aaf.vhr.group.show.heading" args="${[groupInstance.name]}"/></h2>
 
-    <g:if test="${!groupInstance.functioning()}">
+    <g:if test="${groupInstance.archived}">
+      <div class="alert alert-block">
+        <h4><g:message code="views.aaf.vhr.group.show.archived.heading"/></h4>
+        <p><g:message code="views.aaf.vhr.group.show.archived.reason"/></p>
+        <p><g:message code="views.aaf.vhr.group.show.unable.to.login"/></p>
+      </div>
+    </g:if>
+    <g:if test="${groupInstance.blocked}">
       <div class="alert alert-block alert-error">
+        <h4><g:message code="views.aaf.vhr.group.show.blocked.heading"/></h4>
+        <p><g:message code="views.aaf.vhr.group.show.blocked.reason"/></p>
+        <p><g:message code="views.aaf.vhr.group.show.unable.to.login"/></p>
+      </div>
+    </g:if>
+    <g:if test="${!groupInstance.functioning() && !groupInstance.blocked && !groupInstance.archived}">
+      <div class="alert alert-block alert-info">
         <h4><g:message code="views.aaf.vhr.group.show.functioning.heading"/></h4>
         <p><g:message code="views.aaf.vhr.group.show.functioning.reason"/></p>
         <p><g:message code="views.aaf.vhr.group.show.unable.to.login"/></p>
@@ -91,6 +105,16 @@
             <tr>
               <th class="span4"><span id="active-label"><strong><g:message code="label.active" /></strong></span></th>
               <td><span aria-labelledby="active-label"><g:formatBoolean boolean="${groupInstance?.active}" /></span>
+            </tr>
+
+            <tr>
+              <th class="span4"><span id="archived-label"><strong><g:message code="label.archived" /></strong></span></th>
+              <td><span aria-labelledby="archived-label"><g:formatBoolean boolean="${groupInstance?.archived}" /></span>
+            </tr>
+
+            <tr>
+              <th class="span4"><span id="blocked-label"><strong><g:message code="label.blocked" /></strong></span></th>
+              <td><span aria-labelledby="blocked-label"><g:formatBoolean boolean="${groupInstance?.blocked}" /></span>
             </tr>
                     
           </tbody>

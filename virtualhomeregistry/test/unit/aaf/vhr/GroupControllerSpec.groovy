@@ -619,4 +619,114 @@ class GroupControllerSpec  extends spock.lang.Specification {
     flash.type == 'success'
     flash.message == 'controllers.aaf.vhr.group.toggleactive.success'
   }
+
+
+
+  def 'ensure correct output from toggleBlocked when invalid permission'() {
+    setup:
+    def groupTestInstance = Group.build()
+    shiroSubject.isPermitted("app:admnistration") >> false
+
+    when:
+    params.id = groupTestInstance.id
+    def model = controller.toggleBlocked()
+
+    then:
+    model == null
+    response.status == 403
+  }
+
+  def 'ensure correct output from toggleBlocked with null version but valid permission'() {
+    setup:
+    def groupTestInstance = Group.build()
+    shiroSubject.isPermitted("app:administration") >> true
+    
+    expect:
+    Group.count() == 1
+
+    when:
+    params.id = groupTestInstance.id
+    params.version = null
+    controller.toggleBlocked()
+
+    then:
+    Group.count() == 1
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.group.toggleblocked.noversion'
+  }
+
+  def 'ensure correct output from toggleBlocked'() {
+    setup:
+    def groupTestInstance = Group.build(blocked:false)
+    shiroSubject.isPermitted("app:administration") >> true
+    
+    expect:
+    Group.count() == 1
+    !groupTestInstance.blocked
+
+    when:
+    params.id = groupTestInstance.id
+    params.version = 1
+    controller.toggleBlocked()
+
+    then:
+    Group.count() == 1
+    groupTestInstance.blocked
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.group.toggleblocked.success'
+  }
+
+  def 'ensure correct output from toggleArchived when invalid permission'() {
+    setup:
+    def groupTestInstance = Group.build()
+    shiroSubject.isPermitted("app:admnistration") >> false
+
+    when:
+    params.id = groupTestInstance.id
+    def model = controller.toggleArchived()
+
+    then:
+    model == null
+    response.status == 403
+  }
+
+  def 'ensure correct output from toggleArchived with null version but valid permission'() {
+    setup:
+    def groupTestInstance = Group.build()
+    shiroSubject.isPermitted("app:administration") >> true
+    
+    expect:
+    Group.count() == 1
+
+    when:
+    params.id = groupTestInstance.id
+    params.version = null
+    controller.toggleArchived()
+
+    then:
+    Group.count() == 1
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.group.togglearchived.noversion'
+  }
+
+  def 'ensure correct output from toggleArchived'() {
+    setup:
+    def groupTestInstance = Group.build(archived:false)
+    shiroSubject.isPermitted("app:administration") >> true
+    
+    expect:
+    Group.count() == 1
+    !groupTestInstance.archived
+
+    when:
+    params.id = groupTestInstance.id
+    params.version = 1
+    controller.toggleArchived()
+
+    then:
+    Group.count() == 1
+    groupTestInstance.archived
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.group.togglearchived.success'
+  }
 }

@@ -213,6 +213,78 @@ class GroupController {
     }
   }
 
+  def toggleBlocked(Long id, Long version) {
+    def groupInstance = Group.get(id)
+    if(SecurityUtils.subject.isPermitted("app:administration")) {
+      if (version == null) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.group.toggleblocked.noversion'
+        render(view: "show", model:[groupInstance: groupInstance])
+        return
+      }
+
+      if (groupInstance.version > version) {
+        groupInstance.errors.rejectValue("version", "controllers.aaf.vhr.group.toggleblocked.optimistic.locking.failure")
+        render(view: "show", model:[groupInstance: groupInstance])
+        return
+      }
+
+      groupInstance.blocked = !groupInstance.blocked
+
+      if (!groupInstance.save()) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.group.toggleblocked.failed'
+        render(view: "show", model:[groupInstance: groupInstance])
+        return
+      }
+
+      log.info "Action: toggleActive, Subject: $subject, Object: $groupInstance"
+      flash.type = 'success'
+      flash.message = 'controllers.aaf.vhr.group.toggleblocked.success'
+      redirect(action: "show", id: groupInstance.id)
+    }
+    else {
+      log.warn "Attempt to do administrative Group toggleblocked by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
+  }
+
+  def toggleArchived(Long id, Long version) {
+    def groupInstance = Group.get(id)
+    if(SecurityUtils.subject.isPermitted("app:administration")) {
+      if (version == null) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.group.togglearchived.noversion'
+        render(view: "show", model:[groupInstance: groupInstance])
+        return
+      }
+
+      if (groupInstance.version > version) {
+        groupInstance.errors.rejectValue("version", "controllers.aaf.vhr.group.togglearchived.optimistic.locking.failure")
+        render(view: "show", model:[groupInstance: groupInstance])
+        return
+      }
+
+      groupInstance.archived = !groupInstance.archived
+
+      if (!groupInstance.save()) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.group.togglearchived.failed'
+        render(view: "show", model:[groupInstance: groupInstance])
+        return
+      }
+
+      log.info "Action: toggleActive, Subject: $subject, Object: $groupInstance"
+      flash.type = 'success'
+      flash.message = 'controllers.aaf.vhr.group.togglearchived.success'
+      redirect(action: "show", id: groupInstance.id)
+    }
+    else {
+      log.warn "Attempt to do administrative Group togglearchived by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
+  }
+
   private validOrganization() {
     if(!params.organization?.id) {
       log.warn "Organization ID was not present"

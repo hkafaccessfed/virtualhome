@@ -99,4 +99,34 @@ class GroupSpec extends UnitSpec {
     !g.functioning()
   }
 
+  def 'not functioning when blocked' () {
+    setup:
+    def g = Group.build()
+    g.organization.active = true
+
+    expect:
+    g.functioning()
+
+    when:
+    g.blocked = true
+
+    then:
+    !g.functioning()
+  }
+
+  def 'not functioning when archived' () {
+    setup:
+    def g = Group.build()
+    g.organization.active = true
+
+    expect:
+    g.functioning()
+
+    when:
+    g.archived = true
+
+    then:
+    !g.functioning()
+  }
+
 }

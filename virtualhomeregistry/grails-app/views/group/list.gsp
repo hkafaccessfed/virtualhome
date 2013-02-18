@@ -20,6 +20,8 @@
           <th><g:message code="label.name" /></th> 
           <th><g:message code="label.description" /></th> 
           <th><g:message code="label.organization" /></th> 
+          <th><g:message code="label.active" /></th> 
+          <th><g:message code="label.archived" /></th> 
           <th/>
         </tr>
       </thead>
@@ -29,6 +31,8 @@
           <td>${fieldValue(bean: groupInstance, field: "name")}</td>
           <td>${fieldValue(bean: groupInstance, field: "description")}</td>
           <td>${fieldValue(bean: groupInstance, field: "organization.displayName")}</td>
+          <td><g:formatBoolean boolean="${groupInstance.active}" /></td>
+          <td><g:formatBoolean boolean="${groupInstance.archived}" /></td>
           <td><g:link action="show" id="${groupInstance.id}" class="btn btn-small"><g:message code="label.view"/></g:link></td>
         </tr>
       </g:each>

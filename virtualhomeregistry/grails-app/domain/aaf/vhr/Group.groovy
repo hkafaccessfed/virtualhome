@@ -14,6 +14,8 @@ class Group {
   String welcomeMessage
 
   boolean active = true
+  boolean blocked = false
+  boolean archived = false
   
   Date dateCreated
   Date lastUpdated
@@ -37,6 +39,6 @@ class Group {
   }
 
   public boolean functioning() {
-    active && organization.functioning()
+    active && !archived && !blocked && organization.functioning()
   }
 }

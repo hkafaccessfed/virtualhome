@@ -38,7 +38,7 @@
       </div>
     </g:if>
     <g:if test="${!organizationInstance.functioning() && !organizationInstance.undergoingWorkflow && !organizationInstance.blocked && !organizationInstance.archived}">
-      <div class="alert alert-block alert-error">
+      <div class="alert alert-block">
         <h4><g:message code="views.aaf.vhr.organization.show.functioning.heading"/></h4>
         <p><g:message code="views.aaf.vhr.organization.show.functioning.reason"/></p>
         <p><g:message code="views.aaf.vhr.organization.show.unable.to.login"/></p>
@@ -148,7 +148,8 @@
         </table>
       </div>
 
-      <div id="tab-groups" class="tab-pane">        
+      <div id="tab-groups" class="tab-pane">     
+        <h4><g:message code="label.current"/></h4>
         <table class="table table-borderless table-sortable">
           <thead>
             <tr>
@@ -159,7 +160,7 @@
             </tr>
           </thead>
           <tbody>
-          <g:each in="${organizationInstance.groups}" status="i" var="groupInstance">
+          <g:each in="${organizationInstance.groups.findAll{!it.archived}}" status="i" var="groupInstance">
             <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
               <td>${fieldValue(bean: groupInstance, field: "name")}</td>
               <td>${fieldValue(bean: groupInstance, field: "description")}</td>
@@ -169,6 +170,31 @@
           </g:each>
           </tbody>
         </table>
+
+        <hr>
+
+        <h4><g:message code="label.archived"/></h4>
+        <table class="table table-borderless table-sortable">
+          <thead>
+            <tr>
+              <th><g:message code="label.name" /></th> 
+              <th><g:message code="label.description" /></th> 
+              <th><g:message code="label.active" /></th> 
+              <th/>
+            </tr>
+          </thead>
+          <tbody>
+          <g:each in="${organizationInstance.groups.findAll{it.archived}}" status="i" var="groupInstance">
+            <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+              <td>${fieldValue(bean: groupInstance, field: "name")}</td>
+              <td>${fieldValue(bean: groupInstance, field: "description")}</td>
+              <td><g:formatBoolean boolean="${groupInstance?.active}" /></td>
+              <td><g:link action="show" controller="group" id="${groupInstance?.id}" class="btn btn-small"><g:message code="label.view"/></g:link></td>
+            </tr>
+          </g:each>
+          </tbody>
+        </table>
+
       </div>
 
       <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:manage:administrators">
