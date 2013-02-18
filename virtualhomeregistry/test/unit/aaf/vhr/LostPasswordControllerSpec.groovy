@@ -68,8 +68,8 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
 
     then:
     !result
-    ms.lockedChanges.size() == 1
-    ms.lockedChanges.toArray()[0].reason == "Locked by forgotten password process due to many failed login attempts"
+    ms.stateChanges.size() == 1
+    ms.stateChanges.toArray()[0].reason == "Locked by forgotten password process due to many failed login attempts"
 
     response.redirectedUrl == "/lostPassword/locked"
   }

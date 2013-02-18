@@ -60,10 +60,7 @@ class ManagedSubject {
   static hasMany = [challengeResponse: ChallengeResponse,
                     emailReset: EmailReset,
                     invitations: ManagedSubjectInvitation,
-                    activeChanges: ManagedSubjectStateChange,
-                    lockedChanges: ManagedSubjectStateChange,
-                    archivedChanges: ManagedSubjectStateChange,
-                    blockedChanges: ManagedSubjectStateChange]  
+                    stateChanges: StateChange]  
 
   static belongsTo = [organization:Organization,
                       group:Group]
@@ -142,8 +139,8 @@ class ManagedSubject {
   public lock(String reason, String category, String environment, Subject actionedBy) {
     this.locked = true
 
-    def lockChange = new ManagedSubjectStateChange(event:StateChangeType.LOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
-    this.addToLockedChanges(lockChange)
+    def lockChange = new StateChange(event:StateChangeType.LOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToStateChanges(lockChange)
 
     if(!this.save(flush:true)) {
       log.error "Unable to save $this when setting locked state"
@@ -158,8 +155,8 @@ class ManagedSubject {
     this.locked = false
     this.failedResets = 0
 
-    def lockChange = new ManagedSubjectStateChange(event:StateChangeType.UNLOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
-    this.addToLockedChanges(lockChange)
+    def lockChange = new StateChange(event:StateChangeType.UNLOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToStateChanges(lockChange)
 
     if(!this.save(flush:true)) {
       log.error "Unable to save $this when setting unlocked state"
@@ -173,8 +170,8 @@ class ManagedSubject {
   public block(String reason, String category, String environment, Subject actionedBy) {
     this.blocked = true
 
-    def blockChange = new ManagedSubjectStateChange(event:StateChangeType.BLOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
-    this.addToBlockedChanges(blockChange)
+    def blockChange = new StateChange(event:StateChangeType.BLOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToStateChanges(blockChange)
 
     if(!this.save(flush:true)) {
       log.error "Unable to save $this when setting blocked state"
@@ -189,8 +186,8 @@ class ManagedSubject {
     this.blocked = false
     this.failedResets = 0
 
-    def blockChange = new ManagedSubjectStateChange(event:StateChangeType.UNBLOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
-    this.addToBlockedChanges(blockChange)
+    def blockChange = new StateChange(event:StateChangeType.UNBLOCKED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToStateChanges(blockChange)
 
     if(!this.save(flush:true)) {
       log.error "Unable to save $this when setting unblocked state"
@@ -205,8 +202,8 @@ class ManagedSubject {
     this.active = true
     this.failedLogins = 0
 
-    def change = new ManagedSubjectStateChange(event:StateChangeType.ACTIVATE, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
-    this.addToActiveChanges(change)
+    def change = new StateChange(event:StateChangeType.ACTIVATE, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToStateChanges(change)
 
     if(!this.save(flush:true)) {
       log.error "Unable to save $this when setting active state"
@@ -220,8 +217,8 @@ class ManagedSubject {
   public deactivate(String reason, String category, String environment, Subject actionedBy) {
     this.active = false
 
-    def change = new ManagedSubjectStateChange(event:StateChangeType.DEACTIVATE, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
-    this.addToActiveChanges(change)
+    def change = new StateChange(event:StateChangeType.DEACTIVATE, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToStateChanges(change)
 
     if(!this.save(flush:true)) {
       log.error "Unable to save $this when setting deactive state"
@@ -235,8 +232,8 @@ class ManagedSubject {
   public archive(String reason, String category, String environment, Subject actionedBy) {
     this.archived = true
 
-    def change = new ManagedSubjectStateChange(event:StateChangeType.ARCHIVED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
-    this.addToArchivedChanges(change)
+    def change = new StateChange(event:StateChangeType.ARCHIVED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToStateChanges(change)
 
     if(!this.save(flush:true)) {
       log.error "Unable to save $this when setting archive state"
@@ -250,8 +247,8 @@ class ManagedSubject {
   public unarchive(String reason, String category, String environment, Subject actionedBy) {
     this.archived = false
 
-    def change = new ManagedSubjectStateChange(event:StateChangeType.UNARCHIVED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
-    this.addToArchivedChanges(change)
+    def change = new StateChange(event:StateChangeType.UNARCHIVED, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToStateChanges(change)
 
     if(!this.save(flush:true)) {
       log.error "Unable to save $this when setting deactive state"
