@@ -10,6 +10,7 @@ class ManagedSubjectController {
 
   def beforeInterceptor = [action: this.&validManagedSubject, except: ['list', 'create', 'save']]
 
+  def grailsApplication
   def managedSubjectService
   def sharedTokenService
 
@@ -203,9 +204,62 @@ class ManagedSubjectController {
     }
   }
 
-  def toggleLock(Long id, Long version) {
+  def admincode(Long id) {
+    def managedSubjectInstance = ManagedSubject.get(id)
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+      managedSubjectInstance.resetCodeExternal = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(grailsApplication.config.aaf.vhr.passwordreset.reset_code_length)
+
+      if (!managedSubjectInstance.save()) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.managedsubject.admincode.failed'
+        redirect(action: "show", id: managedSubjectInstance.id)
+        return
+      }
+
+      [managedSubjectInstance: managedSubjectInstance]
+
+    } else {
+      log.warn "Attempt to do administrative ManagedSubject lost password code generation by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
+  }
+
+  def toggleBlock(Long id, Long version) {
     def managedSubjectInstance = ManagedSubject.get(id)
     if(SecurityUtils.subject.isPermitted("app:administration")) {
+      if (version == null) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.managedsubject.toggleblock.noversion'
+        render(view: "show", model:[managedSubjectInstance: managedSubjectInstance])
+        return
+      }
+
+      if (managedSubjectInstance.version > version) {
+        managedSubjectInstance.errors.rejectValue("version", "controllers.aaf.vhr.managedsubject.toggleblock.optimistic.locking.failure")
+        render(view: "show", model:[managedSubjectInstance: managedSubjectInstance])
+        return
+      }
+
+      if(managedSubjectInstance.blocked) {
+        managedSubjectInstance.unblock("Unblocked by super administrator", "vhr_management_portal", null, subject)
+      } else {
+        managedSubjectInstance.block("Blocked by administrator", "vhr_management_portal", null, subject)
+      }
+
+      log.info "Action: toggleBlock, Subject: $subject, Object: $managedSubjectInstance"
+      flash.type = 'success'
+      flash.message = 'controllers.aaf.vhr.managedsubject.toggleblock.success'
+      redirect(action: "show", id: managedSubjectInstance.id)
+    }
+    else {
+      log.warn "Attempt to do administrative ManagedSubject togglelock by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
+  }
+
+  def toggleLock(Long id, Long version) {
+    def managedSubjectInstance = ManagedSubject.get(id)
+    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
       if (version == null) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.managedsubject.togglelock.noversion'
