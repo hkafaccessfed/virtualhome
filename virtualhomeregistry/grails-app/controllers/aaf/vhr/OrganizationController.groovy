@@ -198,6 +198,80 @@ class OrganizationController {
     }
   }
 
+  def toggleArchive(Long id, Long version) {
+    if(SecurityUtils.subject.isPermitted("app:administration")) {
+      def organizationInstance = Organization.get(id)
+      
+      if (version == null) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.organization.togglearchive.noversion'
+        render(view: "edit", model: [organizationInstance: organizationInstance])
+        return
+      }
+
+      if (organizationInstance.version > version) {
+        organizationInstance.errors.rejectValue("version", "controllers.aaf.vhr.organization.togglearchive.optimistic.locking.failure")
+        render(view: "edit", model: [organizationInstance: organizationInstance])
+        return
+      }
+
+      organizationInstance.archived = !organizationInstance.archived
+
+      if (!organizationInstance.save()) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.organization.togglearchive.failed'
+        render(view: "edit", model: [organizationInstance: organizationInstance])
+        return
+      }
+
+      log.info "Action: toggleArchived, Subject: $subject, Object: $organizationInstance"
+      flash.type = 'success'
+      flash.message = 'controllers.aaf.vhr.organization.togglearchive.success'
+      redirect(action: "show", id: organizationInstance.id)
+    }
+    else {
+      log.warn "Attempt to do administrative Organization togglearchive by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
+  }
+
+  def toggleBlocked(Long id, Long version) {
+    if(SecurityUtils.subject.isPermitted("app:administration")) {
+      def organizationInstance = Organization.get(id)
+      
+      if (version == null) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.organization.toggleblocked.noversion'
+        render(view: "edit", model: [organizationInstance: organizationInstance])
+        return
+      }
+
+      if (organizationInstance.version > version) {
+        organizationInstance.errors.rejectValue("version", "controllers.aaf.vhr.organization.toggleblocked.optimistic.locking.failure")
+        render(view: "edit", model: [organizationInstance: organizationInstance])
+        return
+      }
+
+      organizationInstance.blocked = !organizationInstance.blocked
+
+      if (!organizationInstance.save()) {
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.organization.toggleblocked.failed'
+        render(view: "edit", model: [organizationInstance: organizationInstance])
+        return
+      }
+
+      log.info "Action: toggleBlocked, Subject: $subject, Object: $organizationInstance"
+      flash.type = 'success'
+      flash.message = 'controllers.aaf.vhr.organization.toggleblocked.success'
+      redirect(action: "show", id: organizationInstance.id)
+    }
+    else {
+      log.warn "Attempt to do administrative Organization toggleblocked by $subject was denied - not permitted by assigned permissions"
+      response.sendError 403
+    }
+  }
+
   def createaccount(Long id) {
     def organizationInstance = Organization.get(params.id)
     if(SecurityUtils.subject.isPermitted("app:manage:organization:$id:edit")) {

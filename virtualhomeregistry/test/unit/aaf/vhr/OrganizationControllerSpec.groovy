@@ -513,6 +513,123 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     flash.message == 'controllers.aaf.vhr.organization.toggleactive.success'
   }
 
+
+
+  def 'ensure correct output from toggleArchive when invalid permission'() {
+    setup:
+    def organizationTestInstance = Organization.build()
+    shiroSubject.isPermitted("app:administration") >> false
+
+    when:
+    def model = controller.toggleArchive()
+
+    then:
+    model == null
+    response.status == 403
+  }
+
+  def 'ensure correct output from toggleArchive with null version but valid permission'() {
+    setup:
+    def organizationTestInstance = Organization.build()
+    shiroSubject.isPermitted("app:administration") >> true
+    
+    expect:
+    Organization.count() == 1
+
+    when:
+    params.id = organizationTestInstance.id
+    params.version = null
+    controller.toggleArchive()
+
+    then:
+    Organization.count() == 1
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.organization.togglearchive.noversion'
+  }
+
+  def 'ensure correct output from toggleArchive'() {
+    setup:
+    def organizationTestInstance = Organization.build(active:false)
+    shiroSubject.isPermitted("app:administration") >> true
+    
+    expect:
+    Organization.count() == 1
+    !organizationTestInstance.archived
+
+    when:
+    params.id = organizationTestInstance.id
+    params.version = 1
+    controller.toggleArchive()
+
+    then:
+    Organization.count() == 1
+    organizationTestInstance.archived
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.organization.togglearchive.success'
+  }
+
+
+
+
+  def 'ensure correct output from toggleBlocked when invalid permission'() {
+    setup:
+    def organizationTestInstance = Organization.build()
+    shiroSubject.isPermitted("app:administration") >> false
+
+    when:
+    def model = controller.toggleBlocked()
+
+    then:
+    model == null
+    response.status == 403
+  }
+
+  def 'ensure correct output from toggleBlocked with null version but valid permission'() {
+    setup:
+    def organizationTestInstance = Organization.build()
+    shiroSubject.isPermitted("app:administration") >> true
+    
+    expect:
+    Organization.count() == 1
+
+    when:
+    params.id = organizationTestInstance.id
+    params.version = null
+    controller.toggleBlocked()
+
+    then:
+    Organization.count() == 1
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.organization.toggleblocked.noversion'
+  }
+
+  def 'ensure correct output from toggleBlocked'() {
+    setup:
+    def organizationTestInstance = Organization.build(active:false)
+    shiroSubject.isPermitted("app:administration") >> true
+    
+    expect:
+    Organization.count() == 1
+    !organizationTestInstance.blocked
+
+    when:
+    params.id = organizationTestInstance.id
+    params.version = 1
+    controller.toggleBlocked()
+
+    then:
+    Organization.count() == 1
+    organizationTestInstance.blocked
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.organization.toggleblocked.success'
+  }
+
+
+
+
+
+
+
   def 'ensure correct output from createAccount when invalid permission'() {
     setup:
     def organizationTestInstance = Organization.build()

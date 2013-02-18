@@ -24,6 +24,7 @@
             <th><g:message code="label.displayname" /></th> 
             <th><g:message code="label.description" /></th> 
             <th><g:message code="label.active" /></th> 
+            <th><g:message code="label.archived" /></th> 
             <th/>
           </tr>
         </thead>
@@ -33,6 +34,7 @@
             <td>${fieldValue(bean: organizationInstance, field: "displayName")}</td>
             <td>${fieldValue(bean: organizationInstance, field: "description")}</td>
             <td><g:formatBoolean boolean="${organizationInstance.active}" /></td>
+            <td><g:formatBoolean boolean="${organizationInstance.archived}" /></td>
             <td><g:link action="show" id="${organizationInstance.id}" class="btn btn-small"><g:message code="label.view"/></g:link></td>
           </tr>
         </g:each>

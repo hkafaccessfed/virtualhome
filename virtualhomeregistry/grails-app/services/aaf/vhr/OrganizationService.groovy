@@ -47,8 +47,10 @@ class OrganizationService {
             org.displayName = result.displayName
             org.description = !result.description.equals(null) ? result.description:null
 
-            if(!org.undergoingWorkflow)
+            if(!org.undergoingWorkflow) {
               org.active = result.functioning
+              org.archived = result.archived
+            }
 
             if(!org.save()) {
               log.error "Unable to update Organization instance ${org}"

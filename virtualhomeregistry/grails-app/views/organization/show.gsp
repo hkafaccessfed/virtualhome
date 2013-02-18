@@ -23,7 +23,21 @@
         <p><g:message code="views.aaf.vhr.organization.show.unable.to.login"/></p>
       </div>
     </g:if>
-    <g:if test="${!organizationInstance.functioning() && !organizationInstance.undergoingWorkflow}">
+    <g:if test="${organizationInstance.archived}">
+      <div class="alert alert-block">
+        <h4><g:message code="views.aaf.vhr.organization.show.archived.heading"/></h4>
+        <p><g:message code="views.aaf.vhr.organization.show.archived.reason"/></p>
+        <p><g:message code="views.aaf.vhr.organization.show.unable.to.login"/></p>
+      </div>
+    </g:if>
+    <g:if test="${organizationInstance.blocked}">
+      <div class="alert alert-block alert-error">
+        <h4><g:message code="views.aaf.vhr.organization.show.blocked.heading"/></h4>
+        <p><g:message code="views.aaf.vhr.organization.show.blocked.reason"/></p>
+        <p><g:message code="views.aaf.vhr.organization.show.unable.to.login"/></p>
+      </div>
+    </g:if>
+    <g:if test="${!organizationInstance.functioning() && !organizationInstance.undergoingWorkflow && !organizationInstance.blocked && !organizationInstance.archived}">
       <div class="alert alert-block alert-error">
         <h4><g:message code="views.aaf.vhr.organization.show.functioning.heading"/></h4>
         <p><g:message code="views.aaf.vhr.organization.show.functioning.reason"/></p>
@@ -106,6 +120,16 @@
             </tr>
 
             <tr>
+              <th class="span4"><span id="archived-label"><strong><g:message code="label.archived" /></strong></span></th>
+              <td><span aria-labelledby="archived-label"><g:formatBoolean boolean="${organizationInstance?.archived}" /></span>
+            </tr>
+
+            <tr>
+              <th class="span4"><span id="blocked-label"><strong><g:message code="label.blocked" /></strong></span></th>
+              <td><span aria-labelledby="blocked-label"><g:formatBoolean boolean="${organizationInstance?.blocked}" /></span>
+            </tr>
+
+            <tr>
               <th class="span4"><span id="frid-label"><strong><g:message code="label.frid" /></strong></span></th>
               <td><span aria-labelledby="frid-label"><g:fieldValue bean="${organizationInstance}" field="frID"/></span>
             </tr>
@@ -139,8 +163,8 @@
             <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
               <td>${fieldValue(bean: groupInstance, field: "name")}</td>
               <td>${fieldValue(bean: groupInstance, field: "description")}</td>
-              <td><g:formatBoolean boolean="${groupInstance.active}" /></td>
-              <td><g:link action="show" controller="group" id="${groupInstance.id}" class="btn btn-small"><g:message code="label.view"/></g:link></td>
+              <td><g:formatBoolean boolean="${groupInstance?.active}" /></td>
+              <td><g:link action="show" controller="group" id="${groupInstance?.id}" class="btn btn-small"><g:message code="label.view"/></g:link></td>
             </tr>
           </g:each>
           </tbody>

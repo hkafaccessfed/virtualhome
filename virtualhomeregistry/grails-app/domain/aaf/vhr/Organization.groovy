@@ -19,6 +19,8 @@ class Organization  {
   long groupLimit
   
   boolean active = false
+  boolean blocked = false
+  boolean archived = false
   boolean undergoingWorkflow = false
 
   List groups
@@ -39,7 +41,7 @@ class Organization  {
   }
 
   public boolean functioning() {
-    active && !undergoingWorkflow
+    active && !archived && !blocked && !undergoingWorkflow 
   }
 
   public boolean canRegisterSubjects() {

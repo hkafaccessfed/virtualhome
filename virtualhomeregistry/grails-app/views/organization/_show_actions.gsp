@@ -20,6 +20,34 @@
     <li>
       <g:render template="show_actions_toggle"/>
     </li>
+    <li>
+      <a href="#" onclick="$(this).next('form').submit();">
+        <g:if test="${organizationInstance.archived}">
+          <g:message code="views.aaf.vhr.organization.show.unarchive"/>
+        </g:if>
+        <g:else>
+          <g:message code="views.aaf.vhr.organization.show.archive"/>
+        </g:else>
+      </a>
+      <g:form action="toggleArchive" method="post">
+        <g:hiddenField name="version" value="${organizationInstance?.version}" />
+        <g:hiddenField name="id" value="${organizationInstance.id}" />
+      </g:form>
+    </li>
+    <li>
+      <a href="#" onclick="$(this).next('form').submit();">
+        <g:if test="${organizationInstance.blocked}">
+          <g:message code="views.aaf.vhr.organization.show.unblock"/>
+        </g:if>
+        <g:else>
+          <g:message code="views.aaf.vhr.organization.show.block"/>
+        </g:else>
+      </a>
+      <g:form action="toggleBlocked" method="post">
+        <g:hiddenField name="version" value="${organizationInstance?.version}" />
+        <g:hiddenField name="id" value="${organizationInstance.id}" />
+      </g:form>
+    </li>
     </li>
     <li>
       <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.organization.confirm.remove')}"><g:message code="label.deleteorganization"/></a>

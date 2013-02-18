@@ -388,4 +388,32 @@ class OrganizationSpec extends UnitSpec {
     then:
     !result
   }
+
+  def 'Ensure archived Organization isnt functioning'() {
+    setup:
+    def o = Organization.build()
+    o.active = true
+    o.undergoingWorkflow = false
+    o.archived = true
+
+    when:
+    def result = o.functioning()
+
+    then:
+    !result
+  }
+
+  def 'Ensure blocked Organization isnt functioning'() {
+    setup:
+    def o = Organization.build()
+    o.active = true
+    o.undergoingWorkflow = false
+    o.blocked = true
+
+    when:
+    def result = o.functioning()
+
+    then:
+    !result
+  }
 }
