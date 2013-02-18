@@ -23,6 +23,7 @@ class ManagedSubject {
   String hash
 
   String apiKey               // Use for local account management context
+  String eptidKey             // Used as input for EPTID generation so login changes don't impact us - should never be altered.
 
   // Password reset. Both codes required to be input, second provided via SMS or administrator
   String resetCode
@@ -103,14 +104,14 @@ class ManagedSubject {
     eduPersonEntitlement type: "text"
   }
 
+  public ManagedSubject() {
+    this.eptidKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(12)
+    this.apiKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(16)
+  }
+
   String plainPassword
   String plainPasswordConfirmation
   static transients = ['plainPassword', 'plainPasswordConfirmation']
-
-  public ManagedSubject() {
-    if(!this.apiKey)
-      this.apiKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(16)
-  }
 
   public canChangePassword() {
     !locked && !blocked && !archived && organization?.functioning() && group?.functioning()
@@ -118,6 +119,10 @@ class ManagedSubject {
 
   public boolean functioning() {
     active && !locked && !blocked && !archived && organization?.functioning() && group?.functioning()
+  }
+
+  public void setEptidKey(String eptidKey) {
+    log.error ("Unable to set eptidKey. It is created automatically and is immutable.")
   }
 
   public void setResetCode(String resetCode) {

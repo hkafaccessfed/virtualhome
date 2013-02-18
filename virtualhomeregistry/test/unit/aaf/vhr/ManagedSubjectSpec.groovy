@@ -332,6 +332,16 @@ class ManagedSubjectSpec extends UnitSpec {
     s.apiKey.size() == 16
   }
 
+  def 'ensure eptidKey is always created'() {
+    when:
+    def s = ManagedSubject.build()
+
+    then:
+    s.validate()
+    s.eptidKey != null
+    s.eptidKey.size() == 12
+  }
+
   def 'ensure resetCode is sanitized'() {
     setup:
     def s = ManagedSubject.build()
