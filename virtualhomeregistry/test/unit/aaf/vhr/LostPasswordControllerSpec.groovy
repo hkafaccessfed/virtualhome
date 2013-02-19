@@ -44,6 +44,8 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
 
   def 'validManagedSubjectInstance errors if locked managedsubject in session'() {
     setup:
+    grailsApplication.config.aaf.vhr.passwordreset.reset_attempt_limit = 5
+    
     def ms = ManagedSubject.build(locked:true)
     session.setAttribute(controller.CURRENT_USER, ms.id)
 

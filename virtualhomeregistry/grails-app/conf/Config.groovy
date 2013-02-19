@@ -1,22 +1,6 @@
 import javax.naming.InitialContext
 import javax.naming.Context
 
-// Import externalized configuration for the Virtual Home Registry application
-def externalConf = getFromEnvironment("config_dir")
-if(externalConf) {
-  grails.config.locations = ["file:${externalConf}/application_config.groovy"]
-} else {
-  println "No external configuration location specified as environment variable config_dir, terminating startup"
-  throw new RuntimeException("No external configuration location specified as environment variable config_dir")
-}
-
-// Extract user details to append to Audit Table
-auditLog {
-  actorClosure = { request, session ->
-    org.apache.shiro.SecurityUtils.getSubject()?.getPrincipal()
-  }
-}
-
 security.shiro.authc.required = false
 
 grails.project.groupId = appName
@@ -55,33 +39,9 @@ grails.exceptionresolver.params.exclude = ['password', 'password_confim']
 environments {
   test {
     testDataConfig.enabled = true
-    grails.mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port 
-
-    log4j = {
-      appenders {
-        console name: "stdout", layout: pattern(conversionPattern: "%c{2} %m%n")
-      }
-      warn 'stdout'     :['grails.buildtestdata'], additivity:false
-      info  'stdout'    :['grails.app.controllers',
-                          'grails.app.domains',
-                          'grails.app.services',
-                          'grails.app.realms',
-                          'aaf.vhr']
-      } 
+    
+    grails.mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
+    grails.mail.default.from="noreply-test@aaf.edu.au"
+    greenmail.disabled = false
   }
-}
-
-/**
-* This is allows usage of environment variables in production
-* while maintaining flexibility in development.
-*/
-public String getFromEnvironment(final String name) {
-  if(name == null) return null;
-  try {
-    final Object object = ((Context)(new InitialContext().lookup("java:comp/env"))).lookup(name);
-    if (object != null)
-      return object.toString();
-  } catch (final Exception e) {}
-
-  System.getenv(name);
 }
