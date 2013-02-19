@@ -3,6 +3,8 @@ package aaf.vhr
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
+import org.apache.shiro.SecurityUtils
+
 import aaf.base.identity.Role
 
 @ToString(includeNames=true, includes="id, name, frID")
@@ -38,6 +40,10 @@ class Organization  {
 
     dateCreated(nullable:true)
     lastUpdated(nullable:true)
+  }
+
+  public boolean isMutable() {
+    SecurityUtils.subject.isPermitted("app:administrator") || (!archived && !blocked)
   }
 
   public boolean functioning() {

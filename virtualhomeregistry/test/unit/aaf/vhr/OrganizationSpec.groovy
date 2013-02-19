@@ -5,9 +5,24 @@ import grails.buildtestdata.mixin.Build
 import spock.lang.*
 import grails.plugin.spock.*
 
+import test.shared.ShiroEnvironment
+
 @TestFor(aaf.vhr.Organization)
 @Build([aaf.vhr.Organization, aaf.vhr.ManagedSubject, aaf.vhr.Group])
 class OrganizationSpec extends UnitSpec {
+
+  @Shared def shiroEnvironment = new ShiroEnvironment()
+
+  org.apache.shiro.subject.Subject shiroSubject
+  
+  def cleanupSpec() { 
+    shiroEnvironment.tearDownShiro() 
+  }
+
+  def setup() {
+    shiroSubject = Mock(org.apache.shiro.subject.Subject)
+    shiroEnvironment.setSubject(shiroSubject)
+  }
 
   def 'ensure name can not be null or blank'() {
     setup:
@@ -412,6 +427,42 @@ class OrganizationSpec extends UnitSpec {
 
     when:
     def result = o.functioning()
+
+    then:
+    !result
+  }
+
+  def 'Ensure administrator can always modify Organization'() {
+    setup:
+    def o = Organization.build(archived:true, blocked:true)
+    shiroSubject.isPermitted("app:administrator") >> true
+
+    when:
+    def result = o.isMutable()
+
+    then:
+    result
+  }
+
+  def 'Ensure non administrator cant modify Organization when blocked'() {
+    setup:
+    def o = Organization.build(archived:false, blocked:true)
+    shiroSubject.isPermitted("app:administrator") >> false
+
+    when:
+    def result = o.isMutable()
+
+    then:
+    !result
+  }
+
+  def 'Ensure non administrator cant modify Organization when archived'() {
+    setup:
+    def o = Organization.build(archived:true, blocked:false)
+    shiroSubject.isPermitted("app:administrator") >> false
+
+    when:
+    def result = o.isMutable()
 
     then:
     !result

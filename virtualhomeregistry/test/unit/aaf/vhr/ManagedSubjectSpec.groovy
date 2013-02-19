@@ -7,9 +7,24 @@ import grails.plugin.spock.*
 
 import aaf.vhr.ManagedSubject
 
+import test.shared.ShiroEnvironment
+
 @TestFor(aaf.vhr.ManagedSubject)
 @Build([ManagedSubject, Organization, Group, ChallengeResponse])
-class ManagedSubjectSpec extends UnitSpec {
+class ManagedSubjectSpec extends spock.lang.Specification  {
+
+  @Shared def shiroEnvironment = new ShiroEnvironment()
+
+  org.apache.shiro.subject.Subject shiroSubject
+  
+  def cleanupSpec() { 
+    shiroEnvironment.tearDownShiro() 
+  }
+
+  def setup() {
+    shiroSubject = Mock(org.apache.shiro.subject.Subject)
+    shiroEnvironment.setSubject(shiroSubject)
+  }
 
   def 'ensure login can be null'() {
     setup:
@@ -528,6 +543,42 @@ class ManagedSubjectSpec extends UnitSpec {
     !s.archived
     s.functioning()
     s.stateChanges.toArray()[1].event == StateChangeType.UNARCHIVED
+  }
+
+  def 'Ensure administrator can always modify ManagedSubject'() {
+    setup:
+    def ms = ManagedSubject.build(archived:true, blocked:true)
+    shiroSubject.isPermitted("app:administrator") >> true
+
+    when:
+    def result = ms.isMutable()
+
+    then:
+    result
+  }
+
+  def 'Ensure non administrator cant modify ManagedSubject when blocked'() {
+    setup:
+    def ms = ManagedSubject.build(archived:false, blocked:true)
+    shiroSubject.isPermitted("app:administrator") >> false
+
+    when:
+    def result = ms.isMutable()
+
+    then:
+    !result
+  }
+
+  def 'Ensure non administrator cant modify ManagedSubject when archived'() {
+    setup:
+    def ms = ManagedSubject.build(archived:true, blocked:false)
+    shiroSubject.isPermitted("app:administrator") >> false
+
+    when:
+    def result = ms.isMutable()
+
+    then:
+    !result
   }
 
 }

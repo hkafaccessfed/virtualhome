@@ -4,6 +4,7 @@ import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
 import aaf.base.identity.Subject
+import org.apache.shiro.SecurityUtils
 
 @ToString(includeNames=true, includes="id, login, cn, email")
 @EqualsAndHashCode
@@ -109,6 +110,10 @@ class ManagedSubject {
   String plainPassword
   String plainPasswordConfirmation
   static transients = ['plainPassword', 'plainPasswordConfirmation']
+
+  public boolean isMutable() {
+    SecurityUtils.subject.isPermitted("app:administrator") || (!archived && !blocked)
+  }
 
   public canChangePassword() {
     !locked && !blocked && !archived && organization?.functioning() && group?.functioning()

@@ -3,6 +3,8 @@ package aaf.vhr
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
+import org.apache.shiro.SecurityUtils
+
 @ToString(includeNames=true, includes="id, name")
 @EqualsAndHashCode
 class Group {
@@ -36,6 +38,10 @@ class Group {
   static mapping = {
     table 'vhr_group'
     welcomeMessage type: "text"
+  }
+
+  public boolean isMutable() {
+    SecurityUtils.subject.isPermitted("app:administrator") || (!archived && !blocked)
   }
 
   public boolean functioning() {

@@ -5,9 +5,24 @@ import grails.buildtestdata.mixin.Build
 import spock.lang.*
 import grails.plugin.spock.*
 
+import test.shared.ShiroEnvironment
+
 @TestFor(aaf.vhr.Group)
 @Build([aaf.vhr.Group, aaf.vhr.ManagedSubject, aaf.vhr.Organization])
-class GroupSpec extends UnitSpec {
+class GroupSpec extends spock.lang.Specification  {
+
+  @Shared def shiroEnvironment = new ShiroEnvironment()
+
+  org.apache.shiro.subject.Subject shiroSubject
+  
+  def cleanupSpec() { 
+    shiroEnvironment.tearDownShiro() 
+  }
+
+  def setup() {
+    shiroSubject = Mock(org.apache.shiro.subject.Subject)
+    shiroEnvironment.setSubject(shiroSubject)
+  }
 
   def 'name is required to be valid'() {
     setup:
@@ -127,6 +142,42 @@ class GroupSpec extends UnitSpec {
 
     then:
     !g.functioning()
+  }
+
+  def 'Ensure administrator can always modify Group'() {
+    setup:
+    def g = Group.build(archived:true, blocked:true)
+    shiroSubject.isPermitted("app:administrator") >> true
+
+    when:
+    def result = g.isMutable()
+
+    then:
+    result
+  }
+
+  def 'Ensure non administrator cant modify Group when blocked'() {
+    setup:
+    def g = Group.build(archived:false, blocked:true)
+    shiroSubject.isPermitted("app:administrator") >> false
+
+    when:
+    def result = g.isMutable()
+
+    then:
+    !result
+  }
+
+  def 'Ensure non administrator cant modify Group when archived'() {
+    setup:
+    def g = Group.build(archived:true, blocked:false)
+    shiroSubject.isPermitted("app:administrator") >> false
+
+    when:
+    def result = g.isMutable()
+
+    then:
+    !result
   }
 
 }
