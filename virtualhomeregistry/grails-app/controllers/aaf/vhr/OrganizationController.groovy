@@ -72,7 +72,7 @@ class OrganizationController {
   def edit(Long id) {
     def organizationInstance = Organization.get(id)
 
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${organizationInstance.id}:edit")) {
+    if(organizationInstance.canMutate()) {
 
       if(!organizationInstance.functioning()) {
         flash.type = 'error'
@@ -93,7 +93,7 @@ class OrganizationController {
 
   def update(Long id, Long version) {
     def organizationInstance = Organization.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${organizationInstance.id}:edit")) {
+    if(organizationInstance.canMutate()) {
 
       if(!organizationInstance.functioning()) {
         flash.type = 'error'
@@ -139,8 +139,8 @@ class OrganizationController {
   }
 
   def delete(Long id) {
-    if(SecurityUtils.subject.isPermitted("app:administrator")) {
-      def organizationInstance = Organization.get(id)
+    def organizationInstance = Organization.get(id)
+    if(organizationInstance.canDelete()) {
       try {
         organizationInstance.delete()
 
@@ -162,9 +162,8 @@ class OrganizationController {
   }
 
   def toggleActive(Long id, Long version) {
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:$id:edit")) {
-      def organizationInstance = Organization.get(id)
-      
+    def organizationInstance = Organization.get(id)
+    if(organizationInstance.canMutate()) {
       if (version == null) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.organization.toggleactive.noversion'
@@ -274,7 +273,7 @@ class OrganizationController {
 
   def createaccount(Long id) {
     def organizationInstance = Organization.get(params.id)
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:$id:edit")) {
+    if(organizationInstance.canMutate()) {
 
       def managedSubjectInstance = new ManagedSubject(organization:organizationInstance)
 

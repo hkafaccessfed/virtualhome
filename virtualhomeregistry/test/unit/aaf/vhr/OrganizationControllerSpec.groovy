@@ -466,6 +466,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance}.id}:edit") >> false
 
     when:
+    params.id = organizationTestInstance.id
     def model = controller.toggleActive()
 
     then:
