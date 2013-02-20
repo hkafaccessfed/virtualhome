@@ -42,8 +42,18 @@ class Organization  {
     lastUpdated(nullable:true)
   }
 
-  public boolean isMutable() {
-    SecurityUtils.subject.isPermitted("app:administrator") || (!archived && !blocked)
+  public boolean canCreate() {
+    SecurityUtils.subject.isPermitted("app:administrator")
+  }
+
+  public boolean canMutate() {
+    SecurityUtils.subject.isPermitted("app:administrator") || 
+    ( SecurityUtils.subject.isPermitted("app:manage:organization:${id}:edit") 
+      && !blocked && !archived )
+  }
+
+  public boolean canDelete() {
+    SecurityUtils.subject.isPermitted("app:administrator")
   }
 
   public boolean functioning() {

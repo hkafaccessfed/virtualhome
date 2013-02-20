@@ -144,37 +144,155 @@ class GroupSpec extends spock.lang.Specification  {
     !g.functioning()
   }
 
-  def 'Ensure administrator can always modify Group'() {
+  def 'Ensure super administrator can always create Group'() {
     setup:
-    def g = Group.build(archived:true, blocked:true)
+    def o = Organization.build()
+    def g = Group.build(organization:o)
+    g.blocked = true
     shiroSubject.isPermitted("app:administrator") >> true
 
     when:
-    def result = g.isMutable()
+    def result = g.canCreate(o)
 
     then:
     result
   }
 
-  def 'Ensure non administrator cant modify Group when blocked'() {
+  def 'Ensure non administrator cant create Group'() {
     setup:
-    def g = Group.build(archived:false, blocked:true)
-    shiroSubject.isPermitted("app:administrator") >> false
+    def o = Organization.build()
+    def g = Group.build(organization:o)
 
     when:
-    def result = g.isMutable()
+    def result = g.canCreate(o)
 
     then:
     !result
   }
 
-  def 'Ensure non administrator cant modify Group when archived'() {
+  def 'Ensure administrator can create Group'() {
     setup:
-    def g = Group.build(archived:true, blocked:false)
-    shiroSubject.isPermitted("app:administrator") >> false
+    def o = Organization.build()
+    def g = Group.build(organization:o)
+    g.organization.active = true
+    shiroSubject.isPermitted("app:manage:organization:${g.organization.id}:group:create") >> true
 
     when:
-    def result = g.isMutable()
+    def result = g.canCreate(o)
+
+    then:
+    result
+  }
+
+  def 'Ensure administrator cant create Group if owner is not functioning'() {
+    setup:
+    def o = Organization.build()
+    o.blocked = true
+    def g = Group.build(organization:o)
+    shiroSubject.isPermitted("app:manage:organization:${g.organization.id}:group:create") >> true
+
+    when:
+    def result = g.canCreate(o)
+
+    then:
+    !result
+  }
+
+  def 'Ensure non administrator cant modify Group'() {
+    setup:
+    def g = Group.build()
+
+    when:
+    def result = g.canMutate()
+
+    then:
+    !result
+  }
+
+  def 'Ensure super administrator can always modify Group'() {
+    setup:
+    def g = Group.build(archived:true, blocked:true)
+    shiroSubject.isPermitted("app:administrator") >> true
+
+    when:
+    def result = g.canMutate()
+
+    then:
+    result
+  }
+
+  def 'Ensure administrator cant modify Group when blocked'() {
+    setup:
+    def g = Group.build(archived:false, blocked:true)
+    g.organization.active = true
+    shiroSubject.isPermitted("app:manage:organization:${g.organization.id}:group:${g.id}:edit") >> true
+
+    when:
+    def result = g.canMutate()
+
+    then:
+    !result
+  }
+
+  def 'Ensure administrator cant modify Group when archived'() {
+    setup:
+    def g = Group.build(archived:true, blocked:false)
+    g.organization.active = true
+    shiroSubject.isPermitted("app:manage:organization:${g.organization.id}:group:${g.id}:edit") >> true
+
+    when:
+    def result = g.canMutate()
+
+    then:
+    !result
+  }
+
+  def 'Ensure administrator cant modify Group when owner cant be modified'() {
+    setup:
+    def g = Group.build(archived:false, blocked:false)
+    g.organization.active = true
+    g.organization.blocked = true
+    shiroSubject.isPermitted("app:manage:organization:${g.organization.id}:group:${g.id}:edit") >> true
+
+    when:
+    def result = g.canMutate()
+
+    then:
+    !result
+  }
+
+  def 'Ensure administrator can modify Group when not blocked or archived'() {
+    setup:
+    def g = Group.build(archived:false, blocked:false)
+    g.organization.active = true
+    shiroSubject.isPermitted("app:manage:organization:${g.organization.id}:group:${g.id}:edit") >> true
+
+    when:
+    def result = g.canMutate()
+
+    then:
+    result
+  }
+
+  def 'Ensure super administrator can always delete Group'() {
+    setup:
+    def g = Group.build()
+    g.organization.blocked = true
+    shiroSubject.isPermitted("app:administrator") >> true
+
+    when:
+    def result = g.canDelete()
+
+    then:
+    result
+  }
+
+  def 'Ensure non administrator cant delete Group'() {
+    setup:
+    def g = Group.build()
+
+    when:
+    def result = g.canDelete()
 
     then:
     !result

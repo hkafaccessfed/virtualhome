@@ -545,37 +545,155 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
     s.stateChanges.toArray()[1].event == StateChangeType.UNARCHIVED
   }
 
-  def 'Ensure administrator can always modify ManagedSubject'() {
+  def 'Ensure super administrator can always create ManagedSubject'() {
     setup:
-    def ms = ManagedSubject.build(archived:true, blocked:true)
+    def g = Group.build()
+    def ms = ManagedSubject.build(group:g)
+    g.blocked = true
     shiroSubject.isPermitted("app:administrator") >> true
 
     when:
-    def result = ms.isMutable()
+    def result = ms.canCreate(g)
 
     then:
     result
   }
 
-  def 'Ensure non administrator cant modify ManagedSubject when blocked'() {
+  def 'Ensure non administrator cant create ManagedSubject'() {
     setup:
-    def ms = ManagedSubject.build(archived:false, blocked:true)
-    shiroSubject.isPermitted("app:administrator") >> false
+    def g = Group.build()
+    def ms = ManagedSubject.build(group:g)
 
     when:
-    def result = ms.isMutable()
+    def result = ms.canCreate(g)
 
     then:
     !result
   }
 
-  def 'Ensure non administrator cant modify ManagedSubject when archived'() {
+  def 'Ensure administrator can create ManagedSubject'() {
     setup:
-    def ms = ManagedSubject.build(archived:true, blocked:false)
-    shiroSubject.isPermitted("app:administrator") >> false
+    def g = Group.build()
+    def ms = ManagedSubject.build(organization:g.organization, group:g)
+    g.organization.active = true
+    shiroSubject.isPermitted("app:manage:organization:${g.organization.id}:group:${g.id}:managedsubject:create") >> true
 
     when:
-    def result = ms.isMutable()
+    def result = ms.canCreate(g)
+
+    then:
+    result
+  }
+
+  def 'Ensure administrator cant create ManagedSubject if owner is not functioning'() {
+    setup:
+    def g = Group.build()
+    g.blocked = true
+    def ms = ManagedSubject.build(group:g)
+    shiroSubject.isPermitted("app:manage:organization:${g.organization.id}:group:${g.id}:managedsubject:create") >> true
+
+    when:
+    def result = ms.canCreate(g)
+
+    then:
+    !result
+  }
+
+  def 'Ensure non administrator cant modify ManagedSubject'() {
+    setup:
+    def ms = ManagedSubject.build()
+
+    when:
+    def result = ms.canMutate()
+
+    then:
+    !result
+  }
+
+  def 'Ensure super administrator can always modify ManagedSubject'() {
+    setup:
+    def ms = ManagedSubject.build(archived:true, blocked:true)
+    shiroSubject.isPermitted("app:administrator") >> true
+
+    when:
+    def result = ms.canMutate()
+
+    then:
+    result
+  }
+
+  def 'Ensure administrator cant modify ManagedSubject when blocked'() {
+    setup:
+    def ms = ManagedSubject.build(archived:false, blocked:true)
+    ms.organization.active = true
+    shiroSubject.isPermitted("app:manage:organization:${ms.organization.id}:group:${ms.group.id}:managedsubject:${ms.id}:edit") >> true
+
+    when:
+    def result = ms.canMutate()
+
+    then:
+    !result
+  }
+
+  def 'Ensure administrator cant modify ManagedSubject when archived'() {
+    setup:
+    def ms = ManagedSubject.build(archived:true, blocked:false)
+    ms.organization.active = true
+    shiroSubject.isPermitted("app:manage:organization:${ms.organization.id}:group:${ms.group.id}:managedsubject:${ms.id}:edit") >> true
+
+    when:
+    def result = ms.canMutate()
+
+    then:
+    !result
+  }
+
+  def 'Ensure administrator cant modify ManagedSubject when owner cant be modified'() {
+    setup:
+    def ms = ManagedSubject.build(archived:false, blocked:false)
+    ms.organization.active = true
+    ms.group.blocked = true
+    shiroSubject.isPermitted("app:manage:organization:${ms.organization.id}:group:${ms.group.id}:managedsubject:${ms.id}:edit") >> true
+
+    when:
+    def result = ms.canMutate()
+
+    then:
+    !result
+  }
+
+  def 'Ensure administrator can modify ManagedSubject when not blocked or archived'() {
+    setup:
+    def ms = ManagedSubject.build(archived:false, blocked:false)
+    ms.organization.active = true
+    shiroSubject.isPermitted("app:manage:organization:${ms.organization.id}:group:${ms.group.id}:managedsubject:${ms.id}:edit") >> true
+
+    when:
+    def result = ms.canMutate()
+
+    then:
+    result
+  }
+
+  def 'Ensure super administrator can always delete ManagedSubject'() {
+    setup:
+    def ms = ManagedSubject.build()
+    ms.group.blocked = true
+    shiroSubject.isPermitted("app:administrator") >> true
+
+    when:
+    def result = ms.canDelete()
+
+    then:
+    result
+  }
+
+  def 'Ensure non super administrator cant delete ManagedSubject'() {
+    setup:
+    def ms = ManagedSubject.build()
+
+    when:
+    def result = ms.canDelete()
 
     then:
     !result

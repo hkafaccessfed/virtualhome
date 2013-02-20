@@ -111,8 +111,20 @@ class ManagedSubject {
   String plainPasswordConfirmation
   static transients = ['plainPassword', 'plainPasswordConfirmation']
 
-  public boolean isMutable() {
-    SecurityUtils.subject.isPermitted("app:administrator") || (!archived && !blocked)
+  public boolean canCreate(Group owner) {
+    SecurityUtils.subject.isPermitted("app:administrator") || 
+    ( SecurityUtils.subject.isPermitted("app:manage:organization:${owner.organization.id}:group:${owner.id}:managedsubject:create") 
+      && owner.functioning() )
+  }
+
+  public boolean canMutate() {
+    SecurityUtils.subject.isPermitted("app:administrator") || 
+    ( SecurityUtils.subject.isPermitted("app:manage:organization:${organization.id}:group:${group.id}:managedsubject:${id}:edit") 
+      && !archived && !blocked && group.functioning() )
+  }
+
+  public boolean canDelete() {
+    SecurityUtils.subject.isPermitted("app:administrator")
   }
 
   public canChangePassword() {
@@ -120,7 +132,7 @@ class ManagedSubject {
   }
 
   public boolean functioning() {
-    active && !locked && !blocked && !archived && organization?.functioning() && group?.functioning()
+    active && !locked && !blocked && !archived && group?.functioning()
   }
 
   public void setEptidKey(String eptidKey) {

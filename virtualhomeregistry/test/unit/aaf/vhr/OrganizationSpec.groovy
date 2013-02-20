@@ -432,37 +432,110 @@ class OrganizationSpec extends UnitSpec {
     !result
   }
 
-  def 'Ensure administrator can always modify Organization'() {
+  def 'Ensure super administrator can always create Organization'() {
     setup:
-    def o = Organization.build(archived:true, blocked:true)
+    def o = Organization.build()
     shiroSubject.isPermitted("app:administrator") >> true
 
     when:
-    def result = o.isMutable()
+    def result = o.canCreate()
 
     then:
     result
   }
 
-  def 'Ensure non administrator cant modify Organization when blocked'() {
+  def 'Ensure non super administrator cant create Organization'() {
     setup:
-    def o = Organization.build(archived:false, blocked:true)
-    shiroSubject.isPermitted("app:administrator") >> false
+    def o = Organization.build()
 
     when:
-    def result = o.isMutable()
+    def result = o.canCreate()
 
     then:
     !result
   }
 
-  def 'Ensure non administrator cant modify Organization when archived'() {
+  def 'Ensure non administrator cant modify Organization'() {
     setup:
-    def o = Organization.build(archived:true, blocked:false)
-    shiroSubject.isPermitted("app:administrator") >> false
+    def o = Organization.build()
 
     when:
-    def result = o.isMutable()
+    def result = o.canMutate()
+
+    then:
+    !result
+  }
+
+  def 'Ensure super administrator can always modify Organization'() {
+    setup:
+    def o = Organization.build(archived:true, blocked:true)
+    shiroSubject.isPermitted("app:administrator") >> true
+
+    when:
+    def result = o.canMutate()
+
+    then:
+    result
+  }
+
+  def 'Ensure administrator cant modify Organization when blocked'() {
+    setup:
+    def o = Organization.build(archived:false, blocked:true)
+    o.active = true
+    shiroSubject.isPermitted("app:manage:organization:${o.id}:edit") >> true
+
+    when:
+    def result = o.canMutate()
+
+    then:
+    !result
+  }
+
+  def 'Ensure administrator cant modify Organization when archived'() {
+    setup:
+    def o = Organization.build(archived:true, blocked:false)
+    o.active = true
+    shiroSubject.isPermitted("app:manage:organization:${o.id}:edit") >> true
+
+    when:
+    def result = o.canMutate()
+
+    then:
+    !result
+  }
+
+  def 'Ensure administrator can modify Organization when not blocked or archived'() {
+    setup:
+    def o = Organization.build(archived:false, blocked:false)
+    o.active = true
+    shiroSubject.isPermitted("app:manage:organization:${o.id}:edit") >> true
+
+    when:
+    def result = o.canMutate()
+
+    then:
+    result
+  }
+
+  def 'Ensure super administrator can always delete Organization'() {
+    setup:
+    def o = Organization.build()
+    o.blocked = true
+    shiroSubject.isPermitted("app:administrator") >> true
+
+    when:
+    def result = o.canDelete()
+
+    then:
+    result
+  }
+
+  def 'Ensure non administrator cant delete Organization'() {
+    setup:
+    def o = Organization.build()
+
+    when:
+    def result = o.canDelete()
 
     then:
     !result
