@@ -28,10 +28,10 @@ class GroupController {
 
   def create() {
     if(validOrganization()) {
-      if(SecurityUtils.subject.isPermitted("app:manage:organization:${params.organization.id}:groups:create")) {
+      def groupInstance = new Group()
+      groupInstance.organization = Organization.get(params.organization.id)
+      if(groupInstance.canCreate(groupInstance.organization)) {
         log.info "Action: create, Subject: $subject"
-        def groupInstance = new Group()
-        groupInstance.organization = Organization.get(params.organization.id)
         [groupInstance: groupInstance]
       }
       else {
@@ -43,14 +43,11 @@ class GroupController {
 
   def save() {
     if(validOrganization()) {
-      if(SecurityUtils.subject.isPermitted("app:manage:organization:${params.organization.id}:groups:create")) {
-
-        def groupInstance = new Group()
+      def groupInstance = new Group()
+      def organization = Organization.get(params.organization.id)
+      groupInstance.organization = organization
+      if(groupInstance.canCreate(groupInstance.organization)) {
         bindData(groupInstance, params, [include: ['name', 'description', 'welcomeMessage']])
-
-        def organization = Organization.get(params.organization.id)
-        groupInstance.organization = organization 
-
         if (!groupInstance.validate()) {
           flash.type = 'error'
           flash.message = 'controllers.aaf.vhr.group.validate.failed'
@@ -100,7 +97,7 @@ class GroupController {
 
   def edit(Long id) {
     def groupInstance = Group.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit")) {
+    if(groupInstance.canMutate()) {
       log.info "Action: edit, Subject: $subject, Object: groupInstance"
       [groupInstance: groupInstance]
     }
@@ -112,7 +109,7 @@ class GroupController {
 
   def update(Long id, Long version) {
     def groupInstance = Group.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit")) {
+    if(groupInstance.canMutate()) {
       if (version == null) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.group.update.noversion'
@@ -156,7 +153,7 @@ class GroupController {
 
   def delete(Long id) {
     def groupInstance = Group.get(id)
-    if(SecurityUtils.subject.isPermitted("app:administrator")) {
+    if(groupInstance.canDelete()) {
       try {
         groupInstance.delete()
 
@@ -179,7 +176,7 @@ class GroupController {
 
   def toggleActive(Long id, Long version) {
     def groupInstance = Group.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:edit")) {
+    if(groupInstance.canMutate()) {
       if (version == null) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.group.toggleactive.noversion'
