@@ -30,8 +30,6 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     shiroSubject.isAuthenticated() >> true
     shiroEnvironment.setSubject(shiroSubject)
 
-    //shiroSubject.isPermitted("app:administrator") >> false
-
     controller.metaClass.getSubject = { subject }
     shiroEnvironment.setSubject(shiroSubject)
   }
