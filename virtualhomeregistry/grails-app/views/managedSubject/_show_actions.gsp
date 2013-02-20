@@ -8,10 +8,8 @@
     <li>
       <g:link action="admincode" id="${managedSubjectInstance.id}"><g:message code="label.generatepasswordresetcode"/></g:link>
     </li>
-
-    <li>
-       <g:render template="show_actions_toggle"/>
-    </li>
+    <li class="divider"></li>
+    <g:render template="show_actions_toggle"/>
     <li class="divider"></li>
     <li>
       <a href="#" onclick="$(this).next('form').submit();">
@@ -37,7 +35,7 @@
   </aaf:hasPermission>
 
   <aaf:lacksPermission target="aaf:administrator">
-    <aaf:hasPermission target="app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit">
+    <g:if test="${managedSubjectInstance.canMutate()}">
       <g:render template="show_actions_resend"/>
       <g:if test="${managedSubjectInstance.functioning()}">
         <li>
@@ -46,12 +44,12 @@
         <li>
           <g:link action="admincode" id="${managedSubjectInstance.id}"><g:message code="label.generatepasswordresetcode"/></g:link>
         </li>
+        <li class="divider"></li>
       </g:if>
       <g:render template="show_actions_toggle"/>
-    </aaf:hasPermission>
+    </g:if>
+    <g:else>
+      <li><span class="label label-important" style="margin:6px;"><g:message code="label.noactions"/></span></li>
+    </g:else>
   </aaf:lacksPermission>
-
-  <aaf:lacksAllPermissions in='["app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit", "app:administrator"]'>
-    <li><span class="label label-important" style="margin:6px;"><g:message code="label.noactions"/></span>
-  </aaf:lacksAllPermissions>
 </ul>

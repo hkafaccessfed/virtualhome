@@ -31,7 +31,7 @@
 </li>
 
 <li>
-  <a href="#" onclick="$(this).next('form').submit();">
+  <a href="#" class="archive-ensure" data-confirm="${message(code:'views.aaf.vhr.managedsubject.confirm.archive')}">
     <g:if test="${managedSubjectInstance.archived}">
       <g:message code="views.aaf.vhr.managedsubject.show.unarchive"/>
     </g:if>

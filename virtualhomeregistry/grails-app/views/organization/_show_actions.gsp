@@ -62,43 +62,28 @@
   </aaf:hasPermission>
 
   <aaf:lacksPermission target="aaf:administrator">
-    <aaf:hasAnyPermission in='["app:manage:organization:${organizationInstance.id}:groups:create", "app:manage:organization:${organizationInstance.id}:edit", "app:manage:organization:${organizationInstance.id}:manage:administrators"]'>
-      <g:if test="${organizationInstance.functioning()}">
-        <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:edit">
-          <li>
-            <g:link action="createaccount" params='['id':"${organizationInstance.id}"]'><g:message code="label.createmanagedsubject"/></g:link>
-          </li>
-        </aaf:hasPermission>
-        <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:groups:create">
-          <li>
-            <g:link action="create" controller="group" params='['organization.id':"${organizationInstance.id}"]'><g:message code="label.creategroup"/></g:link>
-          </li>
-        </aaf:hasPermission>
-        <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:manage:administrators">
-          <li class="divider"></li>
-          <li>
-            <g:render template="show_actions_admin"/>
-          </li>
-        </aaf:hasPermission> 
-
-        <li class="divider"></li>
-      
-        <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:edit">
-          <li>
-            <g:link action="edit" id="${organizationInstance.id}"><g:message code="label.editorganization"/></g:link>
-          </li>
-        </aaf:hasPermission>
-      </g:if>
-      <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:edit">
-        <li>
-          <g:render template="show_actions_toggle"/>
-        </li>
-      </aaf:hasPermission>
-    </aaf:hasAnyPermission>
+    <g:if test="${organizationInstance.canMutate()}">
+      <li>
+        <g:link action="createaccount" params='['id':"${organizationInstance.id}"]'><g:message code="label.createmanagedsubject"/></g:link>
+      </li>
+      <li>
+        <g:link action="create" controller="group" params='['organization.id':"${organizationInstance.id}"]'><g:message code="label.creategroup"/></g:link>
+      </li>
+      <li class="divider"></li>
+      <li>
+        <g:render template="show_actions_admin"/>
+      </li>
+      <li class="divider"></li>
+      <li>
+        <g:link action="edit" id="${organizationInstance.id}"><g:message code="label.editorganization"/></g:link>
+      </li>
+      <li>
+        <g:render template="show_actions_toggle"/>
+      </li>
+    </g:if>
+    <g:else>
+      <li><span class="label label-important" style="margin:6px;"><g:message code="label.noactions"/></span></li>
+    </g:else>
   </aaf:lacksPermission>
-
-  <aaf:lacksAllPermissions in='["app:manage:organization:${organizationInstance.id}:groups:create", "app:manage:organization:${organizationInstance.id}:edit", "app:administrator"]'>
-    <li><span class="label label-important" style="margin:6px;"><g:message code="label.noactions"/></span>
-  </aaf:lacksAllPermissions>
 
 </ul>
