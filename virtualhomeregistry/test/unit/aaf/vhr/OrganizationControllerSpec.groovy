@@ -284,36 +284,6 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
     response.status == 403
   }
 
-  def 'ensure correct output from edit when not functioning'() {
-    setup:
-    def organizationTestInstance = Organization.build(active:false)
-    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
-
-    when:
-    params.id = organizationTestInstance.id
-    def model = controller.edit()
-
-    then:
-
-    flash.type == 'error'
-    flash.message == 'controllers.aaf.vhr.organization.edit.not.functioning'
-  }
-
-  def 'ensure correct output from update when not functioning'() {
-    setup:
-    def organizationTestInstance = Organization.build(active:false)
-    shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
-
-    when:
-    params.id = organizationTestInstance.id
-    def model = controller.update()
-
-    then:
-
-    flash.type == 'error'
-    flash.message == 'controllers.aaf.vhr.organization.update.not.functioning'
-  }
-
   def 'ensure correct output from update with null version but valid permission'() {
     setup:
     def organizationTestInstance = Organization.build(active:true)

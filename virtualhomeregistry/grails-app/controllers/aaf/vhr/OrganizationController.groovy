@@ -74,14 +74,6 @@ class OrganizationController {
 
     if(organizationInstance.canMutate()) {
 
-      if(!organizationInstance.functioning()) {
-        flash.type = 'error'
-        flash.message = 'controllers.aaf.vhr.organization.edit.not.functioning'
-
-        render(view: "show", model: [organizationInstance: organizationInstance])
-        return
-      }
-
       log.info "Action: edit, Subject: $subject, Object: organizationInstance"
       [organizationInstance: organizationInstance]
     }
@@ -94,13 +86,6 @@ class OrganizationController {
   def update(Long id, Long version) {
     def organizationInstance = Organization.get(id)
     if(organizationInstance.canMutate()) {
-
-      if(!organizationInstance.functioning()) {
-        flash.type = 'error'
-        flash.message = 'controllers.aaf.vhr.organization.update.not.functioning'
-        render(view: "show", model: [organizationInstance: organizationInstance])
-        return
-      }
       
       if (version == null) {
         flash.type = 'error'

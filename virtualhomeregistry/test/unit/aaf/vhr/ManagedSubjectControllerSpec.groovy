@@ -102,26 +102,6 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     flash.message == 'controllers.aaf.vhr.managedsubject.group.notfound'
   }
 
-  def 'ensure redirect to list if group found by validGroup is not functioning'() {
-    setup:
-    def organization = Organization.build(active:false)
-    def group = Group.build(organization:organization, active:false)
-    shiroSubject.isPermitted("app:administrator") >> false
-
-    when:
-    params.group = [id:group.id]
-    def result = controller.validGroup()
-
-    then:
-    !result
-    response.status == 302
-
-    response.redirectedUrl== "/managedSubject/list"
-
-    flash.type == 'info'
-    flash.message == 'controllers.aaf.vhr.managedsubject.group.not.functioning'
-  }
-
   def 'ensure true if valid group found by validGroup'() {
     setup:
     def organization = Organization.build(active:true)

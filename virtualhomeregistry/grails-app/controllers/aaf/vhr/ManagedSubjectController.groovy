@@ -378,18 +378,6 @@ class ManagedSubjectController {
       return false
     }
 
-    if(!SecurityUtils.subject.isPermitted("app:administrator")) {
-      if(!groupInstance.functioning()) {
-        log.warn "groupInstance cannot be modified by non super administrator when not functioning"
-
-        flash.type = 'info'
-        flash.message = 'controllers.aaf.vhr.managedsubject.group.not.functioning'
-        
-        redirect action:'list'
-        return false
-      }
-    }
-
     true
   }
 

@@ -74,42 +74,6 @@ class GroupControllerSpec  extends spock.lang.Specification {
     flash.message == 'controllers.aaf.vhr.group.notfound'
   }
 
-  def 'ensure redirect to list if valid instance found by beforeInterceptor but not functioning and not app admin'() {
-    setup:
-    def organizationTestInstance = Organization.build(active:true)
-    def groupTestInstance = Group.build(organization:organizationTestInstance, active:false)
-
-    shiroSubject.isPermitted("app:administrator") >> false
-
-    when:
-    params.id = groupTestInstance.id
-    def result = controller.validGroup()
-
-    then:
-    !result
-    response.status == 302
-
-    response.redirectedUrl== "/group/list"
-
-    flash.type == 'info'
-    flash.message == 'controllers.aaf.vhr.group.validgroup.not.functioning'
-  }
-
-  def 'ensure true if valid instance found by beforeInterceptor but not functioning and app admin'() {
-    setup:
-    def organizationTestInstance = Organization.build(active:true)
-    def groupTestInstance = Group.build(organization:organizationTestInstance, active:false)
-
-    shiroSubject.isPermitted("app:administrator") >> true
-
-    when:
-    params.id = groupTestInstance.id
-    def result = controller.validGroup()
-
-    then:
-    result
-  }
-
   def 'ensure true if valid instance found by beforeInterceptor and functioning and not app admin'() {
     setup:
     def organizationTestInstance = Organization.build(active:true)
@@ -153,38 +117,6 @@ class GroupControllerSpec  extends spock.lang.Specification {
 
     flash.type == 'info'
     flash.message == 'controllers.aaf.vhr.groups.organization.notfound'
-  }
-
-  def 'ensure redirect to list if organization found by validOrganization is not functioning'() {
-    setup:
-    def organization = Organization.build(active:false)
-    shiroSubject.isPermitted("app:administrator") >> false
-
-    when:
-    params.organization = [id:organization.id]
-    def result = controller.validOrganization()
-
-    then:
-    !result
-    response.status == 302
-
-    response.redirectedUrl== "/group/list"
-
-    flash.type == 'info'
-    flash.message == 'controllers.aaf.vhr.groups.organization.not.functioning'
-  }
-
-  def 'ensure true if valid organization found by validOrganization when not functioning but administrator'() {
-    setup:
-    def organization = Organization.build(active:false)
-     shiroSubject.isPermitted("app:administrator") >> true
-
-    when:
-    params.organization = [id:organization.id]
-    def result = controller.validOrganization()
-
-    then:
-    result
   }
 
   def 'ensure true if valid organization found by validOrganization and functioning'() {

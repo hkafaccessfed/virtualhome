@@ -304,18 +304,6 @@ class GroupController {
       return false
     }
 
-    if(!SecurityUtils.subject.isPermitted("app:administrator")) {
-      if(!organizationInstance.functioning()) {
-        log.warn "organizationInstance cannot be modified by non super administrator when not functioning"
-
-        flash.type = 'info'
-        flash.message = 'controllers.aaf.vhr.groups.organization.not.functioning'
-        
-        redirect action:'list'
-        return false
-      }
-    }
-
     true
   }
 
@@ -339,18 +327,6 @@ class GroupController {
 
       redirect action:'list'
       return false
-    }
-
-    if(!SecurityUtils.subject.isPermitted("app:administrator")) {
-      if(!groupInstance.functioning() && actionName != 'show' && actionName != 'toggleActive') {
-        log.warn "groupInstance cannot be modified by non super administrator when not functioning"
-
-        flash.type = 'info'
-        flash.message = 'controllers.aaf.vhr.group.validgroup.not.functioning'
-        
-        redirect action:'list'
-        return false
-      }
     }
 
     true
