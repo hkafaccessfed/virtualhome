@@ -28,7 +28,7 @@ class ManagedSubjectController {
   def show(Long id) {
     def managedSubjectInstance = ManagedSubject.get(id)
 
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:show")) {
+    if(managedSubjectInstance.canShow()) {
       log.info "Action: show, Subject: $subject, Object: $managedSubjectInstance"
       [managedSubjectInstance: managedSubjectInstance]
     }
@@ -41,9 +41,10 @@ class ManagedSubjectController {
   def create() {
     if(validGroup()) {
       def group = Group.get(params.group.id)
-      if(SecurityUtils.subject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create")) {
+      def managedSubjectInstance = new ManagedSubject(group:group, organization:group.organization)
+
+      if(managedSubjectInstance.canCreate(group)) {
         log.info "Action: create, Subject: $subject"
-        def managedSubjectInstance = new ManagedSubject(group:group, organization:group.organization)
         [managedSubjectInstance: managedSubjectInstance]
       }
       else {
@@ -56,12 +57,11 @@ class ManagedSubjectController {
   def save() {
     if(validGroup()) {
       def group = Group.get(params.group.id)
-      if(SecurityUtils.subject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create")) {
-        def managedSubjectInstance = new ManagedSubject()
+      def managedSubjectInstance = new ManagedSubject(group:group, organization:group.organization)
+
+      if(managedSubjectInstance.canCreate(group)) {
         bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance', 'eduPersonEntitlement']])
         managedSubjectInstance.displayName = managedSubjectInstance.cn
-        managedSubjectInstance.group = group
-        managedSubjectInstance.organization = group.organization
         sharedTokenService.generate(managedSubjectInstance)
 
         if(params.eduPersonAffiliation instanceof String)
@@ -103,7 +103,7 @@ class ManagedSubjectController {
 
   def edit(Long id) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+    if(managedSubjectInstance.canMutate()) {
       log.info "Action: edit, Subject: $subject, Object: managedSubjectInstance"
 
       [managedSubjectInstance: managedSubjectInstance]
@@ -116,7 +116,7 @@ class ManagedSubjectController {
 
   def update(Long id, Long version) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+    if(managedSubjectInstance.canMutate()) {
       if (version == null) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.managedsubject.update.noversion'
@@ -167,7 +167,7 @@ class ManagedSubjectController {
 
   def delete(Long id) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:administrator")) {
+    if(managedSubjectInstance.canDelete()) {
       try {
         managedSubjectInstance.delete()
 
@@ -190,7 +190,7 @@ class ManagedSubjectController {
 
   def resend(Long id) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+    if(managedSubjectInstance.canMutate()) {
       managedSubjectService.sendConfirmation(managedSubjectInstance)
 
       log.info "Action: resend, Subject: $subject, Object: $managedSubjectInstance"
@@ -206,7 +206,7 @@ class ManagedSubjectController {
 
   def admincode(Long id) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+    if(managedSubjectInstance.canMutate()) {
       managedSubjectInstance.resetCodeExternal = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(grailsApplication.config.aaf.vhr.passwordreset.reset_code_length)
 
       if (!managedSubjectInstance.save()) {
@@ -259,7 +259,7 @@ class ManagedSubjectController {
 
   def toggleLock(Long id, Long version) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+    if(managedSubjectInstance.canMutate()) {
       if (version == null) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.managedsubject.togglelock.noversion'
@@ -292,7 +292,7 @@ class ManagedSubjectController {
 
   def toggleActive(Long id, Long version) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+    if(managedSubjectInstance.canMutate()) {
       if (version == null) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.managedsubject.toggleactive.noversion'
@@ -325,7 +325,7 @@ class ManagedSubjectController {
 
   def toggleArchive(Long id, Long version) {
     def managedSubjectInstance = ManagedSubject.get(id)
-    if(SecurityUtils.subject.isPermitted("app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:edit")) {
+    if(managedSubjectInstance.canMutate()) {
       if (version == null) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.managedsubject.togglearchive.noversion'

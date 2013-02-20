@@ -127,6 +127,10 @@ class ManagedSubject {
     SecurityUtils.subject.isPermitted("app:administrator")
   }
 
+  public boolean canShow() {
+    SecurityUtils.subject.isPermitted("app:manage:organization:${organization.id}:group:${group.id}:managedsubject:show")
+  }
+
   public canChangePassword() {
     !locked && !blocked && !archived && organization?.functioning() && group?.functioning()
   }

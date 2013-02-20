@@ -30,7 +30,10 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     shiroSubject.isAuthenticated() >> true
     shiroEnvironment.setSubject(shiroSubject)
 
+    //shiroSubject.isPermitted("app:administrator") >> false
+
     controller.metaClass.getSubject = { subject }
+    shiroEnvironment.setSubject(shiroSubject)
   }
 
   def 'ensure beforeInterceptor only excludes list, create, save'() {
@@ -452,7 +455,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
 
     when:
     params.id = managedSubjectTestInstance.id
@@ -466,8 +469,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from edit when valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
 
     when:
     params.id = managedSubjectTestInstance.id
@@ -480,8 +484,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from update when invalid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
 
     when:
     params.id = managedSubjectTestInstance.id
@@ -495,8 +500,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from update with null version but valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
     
     expect:
     ManagedSubject.count() == 1
@@ -515,8 +521,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from update with invalid data and when valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
     managedSubjectTestInstance.getVersion() >> 20
     
     managedSubjectTestInstance.properties.each {
@@ -550,8 +557,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from update with valid data and when valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization, sharedToken:'abcd1234')
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
     
     managedSubjectTestInstance.properties.each {
       if(it.value) {
@@ -589,8 +597,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from update with valid data including entitlements and when valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization, sharedToken:'abcd1234', eduPersonEntitlement:'initial:urn;initial:urn:2')
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
     
     managedSubjectTestInstance.properties.each {
       if(it.value) {
@@ -632,8 +641,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from update with valid data containing multiple eduPersonAffiliation and when valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization, sharedToken:'abcd1234', eduPersonAffiliation:'employee')
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
     
     managedSubjectTestInstance.properties.each {
       if(it.value) {
@@ -673,8 +683,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from update including sharedToken update with valid data and when super admin'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization, sharedToken:'abcd1234')
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
     shiroSubject.isPermitted("app:administrator") >> true
 
     managedSubjectTestInstance.properties.each {
@@ -713,6 +724,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from delete when invalid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
     shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:delete") >> true
 
@@ -750,6 +762,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from delete when integrity violation'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
     shiroSubject.isPermitted("app:administrator") >> true
 
@@ -775,7 +788,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
 
     when:
     params.id = managedSubjectTestInstance.id
@@ -790,8 +803,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def managedSubjectService = Mock(aaf.vhr.ManagedSubjectService)
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
     
     controller.managedSubjectService = managedSubjectService
 
@@ -813,8 +827,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from togglelock when invalid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> false
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> false
 
     when:
     params.id = managedSubjectTestInstance.id
@@ -828,8 +843,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from toggleLock with null version but valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
     
     expect:
     ManagedSubject.count() == 1
@@ -848,8 +864,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from toggleLock with valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(locked:true, group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
     
     expect:
     ManagedSubject.count() == 1
@@ -870,6 +887,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from toggleblock when invalid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
     shiroSubject.isPermitted("app:administration") >> false
 
@@ -885,6 +903,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from toggleBlock with null version but valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
     shiroSubject.isPermitted("app:administration") >> true
     
@@ -905,6 +924,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from toggleBlock with valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(blocked:true, group:group, organization:group.organization)
     shiroSubject.isPermitted("app:administration") >> true
     
@@ -927,8 +947,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from toggleActive when invalid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> false
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> false
     
     when:
     params.id = managedSubjectTestInstance.id
@@ -942,8 +963,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from toggleActive with null version but valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
     
     expect:
     ManagedSubject.count() == 1
@@ -962,8 +984,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from toggleActive with valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(active:false, group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
     
     expect:
     ManagedSubject.count() == 1
@@ -984,8 +1007,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     def 'ensure correct output from toggleArchive when invalid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> false
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> false
     
     when:
     params.id = managedSubjectTestInstance.id
@@ -999,8 +1023,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from toggleArchive with null version but valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
     
     expect:
     ManagedSubject.count() == 1
@@ -1019,8 +1044,9 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
   def 'ensure correct output from toggleArchive with valid permission'() {
     setup:
     def group = Group.build()
+    group.organization.active = true
     def managedSubjectTestInstance = ManagedSubject.build(archived:false, group:group, organization:group.organization)
-    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:edit") >> true
+    shiroSubject.isPermitted("app:manage:organization:${managedSubjectTestInstance.organization.id}:group:${managedSubjectTestInstance.group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
     
     expect:
     ManagedSubject.count() == 1
