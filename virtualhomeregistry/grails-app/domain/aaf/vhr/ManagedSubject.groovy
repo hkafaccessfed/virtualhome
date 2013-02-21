@@ -114,10 +114,10 @@ class ManagedSubject {
 
   def beforeValidate() {
     if(!eptidKey)
-      eptidKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(12)
+      this.@eptidKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(12)
 
     if(!apiKey)
-      apiKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(16)
+      this.@apiKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(16)
   }
 
   String plainPassword
@@ -159,15 +159,6 @@ class ManagedSubject {
     def now = new Date()
     now.after(accountExpires)
   }
-
-  public void setEptidKey(String eptidKey) {
-    log.error ("Unable to set eptidKey. It is created automatically and is immutable.")
-  }
-
-  public void setApiKey(String apiKey) {
-    log.error ("Unable to set apiKey. It is created automatically and is immutable.")
-  }
-
 
   public void setResetCode(String resetCode) {
     if(resetCode)

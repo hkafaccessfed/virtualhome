@@ -73,7 +73,7 @@ class ManagedSubjectService {
   }
 
   def register(ManagedSubject managedSubject, boolean confirm = true) {
-    if(!managedSubject.save()) {
+    if(!managedSubject.save(flush:true)) {
       log.error "Failed trying to save $managedSubject"
       managedSubject.errors.each {
         log.warn it
