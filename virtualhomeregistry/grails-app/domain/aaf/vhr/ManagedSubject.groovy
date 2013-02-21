@@ -78,6 +78,9 @@ class ManagedSubject {
     resetCode nullable:true
     resetCodeExternal nullable:true
 
+    apiKey nullable:true, unique:true
+    eptidKey nullable:true, unique:true
+
     accountExpires nullable:true 
 
     email blank:false, unique:true, email:true
@@ -109,9 +112,12 @@ class ManagedSubject {
     eduPersonEntitlement type: "text"
   }
 
-  public ManagedSubject() {
-    eptidKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(12)
-    apiKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(16)
+  def beforeValidate() {
+    if(!eptidKey)
+      eptidKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(12)
+
+    if(!apiKey)
+      apiKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(16)
   }
 
   String plainPassword
@@ -157,6 +163,11 @@ class ManagedSubject {
   public void setEptidKey(String eptidKey) {
     log.error ("Unable to set eptidKey. It is created automatically and is immutable.")
   }
+
+  public void setApiKey(String apiKey) {
+    log.error ("Unable to set apiKey. It is created automatically and is immutable.")
+  }
+
 
   public void setResetCode(String resetCode) {
     if(resetCode)
