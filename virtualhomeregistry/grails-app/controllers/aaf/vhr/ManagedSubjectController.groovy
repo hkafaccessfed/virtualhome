@@ -60,7 +60,7 @@ class ManagedSubjectController {
       def managedSubjectInstance = new ManagedSubject(group:group, organization:group.organization)
 
       if(managedSubjectInstance.canCreate(group)) {
-        bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance', 'eduPersonEntitlement']])
+        bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance', 'eduPersonEntitlement', 'accountExpires']])
         managedSubjectInstance.displayName = managedSubjectInstance.cn
         sharedTokenService.generate(managedSubjectInstance)
 
@@ -81,6 +81,7 @@ class ManagedSubjectController {
         }
 
         if (!managedSubjectInstance.validate()) {
+          managedSubjectInstance.errors.each { println it}
           flash.type = 'error'
           flash.message = 'controllers.aaf.vhr.managedsubject.validate.failed'
           render(view: "create", model: [managedSubjectInstance: managedSubjectInstance])
@@ -130,7 +131,7 @@ class ManagedSubjectController {
         return
       }
 
-      bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance', 'displayName', 
+      bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance', 'displayName', 'accountExpires', 
                                                           'givenName', 'surname', 'mobileNumber', 'telephoneNumber', 'postalAddress', 
                                                           'organizationalUnit']])
 

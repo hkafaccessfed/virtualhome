@@ -699,4 +699,41 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
     !result
   }
 
+  def 'Ensure account with null expiry returns false for isExpired'() {
+    setup:
+    def ms = ManagedSubject.build()
+
+    when:
+    def result = ms.isExpired()
+
+    then:
+    !result
+  }
+
+  def 'Ensure expired account returns true for isExpired'() {
+    setup:
+    def ms = ManagedSubject.build()
+    def now = new Date()
+    ms.accountExpires = now - 1
+
+    when:
+    def result = ms.isExpired()
+
+    then:
+    result
+  }
+
+  def 'Ensure not yet expired account returns false for isExpired'() {
+    setup:
+    def ms = ManagedSubject.build()
+    def now = new Date()
+    ms.accountExpires = now + 1
+
+    when:
+    def result = ms.isExpired()
+
+    then:
+    !result
+  }
+
 }

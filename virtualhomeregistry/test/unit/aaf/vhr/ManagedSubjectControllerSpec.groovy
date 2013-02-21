@@ -304,9 +304,10 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     def managedSubjectService = Mock(aaf.vhr.ManagedSubjectService)
     def organization = Organization.build(active:true)
     def group = Group.build(organization:organization)
+    shiroSubject.isPermitted("app:administrator") >> false
     shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create") >> true
 
-    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    def managedSubjectTestInstance = ManagedSubject.buildWithoutSave(group:group, organization:group.organization, accountExpires:null)
     managedSubjectTestInstance.properties.each {
       if(it.value) {
         if(grailsApplication.isDomainClass(it.value.getClass()))
@@ -315,7 +316,6 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
           params."${it.key}" = "${it.value}"
       }
     }
-    managedSubjectTestInstance.delete()
 
     controller.sharedTokenService = sharedTokenService
     controller.managedSubjectService = managedSubjectService
@@ -345,9 +345,10 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     def managedSubjectService = Mock(aaf.vhr.ManagedSubjectService)
     def organization = Organization.build(active:true)
     def group = Group.build(organization:organization)
+    shiroSubject.isPermitted("app:administrator") >> false
     shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create") >> true
 
-    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    def managedSubjectTestInstance = ManagedSubject.buildWithoutSave(group:group, organization:group.organization)
     managedSubjectTestInstance.properties.each {
       if(it.value) {
         if(grailsApplication.isDomainClass(it.value.getClass()))
@@ -358,8 +359,6 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     }
 
     params.eduPersonEntitlement = "some:urn:value\nsome:other:urn:value"
-
-    managedSubjectTestInstance.delete()
 
     controller.sharedTokenService = sharedTokenService
     controller.managedSubjectService = managedSubjectService
@@ -391,9 +390,10 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     def managedSubjectService = Mock(aaf.vhr.ManagedSubjectService)
     def organization = Organization.build(active:true)
     def group = Group.build(organization:organization)
+    shiroSubject.isPermitted("app:administrator") >> false
     shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create") >> true
 
-    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    def managedSubjectTestInstance = ManagedSubject.buildWithoutSave(group:group, organization:group.organization)
     managedSubjectTestInstance.properties.each {
       if(it.value) {
         if(grailsApplication.isDomainClass(it.value.getClass()))
@@ -402,7 +402,6 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
           params."${it.key}" = "${it.value}"
       }
     }
-    managedSubjectTestInstance.delete()
 
     controller.sharedTokenService = sharedTokenService
     controller.managedSubjectService = managedSubjectService

@@ -28,7 +28,9 @@ class ManagedSubject {
 
   // Password reset. Both codes required to be input, second provided via SMS or administrator
   String resetCode
-  String resetCodeExternal           
+  String resetCodeExternal
+
+  Date accountExpires         
 
   // AAF Core
   String cn                   // oid:2.5.4.3
@@ -52,6 +54,9 @@ class ManagedSubject {
   boolean blocked = false
   boolean archived = false
 
+  Date dateCreated
+  Date lastUpdated
+
   int failedLogins = 0
   int failedResets = 0
 
@@ -72,6 +77,8 @@ class ManagedSubject {
     
     resetCode nullable:true
     resetCodeExternal nullable:true
+
+    accountExpires nullable:true 
 
     email blank:false, unique:true, email:true
     cn validator: {val, obj ->
@@ -103,8 +110,8 @@ class ManagedSubject {
   }
 
   public ManagedSubject() {
-    this.eptidKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(12)
-    this.apiKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(16)
+    eptidKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(12)
+    apiKey = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(16)
   }
 
   String plainPassword
@@ -137,6 +144,14 @@ class ManagedSubject {
 
   public boolean functioning() {
     active && !locked && !blocked && !archived && group?.functioning()
+  }
+
+  public boolean isExpired() {
+    if(!accountExpires)
+      return false
+
+    def now = new Date()
+    now.after(accountExpires)
   }
 
   public void setEptidKey(String eptidKey) {

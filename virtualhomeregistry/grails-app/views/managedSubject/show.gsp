@@ -18,6 +18,13 @@
 
     <h2><g:message code="views.aaf.vhr.managedsubject.show.heading" args="${[managedSubjectInstance.cn]}"/></h2>
 
+    <g:if test="${managedSubjectInstance.isExpired()}">
+      <div class="alert alert-block">
+        <h4><g:message code="views.aaf.vhr.managedsubject.show.expired.heading"/></h4>
+        <p><g:message code="views.aaf.vhr.managedsubject.show.expired.reason"/></p>
+        <p><g:message code="views.aaf.vhr.managedsubject.show.unable.to.login"/></p>
+      </div>
+    </g:if>
     <g:if test="${managedSubjectInstance.blocked}">
       <div class="alert alert-block alert-error">
         <h4><g:message code="views.aaf.vhr.managedsubject.show.blocked.heading"/></h4>
@@ -194,6 +201,18 @@
             <tr>
               <th class="span4"><span id="login-label"><strong><g:message code="label.login" /></strong></span></th>
               <td><span aria-labelledby="login-label"><g:fieldValue bean="${managedSubjectInstance}" field="login"/></span>
+            </tr>
+
+            <tr>
+              <th class="span4"><span id="accountexpiry-label"><strong><g:message code="label.accountexpires" /></strong></span></th>
+              <td>
+                <g:if test="${managedSubjectInstance.accountExpires}">
+                  <span aria-labelledby="accountexpiry-label"><g:formatDate format="dd-MM-yyyy" date="${managedSubjectInstance.accountExpires}"/></span>
+                </g:if>
+                <g:else>
+                  <span aria-labelledby="accountexpiry-label"><g:message code="label.doesnotexpire"/></span>
+                </g:else>
+              </td>
             </tr>
 
             <tr>
