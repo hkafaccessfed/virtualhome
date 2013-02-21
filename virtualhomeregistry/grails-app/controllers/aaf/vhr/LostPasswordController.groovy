@@ -204,9 +204,10 @@ class LostPasswordController {
     if(!managedSubjectInstance.canChangePassword() || managedSubjectInstance.failedResets >= grailsApplication.config.aaf.vhr.passwordreset.reset_attempt_limit.intValue()) {
       if(managedSubjectInstance.failedResets >= grailsApplication.config.aaf.vhr.passwordreset.reset_attempt_limit.intValue()) {
         String reason = "Locked by forgotten password process due to many failed login attempts"
-        String requestDetails = """User Agent: ${request.getHeader('User-Agent')}
-        Remote Host: ${request.getRemoteHost()}
-        Remote IP: ${request.getRemoteAddr()}"""
+        String requestDetails = """
+User Agent: ${request.getHeader('User-Agent')}
+Remote Host: ${request.getRemoteHost()}
+Remote IP: ${request.getRemoteAddr()}"""
 
         managedSubjectInstance.lock(reason, 'lost_password_max_attempts_reached', requestDetails, null)
       }
