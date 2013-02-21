@@ -31,6 +31,15 @@
         <ul class="nav">
 
           <aaf:isAdministrator>
+            <li>
+              <g:link controller="organization" action="list"><g:message code="branding.nav.organizations" /></g:link>
+            </li>
+            <li>
+              <g:link controller="group" action="list"><g:message code="branding.nav.groups" /></g:link>
+            </li>
+            <li>
+              <g:link controller="managedSubject" action="list"><g:message code="branding.nav.accounts" /></g:link>
+            </li>
             <li class="dropdown">
               <a class="dropdown-toggle" id="workflow" role="button" data-toggle="dropdown" data-target="#" href="#">
                 <g:message code="branding.nav.workflow" />

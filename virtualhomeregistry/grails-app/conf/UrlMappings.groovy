@@ -45,6 +45,15 @@ class UrlMappings {
 
     "/dashboard"(controller:"dashboard", action:"dashboard")
 
+    "/accounts/list" {
+      controller="managedSubject"
+      action="list"
+    }
+    "/groups/list" {
+      controller="group"
+      action="list"
+    }
+
     "/organisations/groups/accounts/$action/$id?" {
       controller="managedSubject"
     }
