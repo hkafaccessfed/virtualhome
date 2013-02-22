@@ -8,7 +8,7 @@ class ManagedSubjectController {
   static defaultAction = "list"
   static allowedMethods = [save: "POST", update: "POST", delete: "DELETE", resend:"POST"]
 
-  def beforeInterceptor = [action: this.&validManagedSubject, except: ['list', 'create', 'save']]
+  def beforeInterceptor = [action: this.&validManagedSubject, except: ['list', 'create', 'save', 'createcsv', 'savecsv']]
 
   def grailsApplication
   def managedSubjectService
@@ -361,10 +361,7 @@ class ManagedSubjectController {
     if(!params.group?.id) {
       log.warn "Group ID was not present"
 
-      flash.type = 'info'
-      flash.message = message(code: 'controllers.aaf.vhr.managedsubject.group.no.id')
-
-      redirect action:'list'
+      response.sendError 404
       return false
     }
 
@@ -372,10 +369,7 @@ class ManagedSubjectController {
     if (!groupInstance) {
       log.warn "groupInstance was not a valid instance"
 
-      flash.type = 'info'
-      flash.message = 'controllers.aaf.vhr.managedsubject.group.notfound'
-
-      redirect action:'list'
+      response.sendError 404
       return false
     }
 
@@ -386,10 +380,7 @@ class ManagedSubjectController {
     if(!params.id) {
       log.warn "ID was not present"
 
-      flash.type = 'info'
-      flash.message = message(code: 'controllers.aaf.vhr.managedsubject.no.id')
-
-      redirect action:'list'
+      response.sendError 404
       return false
     }
 
@@ -397,10 +388,7 @@ class ManagedSubjectController {
     if (!managedSubjectInstance) {
       log.warn "managedSubjectInstance was not a valid instance"
 
-      flash.type = 'info'
-      flash.message = 'controllers.aaf.vhr.managedsubject.notfound'
-
-      redirect action:'list'
+      response.sendError 404
       return false
     }
   }

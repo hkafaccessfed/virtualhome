@@ -34,13 +34,13 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     shiroEnvironment.setSubject(shiroSubject)
   }
 
-  def 'ensure beforeInterceptor only excludes list, create, save'() {
+  def 'ensure beforeInterceptor only excludes list, create, save, createcsv, savecsv'() {
     when:
     controller
 
     then:
-    controller.beforeInterceptor.except.size() == 3
-    controller.beforeInterceptor.except.containsAll(['list', 'create', 'save'])
+    controller.beforeInterceptor.except.size() == 5
+    controller.beforeInterceptor.except.containsAll(['list', 'create', 'save', 'createcsv', 'savecsv'])
   }
 
   def 'ensure redirect to list if no ID presented to beforeInterceptor'() {
@@ -49,12 +49,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
 
     then:
     !result
-    response.status == 302
-
-    response.redirectedUrl == "/managedSubject/list"
-
-    flash.type == 'info'
-    flash.message == 'controllers.aaf.vhr.managedsubject.no.id'
+    response.status == 404
   }
 
   def 'ensure redirect to list if no valid instance found by beforeInterceptor'() {
@@ -64,12 +59,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
 
     then:
     !result
-    response.status == 302
-
-    response.redirectedUrl== "/managedSubject/list"
-
-    flash.type == 'info'
-    flash.message == 'controllers.aaf.vhr.managedsubject.notfound'
+    response.status == 404
   }
 
   def 'ensure redirect to list if no groupID presented to validGroup'() {
@@ -79,12 +69,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
 
     then:
     !result
-    response.status == 302
-
-    response.redirectedUrl == "/managedSubject/list"
-
-    flash.type == 'info'
-    flash.message == 'controllers.aaf.vhr.managedsubject.group.no.id'
+    response.status == 404
   }
 
   def 'ensure redirect to list if no valid instance found by validGroup'() {
@@ -94,12 +79,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
 
     then:
     !result
-    response.status == 302
-
-    response.redirectedUrl== "/managedSubject/list"
-
-    flash.type == 'info'
-    flash.message == 'controllers.aaf.vhr.managedsubject.group.notfound'
+    response.status == 404
   }
 
   def 'ensure true if valid group found by validGroup'() {
