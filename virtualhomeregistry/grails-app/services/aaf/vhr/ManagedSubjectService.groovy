@@ -3,6 +3,8 @@ package aaf.vhr
 import org.springframework.context.i18n.LocaleContextHolder
 import org.apache.commons.validator.EmailValidator
 
+import groovy.time.TimeCategory
+
 import aaf.base.admin.EmailTemplate
 
 class ManagedSubjectService {
@@ -20,6 +22,7 @@ class ManagedSubjectService {
   private final String TOKEN_CN = 'aaf.vhr.managedsubjectservice.registerfromcsv.invalidcn'
   private final String TOKEN_EMAIL = 'aaf.vhr.managedsubjectservice.registerfromcsv.invalidemail'
   private final String TOKEN_AFFILIATION ='aaf.vhr.managedsubjectservice.registerfromcsv.invalidaffiliation'
+  private final String TOKEN_EXPIRY ='aaf.vhr.managedsubjectservice.registerfromcsv.expiry'
 
   private final String TOKEN_EMAIL_SUBJECT ='aaf.vhr.managedsubjectservice.registered.email.subject'
 
@@ -73,7 +76,7 @@ class ManagedSubjectService {
   }
 
   def register(ManagedSubject managedSubject, boolean confirm = true) {
-    if(!managedSubject.save(flush:true)) {
+    if(!managedSubject.save()) {
       log.error "Failed trying to save $managedSubject"
       managedSubject.errors.each {
         log.warn it
@@ -103,7 +106,7 @@ class ManagedSubjectService {
       lc++
 
       // Ensure required pii
-      if(tokens.size() != 3) {
+      if(tokens.size() != 4) {
         valid = false
         errors.add(messageSource.getMessage(TOKEN_COUNT, [lc] as Object[], TOKEN_COUNT, LocaleContextHolder.locale))
       } else {
@@ -124,6 +127,12 @@ class ManagedSubjectService {
         if(tokens[2].size() < 1 || !ManagedSubjectService.AFFILIATIONS.contains(tokens[2])) {
           valid = false
           errors.add(messageSource.getMessage(TOKEN_AFFILIATION, [lc, tokens[2]] as Object[], TOKEN_AFFILIATION, LocaleContextHolder.locale))
+        }
+
+        // Ensure expiry
+        if(tokens[3].size() < 1 || !tokens[3].isNumber()){
+          valid = false
+          errors.add(messageSource.getMessage(TOKEN_EXPIRY, [lc, tokens[2]] as Object[], TOKEN_EXPIRY, LocaleContextHolder.locale))
         }
       }
     }
@@ -147,17 +156,38 @@ class ManagedSubjectService {
       def managedSubject = new ManagedSubject(cn:tokens[0], email:tokens[1], eduPersonAffiliation:tokens[2], active:false, displayName:tokens[0], eduPersonAssurance: DEFAULT_ASSURANCE, organization:group.organization, group:group)
       sharedTokenService.generate(managedSubject)
 
-      managedSubject = register(managedSubject, false)
-      log.info "Created $managedSubject from CSV file submitted by $subject"
+      if(tokens[3].toInteger() > 0) {
+        use(TimeCategory) {
+          Date now = new Date()
+          managedSubject.accountExpires = now + tokens[3].toInteger().months
+        }
+      }
+
+      if(!managedSubject.validate()) {
+        valid = false
+      }
+
       subjects.add(managedSubject)
     }
 
-    log.info "Created all subjects from CSV file submitted by $subject, emailing welcome messages"
-    subjects.each { ms ->
-      sendConfirmation(ms)
-    }
+    if(valid) {
+      // There is of course a small chance that someone else could create a ManagedSubject
+      // with the same values in the interim but there is minimal chance so we're not
+      // going to go nuts with locks. If it does happen the user will get a 500 and everything gets rolled back
+      subjects.each { managedSubject ->
+        managedSubject = register(managedSubject, false)
+        log.info "Created $managedSubject from CSV file submitted by $subject"
+      }
 
-    [true, errors, subjects, lc]
+      log.info "Created all subjects from CSV file submitted by $subject, emailing welcome messages"
+      subjects.each { ms ->
+        sendConfirmation(ms)
+      }
+
+      return [true, errors, subjects, lc]
+    }
+    
+    [false, errors, subjects, lc]
   }
 
   public void sendConfirmation(ManagedSubject managedSubject) {

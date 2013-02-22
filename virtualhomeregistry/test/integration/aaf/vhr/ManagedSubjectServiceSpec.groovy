@@ -9,6 +9,8 @@ import com.icegreen.greenmail.util.*
 import aaf.base.admin.EmailTemplate
 import javax.mail.Message
 
+import groovy.time.TimeCategory
+
 class ManagedSubjectServiceSpec extends IntegrationSpec {
   
   def managedSubjectService
@@ -214,10 +216,34 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
 
     where:
     expectedErrorCount | expectedLinesProcessed | csv
-    1 | 2 | "Test User,testuser@testdomain.com,staff,rubbish\nTest User,testuser@testdomain.com,staff"
-    1 | 2 | "Mr Test User,testuser@testdomain.com,staff\nTest User,testuser@testdomain.com,staff"
-    2 | 3 | "Test J User,testuser@testdomain.com,staff\n Mr Test User,testuser@testdomain.com,staff\nTest User,testuser@testdomain.com,staff"
-    1 | 3 | "Test,testuser@testdomain.com,staff\n Mr Test User,testuser@testdomain.com,staff\nTest User,testuser@testdomain.com,staff"
+    1 | 2 | "Test User,testuser@testdomain.com,staff,rubbish\nTest User,testuser@testdomain.com,staff,0"
+    1 | 2 | "Mr Test User,testuser@testdomain.com,staff,0\nTest User,testuser@testdomain.com,staff,0"
+    3 | 3 | "Test User,testuser@testdomain.com,staff,0\nMr Test User,testuser@testdomain.com,staff,rubbish\nTest User,testuser@testdomain.com,staff,"
+    3 | 3 | "Test,testuser@testdomain.com,staff,\nMr Test User,testuser@testdomain.com,staff,hello\nTest User,testuser@testdomain.com,staff,0"
+  }
+
+  def 'ensure CSV lines cause account conflicts are rejected correctly'() {
+    setup:
+    def o = Organization.build()
+    def g = Group.build(organization: o)
+    def ms = ManagedSubject.build(cn:'Test User', email:'testuser@testdomain.com', eduPersonAffiliation:'member')
+
+    String csv = "Test User,testuser@testdomain.com,member,0\nTest User2,testuser2@testdomain.com,staff,12"
+
+    expect:
+    ManagedSubject.count() == 1
+
+    when:
+    def (result, errors, subjects, linesProcessed) = managedSubjectService.registerFromCSV(g, csv.bytes)
+
+    then:
+    !result
+    errors.size() == 0
+    subjects.size() == 2
+    linesProcessed == 2
+
+    subjects[0].hasErrors()
+    !subjects[1].hasErrors()
   }
 
   def 'ensure valid CSV creates new ManagedSubject from each line'() {
@@ -250,6 +276,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     subjects[0].eduPersonAffiliation == "student"
     subjects[0].organization == o
     subjects[0].group == g
+    subjects[0].accountExpires == null
 
     !subjects[1].functioning()
     subjects[1].cn == "Test User2"
@@ -258,6 +285,11 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     subjects[1].eduPersonAffiliation == "staff"
     subjects[1].organization == o
     subjects[1].group == g
+
+    
+    Date now = new Date()
+    subjects[1].accountExpires.format('yyyy-MM-dd') == use(TimeCategory) {now + 12.months}.format('yyyy-MM-dd')
+    
 
     greenMail.getReceivedMessages().length == expectedLinesProcessed
 
@@ -274,7 +306,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
 
     where:
     expectedErrorCount | expectedLinesProcessed | csv
-    0 | 2 | "Test User,testuser@testdomain.com,student\nTest User2,testuser2@testdomain.com,staff"
+    0 | 2 | "Test User,testuser@testdomain.com,student,0\nTest User2,testuser2@testdomain.com,staff,12"
   }
 
 }
