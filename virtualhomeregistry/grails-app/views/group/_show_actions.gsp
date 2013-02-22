@@ -5,7 +5,7 @@
       <g:link action="create" controller="managedSubject" params='['group.id':"${groupInstance.id}"]'><g:message code="label.createmanagedsubject"/></g:link>
     </li>
     <li>
-      <g:link action="create" controller="managedSubject" params='['group.id':"${groupInstance.id}"]'><g:message code="label.createmultiplemanagedsubject"/></g:link>
+      <g:link action="createcsv" controller="managedSubject" params='['group.id':"${groupInstance.id}"]'><g:message code="label.createmultiplemanagedsubject"/></g:link>
     </li>
 
     <li class="divider"></li>
@@ -67,7 +67,7 @@
         <g:link action="create" controller="managedSubject" params='['group.id':"${groupInstance.id}"]'><g:message code="label.createmanagedsubject"/></g:link>
       </li>
       <li>
-        <g:link action="create" controller="managedSubject" params='['group.id':"${groupInstance.id}"]'><g:message code="label.createmultiplemanagedsubject"/></g:link>
+        <g:link action="createcsv" controller="managedSubject" params='['group.id':"${groupInstance.id}"]'><g:message code="label.createmultiplemanagedsubject"/></g:link>
       </li>
       <li class="divider"></li>
       <li>

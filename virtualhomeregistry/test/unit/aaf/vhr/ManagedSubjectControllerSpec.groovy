@@ -188,6 +188,35 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     response.status == 403
   }
 
+  def 'ensure correct output from createcsv when valid permission'() {
+    setup:
+    def organization = Organization.build(active:true)
+    def group = Group.build(organization:organization)
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:create") >> true
+
+    when:
+    params.group = [id:group.id]
+    def model = controller.createcsv()
+
+    then:
+    model.groupInstance.instanceOf(Group)
+  }
+
+  def 'ensure correct output from createcsv when invalid permission'() {
+    setup:
+    def organization = Organization.build(active:true)
+    def group = Group.build(organization:organization)
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:create") >> true
+
+    when:
+    params.group = [id:group.id]
+    def model = controller.createcsv()
+
+    then:
+    model == null
+    response.status == 403
+  }
+
   def 'ensure correct output from save when invalid permission'() {
     setup:
     def organization = Organization.build(active:true)
@@ -406,6 +435,21 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     }
 
     savedManagedSubjectTestInstance.eduPersonAffiliation == 'member;library-walk-in'
+  }
+
+  def 'ensure correct output from savecsv when invalid permission'() {
+    setup:
+    def organization = Organization.build(active:true)
+    def group = Group.build(organization:organization)
+    shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id + 1}:managedsubject:create") >> true
+
+    when:
+    params.group = [id:group.id]
+    def model = controller.savecsv()
+
+    then:
+    model == null
+    response.status == 403
   }
 
   def 'ensure correct output from edit when invalid permission'() {

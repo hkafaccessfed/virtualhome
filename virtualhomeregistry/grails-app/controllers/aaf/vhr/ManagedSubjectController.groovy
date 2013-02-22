@@ -102,6 +102,54 @@ class ManagedSubjectController {
     }
   }
 
+  def createcsv() {
+    if(validGroup()) {
+      def group = Group.get(params.group.id)
+      def managedSubjectInstance = new ManagedSubject(group:group, organization:group.organization)
+
+      if(managedSubjectInstance.canCreate(group)) {
+        log.info "Action: create, Subject: $subject"
+        [groupInstance: group]
+      }
+      else {
+        log.warn "Attempt to do administrative ManagedSubject create by $subject was denied - not permitted by assigned permissions"
+        response.sendError 403
+      }
+    }
+  }
+
+  def savecsv() {
+    if(validGroup()) {
+      def group = Group.get(params.group.id)
+      def managedSubjectInstance = new ManagedSubject(group:group, organization:group.organization)
+
+      if(managedSubjectInstance.canCreate(group)) {
+        def csv = request.getFile('csvdata')
+        if (csv.empty) {
+          flash.type = 'error'
+          flash.message = 'controllers.aaf.vhr.managedsubject.savecsv.nodata'
+          render(view: 'createcsv')
+          return
+        }
+
+        def (status, errors, subjects, linecount) = managedSubjectService.registerFromCSV(group, csv.getBytes())
+
+        if(!status) {
+          flash.type = 'error'
+          flash.message = 'controllers.aaf.vhr.managedsubject.savecsv.registererror'
+          render(view: 'createcsv', model:[groupInstance: group, status: status, errors:errors, managedSubjectInstances:subjects, linecount:linecount])
+          return
+        }
+
+        [groupInstance:group, status: status, errors:errors, managedSubjectInstances:subjects, linecount:linecount]
+      }
+      else {
+        log.warn "Attempt to do administrative ManagedSubject csv upload by $subject was denied - not permitted by assigned permissions"
+        response.sendError 403
+      }
+    }
+  }
+
   def edit(Long id) {
     def managedSubjectInstance = ManagedSubject.get(id)
     if(managedSubjectInstance.canMutate()) {
