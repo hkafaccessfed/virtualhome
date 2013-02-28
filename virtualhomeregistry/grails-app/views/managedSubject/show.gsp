@@ -257,6 +257,7 @@
               <th><g:message code="label.datecreated"/></th>
               <th><g:message code="label.event"/></th>
               <th><g:message code="label.category"/></th>
+              <th><g:message code="label.reason"/></th>
               <th><g:message code="label.actioner"/></th>
               <th><g:message code="label.environment"/></th>
             </tr>
@@ -267,6 +268,7 @@
                 <td><g:fieldValue bean="${event}" field="dateCreated" /></td>
                 <td><g:fieldValue bean="${event}" field="event" /></td>
                 <td><g:fieldValue bean="${event}" field="category" /></td>
+                <td><g:fieldValue bean="${event}" field="reason" /></td>
                 <aaf:hasPermission target="app:administrator">
                   <td><g:link controller="subject" action="show" id="${event.actionedBy?.id}"><g:fieldValue bean="${event}" field="actionedBy.cn" /></g:link></td>
                 </aaf:hasPermission>
