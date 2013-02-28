@@ -142,10 +142,18 @@ class ManagedSubject {
 
   public boolean canShow() {
     SecurityUtils.subject.isPermitted("app:manage:organization:${organization.id}:group:${group.id}:managedsubject:show")
+  } 
+
+  public boolean canChangePassword() {
+    !locked && !blocked && !archived && organization?.functioning() && group?.functioning()
   }
 
-  public canChangePassword() {
-    !locked && !blocked && !archived && organization?.functioning() && group?.functioning()
+  public boolean canLogin() {
+    this.functioning()
+  }
+
+  public boolean requiresLoginCaptcha() {
+    this.failedLogins >= 2
   }
 
   public boolean functioning() {
@@ -297,15 +305,44 @@ class ManagedSubject {
     }
   }
 
+  public failLogin(String reason, String category, String environment, Subject actionedBy) {
+    this.failedLogins++
+
+    if(failedLogins >= 5) {
+      def change = new StateChange(event:StateChangeType.FAILMULTIPLELOGIN, reason:"$reason Reached login attempts limit, account deactivated", category:category, environment:environment, actionedBy:actionedBy)
+      this.addToStateChanges(change)
+
+      this.active = false     // prevent future auth attempts until unlocked by admin
+    } else {
+      def change = new StateChange(event:StateChangeType.FAILLOGIN, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+      this.addToStateChanges(change)
+    }
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when setting failLogin state"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when setting failLogin state")
+    }
+  }
+
+  public successfulLogin(String reason, String category, String environment, Subject actionedBy) {
+    this.failedLogins = 0
+
+    def change = new StateChange(event:StateChangeType.LOGIN, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToStateChanges(change)
+  }
+
   public increaseFailedResets() {
     this.failedResets++
 
     if(!this.save(flush:true)) {
-      log.error "Unable to save $this when increasing failed logins"
+      log.error "Unable to save $this when increasing failed resets"
       this.errors.each {
         log.error it
       }
-      throw new RuntimeException ("Unable to save $this when increasing failed logins")
+      throw new RuntimeException ("Unable to save $this when increasing failed resets")
     }
   }
 

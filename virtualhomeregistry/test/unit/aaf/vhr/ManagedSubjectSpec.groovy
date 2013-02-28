@@ -736,4 +736,96 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
     !result
   }
 
+  def 'ensure canLogin operates as expected'() {
+    setup:
+    def ms = ManagedSubject.build()
+    ms.organization.active = true
+
+    when:
+    ms.active = act
+
+    then:
+    ms.canLogin() == login
+
+    where:
+    act << [false, true]
+    login << [false, true]
+  }
+
+  def 'ensure requiresLoginCaptcha operates as expected'() {
+    setup:
+    def ms = ManagedSubject.build()
+    ms.organization.active = true
+
+    when:
+    ms.failedLogins = fails
+
+    then:
+    ms.requiresLoginCaptcha() == requires
+
+    where:
+    fails << [0,1,2,10]
+    requires << [false, false, true, true]
+  }
+
+  def 'ensure failLogin increments correctly'() {
+    setup:
+    def s = ManagedSubject.build(failedLogins:1, active:true)
+    s.organization.active = true
+
+    expect:
+    s.active
+    s.canLogin()
+    !s.requiresLoginCaptcha()
+
+    when:
+    s.failLogin("reason", "category", "environment", null)
+
+    then:
+    s.active
+    s.failedLogins == 2
+    s.requiresLoginCaptcha()
+    s.stateChanges.toArray()[0].event == StateChangeType.FAILLOGIN
+  }
+
+  def 'ensure failLogin deactivates after 5 failures'() {
+    setup:
+    def s = ManagedSubject.build(failedLogins:4, active:true)
+    s.organization.active = true
+
+    expect:
+    s.active
+    s.canLogin()
+    s.requiresLoginCaptcha()
+
+    when:
+    s.failLogin("reason", "category", "environment", null)
+
+    then:
+    !s.active
+    s.failedLogins == 5
+    s.requiresLoginCaptcha()
+    s.stateChanges.toArray()[0].event == StateChangeType.FAILMULTIPLELOGIN
+  }
+
+  def 'ensure successfulLogin performs correctly'() {
+    setup:
+    def s = ManagedSubject.build(failedLogins:1, active:true)
+    s.organization.active = true
+
+    expect:
+    s.active
+    s.canLogin()
+    !s.requiresLoginCaptcha()
+
+    when:
+    s.successfulLogin("reason", "category", "environment", null)
+
+    then:
+    s.active
+    s.failedLogins == 0
+    !s.requiresLoginCaptcha()
+    s.stateChanges.toArray()[0].event == StateChangeType.LOGIN
+  }
+
 }
