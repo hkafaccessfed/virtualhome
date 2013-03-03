@@ -49,6 +49,9 @@ shiro.properties
 cobertura.ser
 .DS_Store
 
+grails-app/conf/RecaptchaConfig.groovy
+
+grails-app/i18n/messages-base*
 
 web-app/css/errors.css
 web-app/css/main.css

@@ -4,6 +4,14 @@ class UrlMappings {
 
     "/"(controller:"dashboard", action:"welcome")
 
+    "/login" {
+      controller="login"
+      action="index"
+    }
+    "/login/$action?" {
+      controller="login"
+    }
+
     "/myaccount/setup/login-available" {
       controller="finalization"
       action="loginAvailable"

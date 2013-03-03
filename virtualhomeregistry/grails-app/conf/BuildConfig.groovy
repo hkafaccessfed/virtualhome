@@ -35,6 +35,7 @@ grails.project.dependency.resolution = {
 
   dependencies {
     test 'mysql:mysql-connector-java:5.1.18'
+    compile "com.google.guava:guava:14.0"
   }
 
   /*
