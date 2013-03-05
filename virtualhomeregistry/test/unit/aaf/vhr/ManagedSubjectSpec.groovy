@@ -828,4 +828,25 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
     s.stateChanges.toArray()[0].event == StateChangeType.LOGIN
   }
 
+  def 'ensure successfulLostPassword performs correctly'() {
+    setup:
+    def s = ManagedSubject.build(failedResets: 2, failedLogins:1, resetCode:'123', resetCodeExternal:'456', active:false)
+    s.organization.active = true
+
+    expect:
+    !s.active
+    !s.canLogin()
+
+    when:
+    s.successfulLostPassword()
+
+    then:
+    s.active
+    s.canLogin()
+    s.failedResets == 0
+    s.failedLogins == 0
+    !s.resetCode
+    !s.resetCodeExternal
+  }
+
 }

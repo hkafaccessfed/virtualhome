@@ -157,7 +157,7 @@ class ManagedSubject {
   }
 
   public boolean functioning() {
-    active && !locked && !blocked && !archived && group?.functioning()
+    active && !isExpired() && !locked && !blocked && !archived && group?.functioning()
   }
 
   public boolean isExpired() {
@@ -332,6 +332,24 @@ class ManagedSubject {
 
     def change = new StateChange(event:StateChangeType.LOGIN, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
     this.addToStateChanges(change)
+  }
+
+  public successfulLostPassword() {
+    active = true
+
+    resetCode = null
+    resetCodeExternal = null
+
+    failedResets = 0
+    failedLogins = 0
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when setting successfulLostPassword state"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when setting successfulLostPassword state")
+    }
   }
 
   public increaseFailedResets() {

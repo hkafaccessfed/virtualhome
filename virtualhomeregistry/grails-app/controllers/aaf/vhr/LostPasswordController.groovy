@@ -143,20 +143,7 @@ class LostPasswordController {
     }
 
     cryptoService.generatePasswordHash(managedSubjectInstance)
-
-    managedSubjectInstance.resetCode = null
-    managedSubjectInstance.resetCodeExternal = null
-
-    managedSubjectInstance.failedResets = 0
-
-    if(!managedSubjectInstance.save()) {
-      log.error "Unable to save $managedSubjectInstance when finalizing reset of password"
-      managedSubjectInstance.errors.each {
-        log.error it
-      }
-      redirect action: 'unavailable'
-      return
-    }
+    managedSubjectInstance.successfulLostPassword()
 
     session.invalidate()
 

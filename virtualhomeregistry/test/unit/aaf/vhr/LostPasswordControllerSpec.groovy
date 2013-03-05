@@ -319,7 +319,7 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
     response.redirectedUrl == "/lostPassword/reset"
   }
 
-  def 'validatereset does not increase failure count it resetCodeExternal does not match with second_factor_required disabled'() {
+  def 'validatereset does not increase failure count if resetCodeExternal does not match with second_factor_required disabled'() {
     setup:
     def ms = ManagedSubject.build(resetCode:'1234', resetCodeExternal:'5678')
     session.setAttribute(controller.CURRENT_USER, ms.id)
@@ -349,7 +349,7 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
     model.organizationRole
   }
 
-  def 'validatereset does not increase counts but fails to pass on password error'() {
+  def 'validatereset does not increase counts but fails to pass on password format error'() {
     setup:
     def ms = ManagedSubject.build(resetCode:'1234', resetCodeExternal:'5678')
     session.setAttribute(controller.CURRENT_USER, ms.id)
@@ -381,7 +381,7 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
 
   def 'validatereset completes successfully with correct codes and valid password'() {
     setup:
-    def ms = ManagedSubject.build(failedResets:1, resetCode:'1234', resetCodeExternal:'5678')
+    def ms = ManagedSubject.build(active:false, failedResets:1, failedLogins:2, resetCode:'1234', resetCodeExternal:'5678')
     session.setAttribute(controller.CURRENT_USER, ms.id)
 
     Role.build(name:"group:${ms.group.id}:administrators")
@@ -394,6 +394,7 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
 
     expect:
     ms.failedResets == 1
+    !ms.active
 
     when:
     controller.validatereset()
@@ -402,6 +403,8 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
     1 * passwordValidationService.validate(_) >>> [[true, null]]
     1 * cryptoService.generatePasswordHash(ms)
 
+    ms.active
+    ms.failedLogins == 0
     ms.resetCode == null
     ms.resetCodeExternal == null
     ms.failedResets == 0
