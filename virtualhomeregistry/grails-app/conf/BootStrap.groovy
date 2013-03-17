@@ -19,15 +19,10 @@ class BootStrap {
     
       if(Environment.current != Environment.TEST) {
 
-        def subject = aaf.base.identity.Subject.findWhere(principal:"vhr_internal_account")
+        def subject = aaf.base.identity.Subject.findWhere(principal:"aaf.base.identity:internal_account")
         if(!subject) {
-          subject = new aaf.base.identity.Subject(principal:"vhr_internal_account", cn:"internal account", email:"noreply@aaf.edu.au", sharedToken:"VOID")
-          if(!subject.save()) {
-            subject.errors.each {
-              println it
-            }
-            throw new RuntimeException("Unable to populate initial subject")
-          }
+          throw new RuntimeException("Unable to retrieve initial subject reference \
+            'aaf.base.identity:internal_account' which should be populated by base")
         }
 
         def organization_approval = WorkflowScript.findWhere(name:'organization_approval')
