@@ -23,6 +23,7 @@ auditLog {
 }
 
 security.shiro.authc.required = false
+security.shiro.authc.strategy = aaf.base.shiro.FirstExceptionStrategy 
 
 grails.project.groupId = appName
 grails.converters.xml.pretty.print = true
