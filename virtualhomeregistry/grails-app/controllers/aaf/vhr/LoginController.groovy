@@ -81,9 +81,8 @@ class LoginController {
       Cookie cookie = new Cookie(SSO_COOKIE_NAME, sessionID)
       cookie.maxAge = maxAge
       cookie.secure = grailsApplication.config.aaf.vhr.login.ssl_only_cookie
+      cookie.path = grailsApplication.config.aaf.vhr.login.path
       response.addCookie(cookie)
-
-      
 
       session.removeAttribute(INVALID_USER)
       session.removeAttribute(CURRENT_USER)
