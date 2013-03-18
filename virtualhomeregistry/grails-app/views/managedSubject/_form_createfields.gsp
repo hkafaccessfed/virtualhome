@@ -59,7 +59,7 @@
     <br><br>
 
     <div id="expiryselection">
-      <g:datePicker disabled="disabled" id="accountExpires" name="accountExpires" value="${managedSubjectInstance.accountExpires}" precision="day" noSelection="['':'-Choose-']" relativeYears="[0..3]"/>
+      <g:datePicker disabled="disabled" id="accountExpires" name="accountExpires" value="${managedSubjectInstance.accountExpires}" precision="day" noSelection="['':'-Choose-']" relativeYears="[-2..3]"/>
 
       <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.managedsubject.accountexpires')}"><i class="icon icon-question-sign"></i></a>
     </div>
