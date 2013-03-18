@@ -55,7 +55,7 @@
         <p><g:message code="views.aaf.vhr.managedsubject.show.finalized.correct"/></p>
       </div>
     </g:if>
-    <g:if test="${!(managedSubjectInstance.functioning()) && managedSubjectInstance.login != null && !managedSubjectInstance.blocked && !managedSubjectInstance.locked && !managedSubjectInstance.archived}">
+    <g:if test="${!(managedSubjectInstance.functioning()) && managedSubjectInstance.login != null && !managedSubjectInstance.blocked && !managedSubjectInstance.locked && !managedSubjectInstance.archived && !managedSubjectInstance.isExpired()}">
       <div class="alert alert-block alert-info">
         <h4><g:message code="views.aaf.vhr.managedsubject.show.functioning.heading"/></h4>
         <p><g:message code="views.aaf.vhr.managedsubject.show.functioning.reason"/></p>
@@ -251,7 +251,7 @@
       </div>
 
       <div id="tab-eventlog" class="tab-pane">
-        <table class="table table-borderless table-sortable">
+        <table class="table table-borderless">
           <thead>
             <tr>
               <th><g:message code="label.datecreated"/></th>
@@ -263,7 +263,7 @@
             </tr>
           </thead>
           <tbody>
-            <g:each in="${managedSubjectInstance.stateChanges}" var="event">
+            <g:each in="${managedSubjectInstance.stateChanges.sort{it.dateCreated}.reverse()}" var="event">
               <tr>
                 <td><g:fieldValue bean="${event}" field="dateCreated" /></td>
                 <td><g:fieldValue bean="${event}" field="event" /></td>
