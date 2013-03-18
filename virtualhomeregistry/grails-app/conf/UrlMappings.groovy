@@ -76,9 +76,7 @@ class UrlMappings {
       controller="manageAdministrators"
     }
 
-    "/api/v1/managedsubject/$action" {
-      controller="managedSubjectApi"
-    }
+    "/api/v1/login/$action/$sessionID" (controller: "loginApi")
   }
 
 }
