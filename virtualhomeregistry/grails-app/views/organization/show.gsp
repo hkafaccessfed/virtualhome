@@ -83,6 +83,11 @@
               <th class="span4"><span id="description-label"><strong><g:message code="label.description" /></strong></span></th>
               <td><span aria-labelledby="description-label"><g:fieldValue bean="${organizationInstance}" field="description"/></span>
             </tr>
+
+            <tr>
+              <th class="span4"><span id="orgscope-label"><strong><g:message code="label.scope" /></strong></span></th>
+              <td><span aria-labelledby="orgscope-label"><g:fieldValue bean="${organizationInstance}" field="orgScope"/></span>
+            </tr>
           
             <tr>
               <th class="span4"><span id="grouplimit-label"><strong><g:message code="label.grouplimit" /></strong></span></th>

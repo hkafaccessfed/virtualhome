@@ -15,6 +15,7 @@ class Organization  {
   String name
   String displayName
   String description
+  String orgScope
 
   long frID
   long subjectLimit 
@@ -37,6 +38,7 @@ class Organization  {
     name(nullable: false, blank: false)
     displayName(nullable: false, blank: false)
     description(nullable:true, blank: false, maxSize:2000)
+    orgScope(nullable:true, unique: true, matches: "[a-zA-Z0-9]+")
 
     dateCreated(nullable:true)
     lastUpdated(nullable:true)

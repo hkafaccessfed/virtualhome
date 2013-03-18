@@ -47,7 +47,7 @@ class GroupController {
       def organization = Organization.get(params.organization.id)
       groupInstance.organization = organization
       if(groupInstance.canCreate(groupInstance.organization)) {
-        bindData(groupInstance, params, [include: ['name', 'description', 'welcomeMessage']])
+        bindData(groupInstance, params, [include: ['name', 'description', 'groupScope', 'welcomeMessage']])
         if (!groupInstance.validate()) {
           flash.type = 'error'
           flash.message = 'controllers.aaf.vhr.group.validate.failed'
@@ -123,7 +123,7 @@ class GroupController {
         return
       }
 
-      bindData(groupInstance, params, [include: ['name', 'description', 'welcomeMessage']])
+      bindData(groupInstance, params, [include: ['name', 'description', 'groupScope', 'welcomeMessage']])
       if (!groupInstance.validate()) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.group.validate.failed'

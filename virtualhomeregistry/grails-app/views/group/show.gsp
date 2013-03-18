@@ -75,13 +75,22 @@
             </tr>
 
             <tr>
+              <th class="span4"><span id="groupscope-label"><strong><g:message code="label.scope" /></strong></span></th>
+              <td><span aria-labelledby="groupscope-label"><g:fieldValue bean="${groupInstance}" field="groupScope"/></span>
+            </tr>
+
+            <tr>
               <th class="span4"><span id="organization-label"><strong><g:message code="label.organization" /></strong></span></th>
               <td><span aria-labelledby="organization-label"><g:link controller="organization" action="show" id="${groupInstance?.organization?.id}"><g:fieldValue bean="${groupInstance.organization}" field="displayName"/></g:link></span>
             </tr>
 
             <tr>
               <th class="span4"><span id="organization-welcomemessage"><strong><g:message code="label.welcomemessage" /></strong></span></th>
-              <td><pre><g:fieldValue bean="${groupInstance}" field="welcomeMessage"/></pre></td>
+              <td>
+                <g:if test="${groupInstance.welcomeMessage}">
+                  <pre><g:fieldValue bean="${groupInstance}" field="welcomeMessage"/></pre>
+                </g:if>
+              </td>
             </tr>
 
             <tr><td colspan="2"><hr></tr></td>

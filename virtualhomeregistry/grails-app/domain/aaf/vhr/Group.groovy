@@ -12,6 +12,7 @@ class Group {
 
   String name
   String description
+  String groupScope
 
   String welcomeMessage
 
@@ -29,6 +30,7 @@ class Group {
   static constraints = {
     name(nullable: false, blank: false)
     description (nullable: false, blank:false)
+    groupScope (nullable:true, unique: true, matches: "[a-zA-Z0-9]+")
     dateCreated(nullable:true)
     lastUpdated(nullable:true)
 

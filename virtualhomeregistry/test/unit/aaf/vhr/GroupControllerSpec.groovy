@@ -409,7 +409,7 @@ class GroupControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from update with valid data and when valid permission'() {
     setup:
-    def groupTestInstance = Group.build()
+    def groupTestInstance = Group.build(groupScope:'groupname')
     groupTestInstance.organization.active = true
     shiroSubject.isPermitted("app:manage:organization:${groupTestInstance.organization.id}:group:${groupTestInstance.id}:edit") >> true
     

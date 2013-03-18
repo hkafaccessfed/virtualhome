@@ -339,7 +339,7 @@ class OrganizationControllerSpec  extends spock.lang.Specification {
 
   def 'ensure correct output from update with valid data and when valid permission'() {
     setup:
-    def organizationTestInstance = Organization.build(active:true)
+    def organizationTestInstance = Organization.build(active:true, orgScope:'orgname')
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:edit") >> true
     
     organizationTestInstance.properties.each {

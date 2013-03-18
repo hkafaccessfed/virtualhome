@@ -20,6 +20,16 @@
     </div>
   </div>
 
+  <g:if test="${groupInstance?.organization?.orgScope}">
+    <div class="control-group ${hasErrors(bean: groupInstance, field: 'groupScope', 'error')}">
+      <label class="control-label" for="groupScope"><g:message code="label.scope"/></label>
+      <div class="controls">
+        <g:textField name="groupScope" value="${groupInstance?.groupScope}"/>
+        <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.group.scope')}"><i class="icon icon-question-sign"></i></a>
+      </div>
+    </div>
+  </g:if>
+
   <div class="control-group ${hasErrors(bean: groupInstance, field: 'welcomeMessage', 'error')}">
     <label class="control-label" for="welcomeMessage"><g:message code="label.welcomemessage"/></label>
     <div class="controls">

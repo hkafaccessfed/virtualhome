@@ -2,37 +2,55 @@
 
 <fieldset>
 
-  <div class="control-group ${hasErrors(bean: organizationInstance, field: 'name', 'error')}">
-    <label class="control-label" for="name"><g:message code="label.name"/></label>
-    <div class="controls">
-      <g:textField name="name" required="" value="${organizationInstance?.name}"/>
+  <aaf:hasPermission target='app:administration'>
+    <g:if test="${actionName != 'create'}">
+      <hr>
+      <p class="alert alert-info"><g:message code="views.aaf.vhr.organization.updated.remotely"/></p>
+    </g:if>
+    <div class="control-group ${hasErrors(bean: organizationInstance, field: 'name', 'error')}">
+      <label class="control-label" for="name"><g:message code="label.name"/></label>
+      <div class="controls">
+        <g:textField name="name" required="" value="${organizationInstance?.name}"/>
+      </div>
     </div>
-  </div>
 
-  <div class="control-group ${hasErrors(bean: organizationInstance, field: 'displayName', 'error')}">
-    <label class="control-label" for="displayName"><g:message code="label.displayname"/></label>
-    <div class="controls">
-      <g:textField name="displayName" required="" value="${organizationInstance?.displayName}"/>
+    <div class="control-group ${hasErrors(bean: organizationInstance, field: 'displayName', 'error')}">
+      <label class="control-label" for="displayName"><g:message code="label.displayname"/></label>
+      <div class="controls">
+        <g:textField name="displayName" required="" value="${organizationInstance?.displayName}"/>
+      </div>
     </div>
-  </div>
+
+    <hr>
+  </aaf:hasPermission>
 
   <div class="control-group ${hasErrors(bean: organizationInstance, field: 'description', 'error')}">
     <label class="control-label" for="description"><g:message code="label.description"/></label>
     <div class="controls">
       <g:textArea name="description" cols="40" rows="5" maxlength="2000" value="${organizationInstance?.description}"/>
+      <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.organization.description')}"><i class="icon icon-question-sign"></i></a>
     </div>
   </div>
 
-  <g:if test="${actionName == 'create'}">
-    <div class="control-group ${hasErrors(bean: organizationInstance, field: 'frID', 'error')}">
-      <label class="control-label" for="frID"><g:message code="label.frid"/></label>
-      <div class="controls">
-        <g:field name="frID" type="number" value="${organizationInstance.frID}" required=""/>
-      </div>
+  <div class="control-group ${hasErrors(bean: organizationInstance, field: 'orgScope', 'error')}">
+    <label class="control-label" for="orgScope"><g:message code="label.scope"/></label>
+    <div class="controls">
+      <g:textField name="orgScope" value="${organizationInstance?.orgScope}"/>
+      <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.organization.scope')}"><i class="icon icon-question-sign"></i></a>
     </div>
-  </g:if>
+  </div>
 
   <aaf:hasPermission target='app:administration'>
+    <hr>
+    <g:if test="${actionName == 'create'}">
+      <div class="control-group ${hasErrors(bean: organizationInstance, field: 'frID', 'error')}">
+        <label class="control-label" for="frID"><g:message code="label.frid"/></label>
+        <div class="controls">
+          <g:field name="frID" type="number" value="${organizationInstance.frID}" required=""/>
+        </div>
+      </div>
+    </g:if>
+
     <div class="control-group ${hasErrors(bean: organizationInstance, field: 'groupLimit', 'error')}">
       <label class="control-label" for="groupLimit"><g:message code="label.grouplimit"/></label>
       <div class="controls">
