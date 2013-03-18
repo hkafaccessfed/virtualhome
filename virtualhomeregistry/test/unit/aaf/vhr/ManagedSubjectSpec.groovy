@@ -736,9 +736,25 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
     !result
   }
 
-  def 'ensure canLogin operates as expected'() {
+  def 'ensure canLogin fails if not password set'() {
     setup:
     def ms = ManagedSubject.build()
+    ms.organization.active = true
+
+    when:
+    ms.active = act
+
+    then:
+    ms.canLogin() == login
+
+    where:
+    act << [false, true]
+    login << [false, false]
+  }
+
+  def 'ensure canLogin operates as expected'() {
+    setup:
+    def ms = ManagedSubject.build(hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
     ms.organization.active = true
 
     when:
@@ -770,7 +786,7 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
 
   def 'ensure failLogin increments correctly'() {
     setup:
-    def s = ManagedSubject.build(failedLogins:1, active:true)
+    def s = ManagedSubject.build(failedLogins:1, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
     s.organization.active = true
 
     expect:
@@ -790,7 +806,7 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
 
   def 'ensure failLogin deactivates after 5 failures'() {
     setup:
-    def s = ManagedSubject.build(failedLogins:4, active:true)
+    def s = ManagedSubject.build(failedLogins:4, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
     s.organization.active = true
 
     expect:
@@ -810,7 +826,7 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
 
   def 'ensure successfulLogin performs correctly'() {
     setup:
-    def s = ManagedSubject.build(failedLogins:1, active:true)
+    def s = ManagedSubject.build(failedLogins:1, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
     s.organization.active = true
 
     expect:
@@ -830,7 +846,7 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
 
   def 'ensure successfulLostPassword performs correctly'() {
     setup:
-    def s = ManagedSubject.build(failedResets: 2, failedLogins:1, resetCode:'123', resetCodeExternal:'456', active:false)
+    def s = ManagedSubject.build(failedResets: 2, failedLogins:1, resetCode:'123', resetCodeExternal:'456', active:false, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
     s.organization.active = true
 
     expect:

@@ -149,7 +149,7 @@ class ManagedSubject {
   }
 
   public boolean canLogin() {
-    this.functioning()
+    hash && this.functioning()
   }
 
   public boolean requiresLoginCaptcha() {

@@ -23,7 +23,7 @@ class LoginServiceSpec extends spock.lang.Specification {
     service.cryptoService = cryptoService
 
     service.afterPropertiesSet()
-    ms = ManagedSubject.build()
+    ms = ManagedSubject.build(hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
 
     service.loginCache.invalidateAll()
   }
