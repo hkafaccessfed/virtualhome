@@ -17,18 +17,11 @@ class CryptoService {
           22 characters of salt (effectively only 128 bits)
           31 characters of encrypted output (effectively only 184 bits)
     
-    Thus the total length is 60 bytes.
+    This library doesn't limit the password to 72 characters or less it simply 
+    lets it pass silently. A 72 characters bCrypted password is better than the fast 
+    hashing alternative.
 
-    There is a limit on the number of characters of the incoming password BCrypt will utilise.
-    The BCrypt implementation XOR using P_orig which is 184 bytes integer until it gets to the end, 
-    which limits the encryption "key" to 72 bytes. 
-    Everything after 72 bytes is ignored (a warning would have been nice).
-
-    Hoever we don't limit the user's password to 72 characters or less but simply 
-    let it pass silently. The idea behind this being that a 72 characters bCrypted password 
-    is better than the fast hashing alternative.
-
-    For gensalt we can utilise a value of between 4 and 31. This should be increased in
+    For gensalt provide a value of between 4 and 31. This should be increased in
     configuration over time as server power increases.
 
     @pre: Subject.plainPassword is non null, non blank and meets any min length requirements
@@ -85,7 +78,7 @@ class CryptoService {
   }
 
   /*
-    Verify using Sha512 for email reset codes.
+    Verify using SHA-512 for email reset codes.
 
     @pre: emailReset is non null and has subject it is associated with populated
     by the caller.
