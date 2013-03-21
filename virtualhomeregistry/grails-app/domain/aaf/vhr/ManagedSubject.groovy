@@ -398,6 +398,8 @@ class ManagedSubject {
       checkedNumber = "+61$checkedNumber"
     }
 
+    checkedNumber = checkedNumber.replace(' ','')
+
     if(!checkedNumber.startsWith('+')) {
       return false
     } else {
