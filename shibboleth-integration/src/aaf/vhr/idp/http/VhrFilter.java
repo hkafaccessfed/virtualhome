@@ -83,9 +83,8 @@ public class VhrFilter implements Filter {
 			return;
 		}
 		
-		// TODO how do we handle this error state? Have them auth again?
 		log.info("Failed to establish validity for {} vhrSessionID.", req.getRemoteHost());
-		response.sendRedirect(vhrLoginEndpoint);
+		response.sendRedirect(String.format(vhrLoginEndpoint, codec.encode(request.getRequestURL().toString()), codec.encode(relyingParty)));
 	}
 
 	@Override
