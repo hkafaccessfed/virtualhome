@@ -4,6 +4,9 @@ import groovyx.net.http.*
 import static groovyx.net.http.ContentType.JSON
 import javax.servlet.http.Cookie
 
+import aaf.vhr.switchch.vho.DeprecatedSubject
+import aaf.vhr.MigrateController
+
 class LoginController {
 
   final String ATTEMPT_COUNT = "aaf.vhr.LoginController.ATTEMPT_COUNT"
@@ -16,9 +19,6 @@ class LoginController {
   def loginService
 
   def index() {
-    //OWASP recommendation for click jacking defence
-    response.addHeader("X-FRAME-OPTIONS", "DENY")
-
     if(params.ssourl) {
       session.setAttribute(SSO_URL, params.ssourl)
     } else {
@@ -29,30 +29,40 @@ class LoginController {
     }
 
     def attempts = session.getAttribute(ATTEMPT_COUNT) ?:0
-    attempts++
-    session.setAttribute(ATTEMPT_COUNT, attempts)
-
     if(session.getAttribute(INVALID_USER)) {
       log.debug "INVALID_USER is true indicating invalid username being supplied. Rendering default login screen."
       session.removeAttribute(INVALID_USER)
       return [loginError:true, requiresChallenge:attempts > grailsApplication.config.aaf.vhr.login.require_captcha_after_tries]
     }
 
-    def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
-    if(managedSubjectInstance) {
-      log.debug "CURRENT_USER is set indicating previous failure. Rendering default login screen."
-      session.removeAttribute(CURRENT_USER)
-      return [loginError:true, requiresChallenge:(attempts > grailsApplication.config.aaf.vhr.login.require_captcha_after_tries || managedSubjectInstance.requiresLoginCaptcha())]
+    if(session.getAttribute(CURRENT_USER)) {
+      def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
+      if(managedSubjectInstance) {
+        log.debug "CURRENT_USER is set indicating previous failure. Rendering default login screen."
+        session.removeAttribute(CURRENT_USER)
+        return [loginError:true, requiresChallenge:(attempts > grailsApplication.config.aaf.vhr.login.require_captcha_after_tries || managedSubjectInstance.requiresLoginCaptcha())]
+      }
     }
   }
 
   def login(String username, String password) {
+    def deprecatedSubject = DeprecatedSubject.findWhere(login:username, migrated:false)
+    if(deprecatedSubject) {
+      session.setAttribute(MigrateController.MIGRATION_USER, username)
+      redirect (controller:'migrate', action:'introduction')
+      return
+    }
+
     def redirectURL = session.getAttribute(SSO_URL)
     if(!redirectURL) {
       log.error "No redirectURL set for login, redirecting to oops"
       redirect action: "oops"
       return
     }
+
+    def attempts = session.getAttribute(ATTEMPT_COUNT) ?:0
+    attempts++
+    session.setAttribute(ATTEMPT_COUNT, attempts)
 
     def managedSubjectInstance = ManagedSubject.findWhere(login: username)
     if(!managedSubjectInstance) {
@@ -61,8 +71,6 @@ class LoginController {
       redirect action:"index"
       return
     }
-
-    def attempts = session.getAttribute(ATTEMPT_COUNT)
 
     int require_captcha_after_tries = grailsApplication.config.aaf.vhr.login.require_captcha_after_tries
 

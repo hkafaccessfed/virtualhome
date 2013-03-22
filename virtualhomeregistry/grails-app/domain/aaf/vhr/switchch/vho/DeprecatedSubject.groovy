@@ -12,6 +12,7 @@ class DeprecatedSubject {
   String password
 
   boolean migrated = false
+  int migrationAttempts = 0
   
   Date dateCreated
   Date lastUpdated

@@ -7,21 +7,11 @@ import grails.buildtestdata.mixin.Build
 import spock.lang.*
 
 import aaf.base.identity.*
+import aaf.vhr.switchch.vho.DeprecatedSubject
 
 @TestFor(aaf.vhr.LoginController)
-@Build([aaf.vhr.Organization, aaf.vhr.Group, aaf.vhr.ManagedSubject])
+@Build([aaf.vhr.Organization, aaf.vhr.Group, aaf.vhr.ManagedSubject,aaf.vhr.switchch.vho.DeprecatedSubject])
 class LoginControllerSpec extends spock.lang.Specification {
-
-  def "index supplies click-jack protection"() {
-    setup:
-    params.sso = "http://test.com"
-
-    when:
-    controller.index()
-
-    then:
-    response.getHeader("X-FRAME-OPTIONS") == "DENY"
-  }
 
   def "index errors if no sso url provided in request or session"() {
     when:
@@ -54,25 +44,12 @@ class LoginControllerSpec extends spock.lang.Specification {
     response.status == 200
   }
 
-  def "index increments attempt count regardless of username etc"() {
-    setup:
-    session.setAttribute(controller.SSO_URL, "http://test.com")
-    session.setAttribute(controller.ATTEMPT_COUNT, 2)
-  
-    when:
-    controller.index()
-
-    then:
-    response.status == 200
-    session.getAttribute(controller.ATTEMPT_COUNT) == 3
-  }
-
   def "invalid user sets loginError and requiresChallenge"() {
     setup:
     grailsApplication.config.aaf.vhr.login.require_captcha_after_tries = 2
 
     session.setAttribute(controller.SSO_URL, "http://test.com")
-    session.setAttribute(controller.ATTEMPT_COUNT, 2)
+    session.setAttribute(controller.ATTEMPT_COUNT, 3)
     session.setAttribute(controller.INVALID_USER, true)
   
     when:
@@ -80,7 +57,6 @@ class LoginControllerSpec extends spock.lang.Specification {
 
     then:
     response.status == 200
-    session.getAttribute(controller.ATTEMPT_COUNT) == 3
     session.getAttribute(controller.INVALID_USER) == null
     model.loginError
     model.requiresChallenge
@@ -101,10 +77,37 @@ class LoginControllerSpec extends spock.lang.Specification {
 
     then:
     response.status == 200
-    session.getAttribute(controller.ATTEMPT_COUNT) == 3
     session.getAttribute(controller.CURRENT_USER) == null
     model.loginError
     !model.requiresChallenge
+  }
+
+  def "non migrated user goes directly to migrate controller"() {
+    setup:
+    def ds = DeprecatedSubject.build(login:'username', migrated:false)
+  
+    when:
+    controller.login('username', 'passoword')
+
+    then:
+    response.status == 302
+    response.redirectUrl == '/migrate/introduction'
+    session.getAttribute(MigrateController.MIGRATION_USER) == 'username'
+  }
+
+  def "login increments attempt count regardless of username etc"() {
+    setup:
+    def ds = DeprecatedSubject.build(login:'username', migrated:true)
+
+    session.setAttribute(controller.SSO_URL, "http://test.com")
+    session.setAttribute(controller.ATTEMPT_COUNT, 2)
+  
+    when:
+    controller.login('username', 'passoword')
+
+    then:
+    response.status == 302
+    session.getAttribute(controller.ATTEMPT_COUNT) == 3
   }
 
   def "login withouth redirectURL redirects to oops"() {
@@ -116,7 +119,7 @@ class LoginControllerSpec extends spock.lang.Specification {
   }
 
   def "login without valid managedSubject sets INVALID_USER"() {
-    expect:
+    setup:
     session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
     session.getAttribute(controller.INVALID_USER) == null
 

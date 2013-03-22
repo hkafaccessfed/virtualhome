@@ -50,6 +50,9 @@ class UrlMappings {
     "/lostpassword/$action" {
       controller="lostPassword"
     }
+    "/migration/$action" {
+      controller="migrate"
+    }
 
     "/dashboard"(controller:"dashboard", action:"dashboard")
 
