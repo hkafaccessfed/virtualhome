@@ -137,7 +137,7 @@ class PasswordValidationService {
     if(result.isValid())
       [true, null]
     else {
-      validator.getMessages(result).each { e ->
+      validator.getMessages(result).unique().each { e ->
         subject.errors.rejectValue('plainPassword', e)
       }
       subject.discard()
