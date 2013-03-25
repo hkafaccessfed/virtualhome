@@ -1,4 +1,4 @@
-Welcome to ${organization.displayName}!<br><br>
+Welcome to ${organization.displayName.encodeAsHTML()}!<br><br>
 
 This new organisation has been created and activated in the Virtual Home Registry via the Federation Registry Rest API.<br><br>
 

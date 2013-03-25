@@ -1,4 +1,4 @@
-Hello ${managedSubject.cn},<br><br>
+Hello ${managedSubject.cn.encodeAsHTML()},<br><br>
 
 You have been provided with new account that allows you to access the wide range of online services connected to the Australian Access Federation.<br><br>
 
