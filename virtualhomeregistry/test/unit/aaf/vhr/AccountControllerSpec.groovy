@@ -60,7 +60,7 @@ class AccountControllerSpec extends spock.lang.Specification {
     setup:
     def cryptoService = Mock(aaf.vhr.CryptoService)
 
-    def managedSubjectTestInstance = ManagedSubject.build(login:'validlogin')
+    def managedSubjectTestInstance = ManagedSubject.build(login:'validlogin', hash:'E9mF0hd97Y6Z0h8TkySUz69wmxlUU8IZOlQrVDLkSm09XmxBBhbnojdxUEkh')
     params.login = 'validlogin'
     params.plainPassword = 'password'
 
@@ -81,7 +81,7 @@ class AccountControllerSpec extends spock.lang.Specification {
     setup:
     def cryptoService = Mock(aaf.vhr.CryptoService)
 
-    def managedSubjectTestInstance = ManagedSubject.build(login:'validlogin')
+    def managedSubjectTestInstance = ManagedSubject.build(login:'validlogin', hash:'E9mF0+d97Y6Z0+8TkySUz69wmxlUU8IZOlQrVDLkSm09XmxBB+bnojdxUEkh')
     params.login = 'validlogin'
     params.plainPassword = 'password'
 
