@@ -1,6 +1,6 @@
 Hello ${managedSubject.cn.encodeAsHTML()},<br><br>
 
-You have requested a reset of the password that allows you to access the wide range of online services connected to the Australian Access Federation.<br><br>
+We have recieved a reqest to reset the password you use for logging in to the AAF Virtual Home.<br><br>
 
 If you did not request a password reset please contact support@aaf.edu.au immediately, providing your account details and a copy of this notification.<br><br>
 

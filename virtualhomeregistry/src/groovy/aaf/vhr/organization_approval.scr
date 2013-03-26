@@ -20,7 +20,7 @@ if(org) {
   }
 
   def emailTemplate = EmailTemplate.findWhere(name:"approved_new_organization")
-  emailManagerService.send('support@aaf.edu.au', "New VHR Organization: ${org.displayName}", emailTemplate, [organization:org])
+  emailManagerService.send('support@aaf.edu.au', "New AAF Virtual Home organization: ${org.displayName}", emailTemplate, [organization:org])
 
   workflowTaskService.complete(env.taskInstanceID.toLong(), 'organizationactivated')
 }
