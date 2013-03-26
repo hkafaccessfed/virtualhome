@@ -13,9 +13,9 @@ There is some terribly awful shit in here but I hope to only ever need to use it
 */
 
 // VHO specific config
-database = 'vhoold'
-dbusername = 'vhoold'
-dbpassword = 'password'
+database = 'old_vho_test'
+dbusername = 'root'
+dbpassword = ''
 
 discardIntervalMonths = 3
 

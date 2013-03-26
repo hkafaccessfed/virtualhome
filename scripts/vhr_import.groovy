@@ -18,8 +18,8 @@ There is some terribly awful shit in here but I hope to only ever need to use it
 commit = true
 verbose = false
 updateOrgs = false
-mappingFile = "/tmp/vhoold_fr_mapping.txt"
-dataFile = "/tmp/vhoold.json"
+mappingFile = "/tmp/old_vho_test_fr_mapping.txt"
+dataFile = "/tmp/old_vho_test.json"
 
 // Shouldn't need to modify anything below here
 if(updateOrgs) {
@@ -105,7 +105,7 @@ def createManagedSubject(def s, def group) {
         storedID.persistentId = sid.persistentId
         storedID.peerProvidedId = sid.peerProvidedId
         storedID.creationDate = sdf.parse(sid.creationDate)
-        storedID.principalName = managedSubject.eptidKey
+        storedID.principalName = managedSubject.login
         storedID.localId = managedSubject.eptidKey
 
         if(!storedID.save()) {
