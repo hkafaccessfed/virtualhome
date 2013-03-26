@@ -31,7 +31,7 @@ class MigrateController {
     log.info "Attempting account migration and validation for $managedSubjectInstance"
 
     // We're more generous with attempts to assist migration
-    def requireCaptchaAttempts = 1 //grailsApplication.config.aaf.vhr.login.require_captcha_after_tries * 3
+    def requireCaptchaAttempts = grailsApplication.config.aaf.vhr.login.require_captcha_after_tries * 3
 
     if(deprecatedSubject.migrationAttempts >= requireCaptchaAttempts && 
       !recaptchaService.verifyAnswer(session, request.getRemoteAddr(), params)) {
@@ -69,7 +69,11 @@ class MigrateController {
 
     managedSubjectInstance.plainPassword = params.plainPassword
     managedSubjectInstance.plainPasswordConfirmation = params.plainPasswordConfirmation
-    managedSubjectInstance.mobileNumber = params.mobileNumber != "" ?:null
+
+    if(params.mobileNumber)
+      managedSubjectInstance.mobileNumber = params.mobileNumber
+    else
+      managedSubjectInstance.mobileNumber = null
 
     managedSubjectInstance.validate()
     def (validPassword, errors) = passwordValidationService.validate(managedSubjectInstance)
