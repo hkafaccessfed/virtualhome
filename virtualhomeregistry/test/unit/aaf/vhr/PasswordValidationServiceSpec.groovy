@@ -97,94 +97,6 @@ class PasswordValidationServiceSpec extends UnitSpec {
       expected << [true, true, false, false, false]
   }
 
-  def 'confirm password meets alphabetical sequence rules'() {
-    setup:
-    def subject = ManagedSubject.build()
-    subject.plainPassword = val
-    subject.plainPasswordConfirmation = val
-
-    when:
-    def result = pv.validate(subject)
-
-    then:
-    result[0] == expected
-
-    if(!expected) {
-      assert result[1].size() >= 1
-      assert result[1].contains('aaf.vhr.passwordvalidationservice.sequence')
-    }
-
-    where:
-      val << ['Ab1!deXgh', 'Abc1!deXgh', 'Abd1!defgXgh', 'Abd1!DEFGXgh']
-      expected << [true, false, false, false]
-  }
-
-  def 'confirm password meets numerical sequence rules'() {
-    setup:
-    def subject = ManagedSubject.build()
-    subject.plainPassword = val
-    subject.plainPasswordConfirmation = val
-
-    when:
-    def result = pv.validate(subject)
-
-    then:
-    result[0] == expected
-
-    if(!expected) {
-      assert result[1].size() >= 1
-      assert result[1].contains('aaf.vhr.passwordvalidationservice.sequence')
-    }
-
-    where:
-      val << ['Ab1!deXgh', 'Ab12!deXgh', 'Ab123!deXgh', 'Ab1!deXgh678']
-      expected << [true, true, false, false]
-  }
-
-  def 'confirm password meets qwerty sequence rules'() {
-    setup:
-    def subject = ManagedSubject.build()
-    subject.plainPassword = val
-    subject.plainPasswordConfirmation = val
-
-    when:
-    def result = pv.validate(subject)
-
-    then:
-    result[0] == expected
-
-    if(!expected) {
-      assert result[1].size() >= 1
-      assert result[1].contains('aaf.vhr.passwordvalidationservice.sequence')
-    }
-
-    where:
-      val << ['Ab1!deXgh', 'Ab1!deXqW', 'Ab1!deXghqWe', 'Ab1!deXghxcVbNm']
-      expected << [true, true, false, false]
-  }
-
-  def 'confirm password meets repeat character sequence rules'() {
-    setup:
-    def subject = ManagedSubject.build()
-    subject.plainPassword = val
-    subject.plainPasswordConfirmation = val
-
-    when:
-    def result = pv.validate(subject)
-
-    then:
-    result[0] == expected
-
-    if(!expected) {
-      assert result[1].size() >= 1
-      assert result[1].contains('aaf.vhr.passwordvalidationservice.match')
-    }
-
-    where:
-      val << ['Ab1!deXgh', 'Aaab1!deXgh', 'Aaaab1!deXgh', 'Ab1!deeeeeeXgh']
-      expected << [true, true, false, false]
-  }
-
   def 'confirm short password meets char characteristic rules'() {
     setup:
     def subject = ManagedSubject.build()
@@ -242,7 +154,7 @@ class PasswordValidationServiceSpec extends UnitSpec {
     result[0] == expected
 
     where:
-      val << ['thehorseZEBRAlikedIceland', 'icelandisagreatplacetovisit', 'ICELANDwasagreatexperience!', 'pizzlepixythermosvenosity']
+      val << ['thehorseZEBRAlikedIceland', 'icelandisagreatplacetovisit', 'ICELAND was a great experience!', 'pizzlepixythermosvenosity']
       expected << [true, true, true, true]
   }
 

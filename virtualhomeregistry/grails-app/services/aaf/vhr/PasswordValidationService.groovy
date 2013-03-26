@@ -49,10 +49,6 @@ class PasswordValidationService {
 
       Password is 8 - 15 char:
       No whitespace
-      No alphabetic sequences
-      No numerical sequences
-      No qwerty sequences
-      No more then 3 repeat characters
       At least 1 number
       At least 1 Non Alpha
       At least 1 Uppercase Character
@@ -91,10 +87,6 @@ class PasswordValidationService {
     MessageResolver resolver = new MessageResolver(msgs)
 
     WhitespaceRule whitespaceRule = new WhitespaceRule()
-    AlphabeticalSequenceRule alphaSeqRule = new AlphabeticalSequenceRule(3, false)
-    NumericalSequenceRule numSeqRule = new NumericalSequenceRule(3, false)
-    QwertySequenceRule qwertySeqRule = new QwertySequenceRule(3, false)
-    RepeatCharacterRegexRule repeatRule = new RepeatCharacterRegexRule(3)
 
     List<Rule> ruleList = new ArrayList<Rule>()
 
@@ -115,10 +107,6 @@ class PasswordValidationService {
       dictRule.setMatchBackwards(true)
 
       ruleList.add(whitespaceRule)
-      ruleList.add(alphaSeqRule)
-      ruleList.add(numSeqRule)
-      ruleList.add(qwertySeqRule)
-      ruleList.add(repeatRule)
 
       ruleList.add(lengthRule)
       ruleList.add(charRule)

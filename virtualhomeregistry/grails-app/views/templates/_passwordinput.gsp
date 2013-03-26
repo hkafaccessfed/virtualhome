@@ -10,7 +10,7 @@
       <div class="help-block">
         <p>The AAF has strict password requirements in order to meet international security standard NIST 800-63.</p>
 
-        <p>The AAF <a href="http://xkcd.com/936/" target="_blank" tabindex="-1">and others</a> recommend you use a password/passphrase of <strong>greater then 16 characters</strong>. A phrase unique to you is the easiest way to achieve this: e.g. <em>'IbackedHorsenumber46intheMelbournecup!' or 'ilovedvisitingIcelandin2012'</em>. While not required capitalisation and non alphabetic characters as shown make your phrase even better.</p>
+        <p>The AAF <a href="http://xkcd.com/936/" target="_blank" tabindex="-1">and others</a> recommend you use a password/passphrase of <strong>greater than 16 characters</strong>. A phrase unique to you is the easiest way to achieve this: e.g. <em>'I backed Horse 46 in the Melbourne cup!' or 'ilovedvisitingIcelandin2012'</em>. While not required capitalisation and non alphabetic characters as shown make your phrase even better.</p>
 
         <p>Often a longer passphrase is actually easier to remember then a password with fewer characters but stricter requirements like the ones below.</p>
 
@@ -21,13 +21,9 @@
           <li>At least 1 number;</li>
           <li>At least 1 symbol e.g. !,@,$ etc;</li>
           <li>At least 1 uppercase character;</li>
-          <li>At least 1 lwercase chatacter;</li>
+          <li>At least 1 lowercase chatacter;</li>
           <li>No dictionary words;</li>
           <li>No whitespace;</li>
-          <li>No alphabetic sequences;</li>
-          <li>No numerical sequences;</li>
-          <li>No QWERTY sequences; and</li>
-          <li>No more than 3 repeat characters.</li>
         </ul>
       </div>
     </div>
@@ -50,7 +46,7 @@
   $('#plainPassword').showPassword();
   $('#plainPasswordConfirmation').showPassword();
 
-  var examples = ['lol', 'correcthorsebatterystaple', 'ilovedvisitingIcelandin2012', 'IbackedHorsenumber46intheMelbournecup!'];
+  var examples = ['lol', 'correcthorsebatterystaple', 'ilovedvisitingIcelandin2012', 'I backed Horse 46 in the Melbourne cup!'];
 
   $('#plainPassword').on("keyup", function() {
     $('#pwlength').html($('#plainPassword').val().length);
