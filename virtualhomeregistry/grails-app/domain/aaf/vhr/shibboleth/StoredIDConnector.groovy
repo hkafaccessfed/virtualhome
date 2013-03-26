@@ -6,6 +6,9 @@ https://wiki.shibboleth.net/confluence/display/SHIB2/ResolverStoredIDDataConnect
 
 However referenced here incase we wish to expose it in
 the VHO UI sometime in the future.
+
+We need to edit this table on DB creation:
+alter table shibpid change 'deactivationDate' 'deactivationDate' TIMESTAMP NULL;
 */
 class StoredIDConnector {
   String localEntity
@@ -16,15 +19,17 @@ class StoredIDConnector {
   String peerProvidedId
 
   Date creationDate
-  Date deactivationDate
+  Date deactivationDate = null
 
   static constraints = {
-    peerProvidedId nullable:true
-    deactivationDate nullable:true
+    peerProvidedId nullable : true
+    deactivationDate nullable : true
   }
 
   static mapping = {
     table 'shibpid'
+
+    version false
 
     principalName column:'principalName'
     peerProvidedId column:'peerProvidedId'
@@ -34,7 +39,7 @@ class StoredIDConnector {
     peerEntity column:'peerEntity', index:'localEntity_idx,localEntity2_idx'
     localId column:'localId', index:'localEntity_idx,localEntity2_idx'
 
-    creationDate column:'creationDate', sqlType: "timestamp"
-    deactivationDate column:'deactivationDate', index:'persistentId2_idx,localEntity2_idx', sqlType: "timestamp"
+    creationDate column:'creationDate', sqlType: 'timestamp'
+    deactivationDate column:'deactivationDate', sqlType: 'timestamp', index:'persistentId2_idx,localEntity2_idx'
   }
 }
