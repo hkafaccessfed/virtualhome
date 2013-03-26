@@ -229,13 +229,12 @@
                                 <tr>
                                     <td valign="top">
                                         <div >
-                                           An important message from the Australian Access Federation<br> 
-                                           Virtual Home Registry
+                                           An important message from the AAF Virtual Home
                                         </div>
                                       </td>
                                       <td valign="top" width="190">
                                         <div >
-                                            Do you need help with the Federation?<br /><a href="http://support.aaf.edu.au" target="_blank">Access the AAF Support service</a>.
+                                            Do you need help?<br /><a href="http://support.aaf.edu.au" target="_blank">Access the AAF Support service</a>.
                                           </div>
                                       </td>
                                   </tr>

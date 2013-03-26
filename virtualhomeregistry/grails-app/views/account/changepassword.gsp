@@ -36,7 +36,7 @@
           </div>
           <div class="span4">
             <span class="help-block">
-              <p>Please enter the password you're currently using when logging into the Virtual Home Registry.</p>
+              <p>Please enter the password you're currently using when logging into the AAF Virtual Home.</p>
             </span>
           </div>
         </div>
@@ -47,7 +47,7 @@
       <g:render template="/templates/passwordinput"/>
 
       <div class="form-actions">
-        <p class="text-muted"><i class="icon-info-sign"></i> <strong>Intensive cryptography coming up!! Your browser will take a few seconds to talk with VHR after you click, there is no need to refresh.</strong></p>
+        <p class="text-muted"><i class="icon-info-sign"></i> <strong>Intensive cryptography coming up!! Your browser will take a few seconds to process the request after you click. There is no need to refresh.</strong></p>
         <button type="submit" class="btn btn-success btn-large">Change Password</button>
         <g:link action="show" class="btn btn-large"><g:message code="label.cancel"/></g:link>
       </div>
