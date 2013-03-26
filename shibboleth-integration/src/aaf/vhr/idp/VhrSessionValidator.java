@@ -89,7 +89,7 @@ public class VhrSessionValidator {
 					String remoteUser = (String) responseJSON.get("remote_user");
 					
 					if(remoteUser != null) {
-						log.info("VHR API advises sessionID {} belongs to user {},  setting for REMOTE_USER.", vhrSessionID, remoteUser);
+						log.info("VHR API advises sessionID {} belongs to user {}, setting for REMOTE_USER.", vhrSessionID, remoteUser);
 						return remoteUser;
 					}
 				}
