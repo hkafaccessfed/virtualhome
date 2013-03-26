@@ -43,6 +43,11 @@ public class VhrFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) res;
 		
+		URLCodec codec = new URLCodec();
+		StorageService storageService = HttpServletHelper.getStorageService(req.getServletContext());
+		LoginContext loginContext = HttpServletHelper.getLoginContext(storageService, req.getServletContext(), request);
+		String relyingParty = loginContext.getRelyingPartyId();
+		
 		// Attempt to locate VHR SessionID
 		String vhrSessionID = null;
 		Cookie[] cookies = request.getCookies();
@@ -54,14 +59,9 @@ public class VhrFilter implements Filter {
 		}
 		
 		if(vhrSessionID == null) {
-			StorageService storageService = HttpServletHelper.getStorageService(req.getServletContext());
-			LoginContext loginContext = HttpServletHelper.getLoginContext(storageService, req.getServletContext(), request);
-			String relyingParty = loginContext.getRelyingPartyId();
-			
 			log.info("No vhrSessionID found from {}. Directing to VHR authentication process.", req.getRemoteHost());
 			log.debug ("Relying party which initiated the SSO request was: {}", relyingParty);
 			
-			URLCodec codec = new URLCodec();
 			try {
 				response.sendRedirect(String.format(vhrLoginEndpoint, codec.encode(request.getRequestURL().toString()), codec.encode(relyingParty)));
 			} catch (EncoderException e) {
@@ -83,8 +83,13 @@ public class VhrFilter implements Filter {
 			return;
 		}
 		
-		log.info("Failed to establish validity for {} vhrSessionID.", req.getRemoteHost());
-		response.sendRedirect(String.format(vhrLoginEndpoint, codec.encode(request.getRequestURL().toString()), codec.encode(relyingParty)));
+		try {
+			log.info("Failed to establish validity for {} vhrSessionID.", req.getRemoteHost());
+			response.sendRedirect(String.format(vhrLoginEndpoint, codec.encode(request.getRequestURL().toString()), codec.encode(relyingParty)));
+		} catch (EncoderException e) {
+			log.error ("Could not encode VHR redirect params after failing to establish validity");
+			throw new IOException(e);
+		}
 	}
 
 	@Override
