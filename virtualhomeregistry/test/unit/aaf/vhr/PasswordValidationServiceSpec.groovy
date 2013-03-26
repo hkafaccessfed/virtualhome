@@ -97,28 +97,6 @@ class PasswordValidationServiceSpec extends UnitSpec {
       expected << [true, true, false, false, false]
   }
 
-  def 'confirm password meets non whitespace rules'() {
-    setup:
-    def subject = ManagedSubject.build()
-    subject.plainPassword = val
-    subject.plainPasswordConfirmation = val
-
-    when:
-    def result = pv.validate(subject)
-
-    then:
-    result[0] == expected
-
-    if(!expected) {
-      assert result[1].size() >= 1
-      assert result[1].contains('aaf.vhr.passwordvalidationservice.whitespace')
-    }
-
-    where:
-      val << ['Ab1!deXgh', 'Ab1! deXgh', 'hello there cat tortoise man', 'hellotherecattortoiseman']
-      expected << [true, false, false, true]
-  }
-
   def 'confirm password meets alphabetical sequence rules'() {
     setup:
     def subject = ManagedSubject.build()

@@ -46,13 +46,13 @@ class PasswordValidationService {
       All passwords:
       Do not contain the login name
       Minimum length 8 char
+
+      Password is 8 - 15 char:
       No whitespace
       No alphabetic sequences
       No numerical sequences
       No qwerty sequences
       No more then 3 repeat characters
-
-      Password is 8 - 15 char:
       At least 1 number
       At least 1 Non Alpha
       At least 1 Uppercase Character
@@ -97,11 +97,6 @@ class PasswordValidationService {
     RepeatCharacterRegexRule repeatRule = new RepeatCharacterRegexRule(3)
 
     List<Rule> ruleList = new ArrayList<Rule>()
-    ruleList.add(whitespaceRule)
-    ruleList.add(alphaSeqRule)
-    ruleList.add(numSeqRule)
-    ruleList.add(qwertySeqRule)
-    ruleList.add(repeatRule)
 
     if(pw.length() < 16) {
       LengthRule lengthRule = new LengthRule()
@@ -118,6 +113,12 @@ class PasswordValidationService {
       DictionarySubstringRule dictRule = new DictionarySubstringRule(dict)
       dictRule.setWordLength(4)
       dictRule.setMatchBackwards(true)
+
+      ruleList.add(whitespaceRule)
+      ruleList.add(alphaSeqRule)
+      ruleList.add(numSeqRule)
+      ruleList.add(qwertySeqRule)
+      ruleList.add(repeatRule)
 
       ruleList.add(lengthRule)
       ruleList.add(charRule)
