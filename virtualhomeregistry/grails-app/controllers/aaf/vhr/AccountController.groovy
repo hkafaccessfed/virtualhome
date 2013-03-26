@@ -33,16 +33,14 @@ class AccountController {
 
       managedSubjectInstance = ManagedSubject.findWhere(login: params.login)
 
-      if(!managedSubjectInstance) {
-        if(!managedSubjectInstance) {
-          log.error "No such ManagedSubject for $params.login"
-          
-          flash.type = 'error'
-          flash.message = 'controllers.aaf.vhr.account.login.error'
-          render view: 'index'
+      if(!managedSubjectInstance || !managedSubjectInstance.hash) {
+        log.error "No such ManagedSubject for $params.login or password is not populated"
+        
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.account.login.error'
+        render view: 'index'
 
-          return
-        }
+        return
       }
 
       if(!cryptoService.verifyPasswordHash(params.plainPassword, managedSubjectInstance)) {
