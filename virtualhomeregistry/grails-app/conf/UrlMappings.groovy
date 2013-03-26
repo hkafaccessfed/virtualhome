@@ -80,6 +80,7 @@ class UrlMappings {
     }
 
     "/api/v1/login/$action/$sessionID" (controller: "loginApi")
+    "/api/v1/organizations/$action/$id?" (controller: "organizationApi")
   }
 
 }
