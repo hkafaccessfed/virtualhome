@@ -61,3 +61,11 @@ form.form-login input[type="text"], input[type="password"] {
 #loginform .well a {
   color: #08c;
 }
+
+.help-block-pulse {
+  color: #289ABF; 
+  a {
+    color: #289ABF;
+    text-decoration: underline;
+  }
+}

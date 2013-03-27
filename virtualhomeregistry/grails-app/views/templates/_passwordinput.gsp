@@ -7,10 +7,10 @@
       <p class="lead" style="margin-top:12px; margin-bottom: 6px;">Your password is <strong id="pwlength">0</strong> characters long</p>
     </div>
     <div class="span4">
-      <div class="help-block">
+      <div class="help-block pulse-target">
         <p>The AAF has strict password requirements in order to meet international security standard NIST 800-63.</p>
 
-        <p>The AAF <a href="http://xkcd.com/936/" target="_blank" tabindex="-1">and others</a> recommend you use a password/passphrase of <strong>greater than 16 characters</strong>. A phrase unique to you is the easiest way to achieve this: e.g. <em>'I backed Horse 46 in the Melbourne cup!' or 'ilovedvisitingIcelandin2012'</em>. While not required capitalisation and non alphabetic characters as shown make your phrase even better.</p>
+        <p>The AAF <a href="http://xkcd.com/936/" target="_blank" tabindex="-1">and others</a> recommend you use a password/passphrase of <strong>greater than 16 characters</strong>. A phrase unique to you is the easiest way to achieve this: e.g. <em>'I backed Horse 46 in the Melbourne cup!' or 'ilovedvisitingIcelandin2012'</em>.</p>
 
         <p>Often a longer passphrase is actually easier to remember then a password with fewer characters but stricter requirements like the ones below.</p>
 
@@ -42,6 +42,7 @@
   </div>
 </div>
 
+<r:require modules="pulse" />
 <r:script>
   $('#plainPassword').showPassword();
   $('#plainPasswordConfirmation').showPassword();
@@ -50,7 +51,15 @@
 
   $('#plainPassword').on("keyup", function() {
     $('#pwlength').html($('#plainPassword').val().length);
-    
+  });
+
+  $('#plainPassword').on("focus", function() {
+    $('.pulse-target').pulse( {opacity: 0.4}, {duration : 600, pulses : 2});
+    $('.pulse-target').addClass('help-block-pulse');
+  });
+
+  $('#plainPassword').on("focusout", function() {
+    $('.pulse-target').removeClass('help-block-pulse');
   });
 
   $('button[type=submit]').click(function() {
