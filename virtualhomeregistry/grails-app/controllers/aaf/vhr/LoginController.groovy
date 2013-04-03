@@ -81,24 +81,24 @@ class LoginController {
       session.setAttribute(CURRENT_USER, managedSubjectInstance.id)
       redirect action:"index"
       return
-    } else {
-      log.info "LoginService indicates success for attempted login by $managedSubjectInstance, setting up environment"
-
-      // Setup SSO cookie for use with Shib IdP VHR filter
-      int maxAge = grailsApplication.config.aaf.vhr.login.validity_period_minutes * 60
-      Cookie cookie = new Cookie(SSO_COOKIE_NAME, sessionID)
-      cookie.maxAge = maxAge
-      cookie.secure = grailsApplication.config.aaf.vhr.login.ssl_only_cookie
-      cookie.path = grailsApplication.config.aaf.vhr.login.path
-      response.addCookie(cookie)
-
-      session.removeAttribute(INVALID_USER)
-      session.removeAttribute(CURRENT_USER)
-      session.removeAttribute(ATTEMPT_COUNT)
-      session.removeAttribute(SSO_URL)
-
-      redirect url: redirectURL
     }
+
+    log.info "LoginService indicates success for attempted login by ${managedSubjectInstance}. Established sessionID of $sessionID"
+
+    // Setup SSO cookie for use with Shib IdP VHR filter
+    int maxAge = grailsApplication.config.aaf.vhr.login.validity_period_minutes * 60
+    Cookie cookie = new Cookie(SSO_COOKIE_NAME, sessionID)
+    cookie.maxAge = maxAge
+    cookie.secure = grailsApplication.config.aaf.vhr.login.ssl_only_cookie
+    cookie.path = grailsApplication.config.aaf.vhr.login.path
+    response.addCookie(cookie)
+
+    session.removeAttribute(INVALID_USER)
+    session.removeAttribute(CURRENT_USER)
+    session.removeAttribute(ATTEMPT_COUNT)
+    session.removeAttribute(SSO_URL)
+
+    redirect url: redirectURL
   }
 
   def oops() {
