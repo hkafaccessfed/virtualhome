@@ -6,9 +6,8 @@ grails.project.test.reports.dir = "target/test-reports"
 grails.project.target.level = 1.7
 grails.project.source.level = 1.7
 
-grails.server.port.http=8181
-
 grails.plugin.location.'aaf-application-base' = '../../applicationbase'
+grails.plugin.location.'grails-sanitizer' = '../plugins/grails-sanitizer'
 
 grails.project.dependency.resolution = {
   inherits("global") {
@@ -51,7 +50,6 @@ grails.project.dependency.resolution = {
   plugins {
     compile ":rest:0.7"
     compile ":csv:0.3.1"
-    compile ":sanitizer:0.8.0"
     compile ":recaptcha:0.5.3"
   }
 }
