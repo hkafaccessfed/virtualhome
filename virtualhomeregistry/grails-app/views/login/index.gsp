@@ -99,10 +99,6 @@
       $(function () {
         extend_media_queries();
         $("#username").focus();
-
-        //$.getJSON('/virtualhomeregistry/login/servicedetails?id=539', function(data) {
-        //  $(".service-name").html("to " + data.serviceprovider.name);
-        //});
       });
 
       $(window).resize(function() {
@@ -115,10 +111,10 @@
         if ($(window).width() >= 980) {
           $("#loginform").removeClass('span12');
           $("#loginform").addClass('span5 offset1');
-          $("#servicedescription").removeClass('hidden');
+          $("#servicedescription").show();
         } else {
           $("#loginform").removeClass('span5 offset1');
-          $("#servicedescription").addClass('hidden');
+          $("#servicedescription").hide();
           $("#loginform").addClass('span12');
         }
       };
