@@ -73,6 +73,10 @@ class ManagedSubjectController {
           managedSubjectInstance.eduPersonEntitlement = params.eduPersonEntitlement.replaceAll("\r\n|\n\r|\n|\r",";")
         }
 
+        if(SecurityUtils.subject.isPermitted("app:administrator") && params.sharedToken) {
+          managedSubjectInstance.sharedToken = params.sharedToken
+        }
+
         if(!group.organization.canRegisterSubjects() && !SecurityUtils.subject.isPermitted("app:administrator")) {
           flash.type = 'error'
           flash.message = 'controllers.aaf.vhr.managedsubject.licensing.failed'

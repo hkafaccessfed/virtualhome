@@ -393,7 +393,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     savedManagedSubjectTestInstance.eduPersonEntitlement == "some:urn:value;some:other:urn:value"
   }
   
-  def 'ensure correct output from save with valid data, multiple eduPersonAffilliation and when valid permission'() {
+  def 'ensure correct output from save with valid data, multiple eduPersonAffilliation but not saving sharedToken when valid create permission'() {
     setup:
     def sharedTokenService = Mock(aaf.vhr.SharedTokenService)
     def managedSubjectService = Mock(aaf.vhr.ManagedSubjectService)
@@ -420,6 +420,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
 
     when:
     params.eduPersonAffiliation = ['member', 'library-walk-in']
+    params.sharedToken = 'abcdefg'
     controller.save()
 
     then:
@@ -433,6 +434,52 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     savedManagedSubjectTestInstance.properties.each {
       it.value == managedSubjectTestInstance.getProperty(it.key)
     }
+    savedManagedSubjectTestInstance.sharedToken != 'abcdefg'
+
+    savedManagedSubjectTestInstance.eduPersonAffiliation == 'member;library-walk-in'
+  }
+
+   def 'ensure correct output from save with valid data specifying sharedToken when administrator'() {
+    setup:
+    def sharedTokenService = Mock(aaf.vhr.SharedTokenService)
+    def managedSubjectService = Mock(aaf.vhr.ManagedSubjectService)
+    def organization = Organization.build(active:true)
+    def group = Group.build(organization:organization)
+    shiroSubject.isPermitted("app:administrator") >> true
+
+    def managedSubjectTestInstance = ManagedSubject.buildWithoutSave(group:group, organization:group.organization)
+    managedSubjectTestInstance.properties.each {
+      if(it.value) {
+        if(grailsApplication.isDomainClass(it.value.getClass()))
+          params."${it.key}" = [id:"${it.value.id}"]
+        else
+          params."${it.key}" = "${it.value}"
+      }
+    }
+
+    controller.sharedTokenService = sharedTokenService
+    controller.managedSubjectService = managedSubjectService
+
+    expect:
+    ManagedSubject.count() == 0
+
+    when:
+    params.eduPersonAffiliation = ['member', 'library-walk-in']
+    params.sharedToken = 'abcdefg'
+    controller.save()
+
+    then:
+    1 * sharedTokenService.generate(_ as ManagedSubject) >> {ManagedSubject subject -> subject.sharedToken = '1234'}
+    1 * managedSubjectService.register(_ as ManagedSubject)>> {ManagedSubject subject -> subject.save()}
+    ManagedSubject.count() == 1
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.managedsubject.save.success'
+
+    def savedManagedSubjectTestInstance = ManagedSubject.first()
+    savedManagedSubjectTestInstance.properties.each {
+      it.value == managedSubjectTestInstance.getProperty(it.key)
+    }
+    savedManagedSubjectTestInstance.sharedToken == 'abcdefg'
 
     savedManagedSubjectTestInstance.eduPersonAffiliation == 'member;library-walk-in'
   }
