@@ -113,7 +113,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     setup:
     def o = Organization.build()
     def g = Group.build(organization: o)
-    def ms = ManagedSubject.build(organization:o, group:g)
+    def ms = ManagedSubject.build(organization:o, group:g, login:null)
     def inv = new ManagedSubjectInvitation(managedSubject: ms).save()
 
     expect:
@@ -135,11 +135,55 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     managedSubject.hash == null
   }
 
+  def 'ensure failed finalize for ManagedSubject that has already undertaken the process'() {
+    setup:
+    def o = Organization.build()
+    def g = Group.build(organization: o)
+    def ms = ManagedSubject.build(organization:o, group:g, login:'mylogin')
+    def inv = new ManagedSubjectInvitation(managedSubject: ms).save()
+
+    expect:
+    ManagedSubject.count() == 1
+    ManagedSubjectInvitation.count() == 1
+    o.subjects.size() == 1
+    g.subjects.size() == 1
+
+    when:
+    def (result, error) = managedSubjectService.finalize(inv, 'usert', 'insecurepw', 'insecurepw', '0413123456')
+    inv.refresh()
+
+    then:
+    !result
+    error == "The invitation code that is attempting to be claimed is invalid"
+  }
+
+  def 'ensure failed finalize for ManagedSubject that has no unutilized invite'() {
+    setup:
+    def o = Organization.build()
+    def g = Group.build(organization: o)
+    def ms = ManagedSubject.build(organization:o, group:g, login:'mylogin')
+    def inv = new ManagedSubjectInvitation(managedSubject: ms, utilized:true).save()
+
+    expect:
+    ManagedSubject.count() == 1
+    ManagedSubjectInvitation.count() == 1
+    o.subjects.size() == 1
+    g.subjects.size() == 1
+
+    when:
+    def (result, error) = managedSubjectService.finalize(inv, 'usert', 'insecurepw', 'insecurepw', '0413123456')
+    inv.refresh()
+
+    then:
+    !result
+    error == "The invitation code that is attempting to be claimed is invalid"
+  }
+
   def 'ensure failed finalize for ManagedSubject with non matching password'() {
     setup:
     def o = Organization.build()
     def g = Group.build(organization: o)
-    def ms = ManagedSubject.build(organization:o, group:g)
+    def ms = ManagedSubject.build(organization:o, group:g, login:null)
     def inv = ManagedSubjectInvitation.build(managedSubject: ms)
 
     expect:

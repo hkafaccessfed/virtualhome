@@ -24,6 +24,10 @@ class UrlMappings {
       controller="finalization"
       action="used"
     }
+    "/myaccount/setup/error" {
+      controller="finalization"
+      action="error"
+    }
     "/myaccount/setup/$inviteCode" {
       controller="finalization"
     }

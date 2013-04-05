@@ -35,13 +35,13 @@ class FinalizationControllerSpec  extends spock.lang.Specification {
     controller.metaClass.getSubject = { subject }
   }
 
-  def 'ensure invalid invitation instance gives 500 response'() {
+  def 'ensure invalid invitation instance gives error response'() {
     when:
     params.inviteCode = "invalidcode"
     controller.index()
 
     then:
-    response.status == 500
+    response.redirectedUrl == "/finalization/error"
   }
 
   def 'ensure utilised invitation redirects to used action'() {
@@ -102,13 +102,13 @@ class FinalizationControllerSpec  extends spock.lang.Specification {
     controller.response.contentAsString == "true"
   }
 
-  def 'ensure invalid invitation returns 500 when completing finalization'() {
+  def 'ensure invalid invitation returns error view when completing finalization'() {
     when:
     params.inviteCode = "invalidcode"
     controller.complete()
 
     then:
-    response.status == 500
+    response.redirectedUrl == "/finalization/error"
   }
 
   def 'ensure fault in ManagedSubjectService renders index again for user to fix errors'() {

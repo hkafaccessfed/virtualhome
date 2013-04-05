@@ -34,10 +34,11 @@ class ManagedSubjectService {
   public static final String DEFAULT_ASSURANCE = 'urn:mace:aaf.edu.au:iap:id:1'
 
   def finalize(ManagedSubjectInvitation invitation, String login, String plainPassword, String plainPasswordConfirmation, String mobileNumber) {
-    if(invitation.utilized)
+    def managedSubject = invitation.managedSubject
+
+    if(invitation.utilized || managedSubject.login != null)
       return [false, messageSource.getMessage(INVITATION_INVALID, [] as Object[], INVITATION_INVALID, LocaleContextHolder.locale)]
 
-    def managedSubject = invitation.managedSubject
     managedSubject.login = login
     managedSubject.plainPassword = plainPassword
     managedSubject.plainPasswordConfirmation = plainPasswordConfirmation
@@ -70,6 +71,9 @@ class ManagedSubjectService {
 
       throw new RuntimeException("Failed trying to save $invitation when finalizing $managedSubject")  // Rollback transaction
     }
+
+    // Clean up any unused invitations
+    //ManagedSubjectInvitation.findAllWhere(managedSubject:managedSubject, utilized:false)*.delete()
 
     log.info "Finalized the account for $managedSubject - they are now ready to use VHR"
     return [true, managedSubject]

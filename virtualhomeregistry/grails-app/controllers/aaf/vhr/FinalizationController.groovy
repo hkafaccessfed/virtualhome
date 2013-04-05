@@ -12,7 +12,7 @@ class FinalizationController {
 
     if(!invitationInstance) {
       log.error "no such invitation exists"
-      response.sendError 500
+      redirect action: 'error'
       return
     }
 
@@ -42,7 +42,7 @@ class FinalizationController {
 
     if(!invitationInstance) {
       log.error "no such invitation exists"
-      response.sendError 500
+      redirect action: 'error'
       return
     }
 
@@ -55,5 +55,8 @@ class FinalizationController {
   }
 
   def used() {
+  }
+
+  def error() {
   }
 }
