@@ -28,7 +28,7 @@
           </ul>
 
           <br><br>
-          <center><r:img file="loginlogos.png" width="297px" height="304px"/></center>
+          <center><r:img file="loginlogos.png" width="304" height="297"/></center>
         </div>
 
         <div id="loginform" class="span5 offset1">
