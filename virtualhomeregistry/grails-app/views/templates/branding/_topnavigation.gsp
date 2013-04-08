@@ -67,7 +67,7 @@
                     <li><g:link controller="workflowProcess" action="list"><g:message code="branding.nav.admin.workflow.process" /></g:link></li>
                     <li><g:link controller="workflowScript" action="list"><g:message code="branding.nav.admin.workflow.script" /></g:link></li>
                   </ul>
-                <li><g:link controller="adminConsole" action="index"><g:message code="branding.nav.admin.console" /></g:link></li>
+                <li><g:link controller="console" action="index" target="_blank"><g:message code="branding.nav.admin.console" /></g:link></li>
                 <li><g:link controller="adminDashboard" action="environment"><g:message code="branding.nav.admin.environment" /></g:link></li>
               </ul>
             </li>
