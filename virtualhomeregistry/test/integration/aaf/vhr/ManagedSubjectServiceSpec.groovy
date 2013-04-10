@@ -7,6 +7,7 @@ import grails.plugin.spock.*
 import com.icegreen.greenmail.util.*
 
 import aaf.base.admin.EmailTemplate
+import aaf.base.identity.Permission
 import javax.mail.Message
 
 import groovy.time.TimeCategory
@@ -17,13 +18,13 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
   def greenMail
   def cryptoService
 
-  @Shared def grailsApplication
-  @Shared def subject
-  @Shared def role
+  def grailsApplication
+  def subject
+  def role
 
-  def setupSpec() {
+  def setup() {
     role = new aaf.base.identity.Role(name:'allsubjects')
-    subject = new aaf.base.identity.Subject(principal:'http://idp.test.com/entity!http://sp.test.com/entity!1234', cn:'test subject', email:'testsubject@test.com', sharedToken:'1234sharedtoken')
+    subject = aaf.base.identity.Subject.build(principal:'http://idp.test.com/entity!http://sp.test.com/entity!1234', cn:'test subject', email:'testsubject@test.com', sharedToken:'1234sharedtoken')
     subject.save()
     subject.errors.each { println it }
     
@@ -239,7 +240,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     managedSubject.group == g
   }
 
-  def 'ensure invalid CSV lines are rejected correctly'() {
+  def 'ensure invalid CSV lines are rejected correctly (no admin rights)'() {
     setup:
     def o = Organization.build()
     def g = Group.build(organization: o)
@@ -252,6 +253,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
 
     then:
     !result
+    println errors
     errors.size() == expectedErrorCount
     linesProcessed == expectedLinesProcessed
     subjects == null
@@ -264,6 +266,39 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     1 | 2 | "Mr Test User,testuser@testdomain.com,staff,0\nTest User,testuser@testdomain.com,staff,0"
     3 | 3 | "Test User,testuser@testdomain.com,staff,0\nMr Test User,testuser@testdomain.com,staff,rubbish\nTest User,testuser@testdomain.com,staff,"
     3 | 3 | "Test,testuser@testdomain.com,staff,\nMr Test User,testuser@testdomain.com,staff,hello\nTest User,testuser@testdomain.com,staff,0"
+    2 | 3 | "Test User,testuser@testdomain.com,staff,rubbish\nTest User,testuser@testdomain.com,staff,0\nTest User2,testuser2@testdomain.com,staff,0,testuser2,password"
+  }
+
+  def 'ensure invalid CSV lines are rejected correctly (admin rights)'() {
+    setup:
+    def o = Organization.build()
+    def g = Group.build(organization: o)
+
+    subject.permissions = []
+    subject.permissions.add(Permission.build(target:"app:administrator"))
+
+    expect:
+    ManagedSubject.count() == 0
+
+    when:
+    def (result, errors, subjects, linesProcessed) = managedSubjectService.registerFromCSV(g, csv.bytes)
+
+    then:
+    !result
+
+    errors.size() == expectedErrorCount
+    linesProcessed == expectedLinesProcessed
+    subjects == null
+
+    ManagedSubject.count() == 0
+
+    where:
+    expectedErrorCount | expectedLinesProcessed | csv
+    1 | 2 | "Test User,testuser@testdomain.com,staff,rubbish,username,password\nTest User,testuser@testdomain.com,staff,0"
+    1 | 2 | "Mr Test User,testuser@testdomain.com,staff,0\nTest User,testuser@testdomain.com,staff,0"
+    3 | 3 | "Test User,testuser@testdomain.com,staff,0,password\nMr Test User2,testuser@testdomain.com,staff,rubbish,username\nTest User,testuser@testdomain.com,staff,"
+    4 | 3 | "Test,testuser@testdomain.com,staff,\nMr Test User3,testuser@testdomain.com,staff,hello,,password\nTest User,testuser@testdomain.com,staff,0"
+    1 | 3 | "Test User,testuser@testdomain.com,staff,rubbish\nTest User,testuser@testdomain.com,staff,0\nTest User2,testuser2@testdomain.com,staff,0,testuser2,password"
   }
 
   def 'ensure CSV lines cause account conflicts are rejected correctly'() {
@@ -288,6 +323,33 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
 
     subjects[0].hasErrors()
     !subjects[1].hasErrors()
+  }
+
+  def 'ensure CSV lines for admin with invalid password are rejected correctly'() {
+    setup:
+    def o = Organization.build()
+    def g = Group.build(organization: o)
+
+    String csv = "Test User,testuser@testdomain.com,member,0,username,password\nTest User2,testuser2@testdomain.com,staff,12,username2,password2"
+
+    subject.permissions = []
+    subject.permissions.add(Permission.build(target:"app:administrator"))
+
+    when:
+    def (result, errors, subjects, linesProcessed) = managedSubjectService.registerFromCSV(g, csv.bytes)
+
+    then:
+    !result
+    ManagedSubject.count() == 0
+    errors.size() == 0
+    subjects.size() == 2
+    linesProcessed == 2
+
+    subjects[0].hasErrors()
+    subjects[0].errors['plainPassword']
+
+    subjects[1].hasErrors()
+    subjects[1].errors['plainPassword']
   }
 
   def 'ensure valid CSV creates new ManagedSubject from each line'() {
@@ -351,6 +413,64 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     where:
     expectedErrorCount | expectedLinesProcessed | csv
     0 | 2 | "Test User,testuser@testdomain.com,student,0\nTest User2,testuser2@testdomain.com,staff,12"
+  }
+
+  def 'ensure valid CSV creates new ManagedSubject from each line for admins'() {
+    setup:
+    def o = Organization.build(active:true)
+    def g = Group.build(organization: o, active:true)
+    def et = new EmailTemplate(name:'registered_managed_subject', content: 'This is an email for ${managedSubject.cn} telling them to come and complete registration with code ${invitation.inviteCode}').save()
+    
+    subject.permissions = []
+    subject.permissions.add(Permission.build(target:"app:administrator"))
+
+    expect:
+    ManagedSubject.count() == 0
+    o.subjects == null
+    g.subjects == null
+
+    when:
+    def (result, errors, subjects, linesProcessed) = managedSubjectService.registerFromCSV(g, csv.bytes)
+    o.refresh()
+    g.refresh()
+
+    then:
+    result
+    errors.size() == expectedErrorCount
+    linesProcessed == expectedLinesProcessed
+    subjects.size() == expectedLinesProcessed
+
+    ManagedSubject.count() == expectedLinesProcessed
+    subjects[0].cn == "Test User"
+    subjects[0].email == "testuser@testdomain.com"
+    subjects[0].eduPersonAffiliation == "student"
+    subjects[0].organization == o
+    subjects[0].group == g
+    subjects[0].accountExpires == null
+    subjects[0].login == 'username'
+    cryptoService.verifyPasswordHash('T0day123!', subjects[0])
+    subjects[0].functioning()
+    subjects[0].canLogin()
+
+    subjects[1].cn == "Test User2"
+    subjects[1].email == "testuser2@testdomain.com"
+    subjects[1].eduPersonAffiliation == "staff"
+    subjects[1].organization == o
+    subjects[1].group == g
+    subjects[1].login == 'username2'
+    cryptoService.verifyPasswordHash('T0day456!', subjects[1])
+    subjects[1].functioning()
+    subjects[1].canLogin()
+
+    
+    Date now = new Date()
+    subjects[1].accountExpires.format('yyyy-MM-dd') == use(TimeCategory) {now + 12.months}.format('yyyy-MM-dd')
+    
+    greenMail.getReceivedMessages().length == 0
+
+    where:
+    expectedErrorCount | expectedLinesProcessed | csv
+    0 | 2 | "Test User,testuser@testdomain.com,student,0,username,T0day123!\nTest User2,testuser2@testdomain.com,staff,12,username2,T0day456!"
   }
 
 }

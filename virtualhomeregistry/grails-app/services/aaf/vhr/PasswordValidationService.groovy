@@ -131,7 +131,7 @@ class PasswordValidationService {
         log.info "Password error for ${subject}: $e"
       }
       subject.discard()
-      [false, validator.getMessages(result), subject]
+      [false, validator.getMessages(result)]
     }
   }
 }

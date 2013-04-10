@@ -3,6 +3,8 @@ package aaf.vhr
 import org.springframework.context.i18n.LocaleContextHolder
 import org.apache.commons.validator.EmailValidator
 
+import org.apache.shiro.SecurityUtils
+
 import groovy.time.TimeCategory
 
 import aaf.base.admin.EmailTemplate
@@ -23,6 +25,8 @@ class ManagedSubjectService {
   private final String TOKEN_EMAIL = 'aaf.vhr.managedsubjectservice.registerfromcsv.invalidemail'
   private final String TOKEN_AFFILIATION ='aaf.vhr.managedsubjectservice.registerfromcsv.invalidaffiliation'
   private final String TOKEN_EXPIRY ='aaf.vhr.managedsubjectservice.registerfromcsv.expiry'
+  private final String TOKEN_LOGIN = 'aaf.vhr.managedsubjectservice.registerfromcsv.invalidlogin'
+  private final String TOKEN_PASSWORD = 'aaf.vhr.managedsubjectservice.registerfromcsv.invalidpassword'
 
   private final String TOKEN_EMAIL_SUBJECT ='aaf.vhr.managedsubjectservice.registered.email.subject'
 
@@ -110,7 +114,7 @@ class ManagedSubjectService {
       lc++
 
       // Ensure required pii
-      if(tokens.size() != 4) {
+      if(tokens.size() != 4 && tokens.size() != 6) {
         valid = false
         errors.add(messageSource.getMessage(TOKEN_COUNT, [lc] as Object[], TOKEN_COUNT, LocaleContextHolder.locale))
       } else {
@@ -137,6 +141,26 @@ class ManagedSubjectService {
         if(tokens[3].size() < 1 || !tokens[3].isNumber()){
           valid = false
           errors.add(messageSource.getMessage(TOKEN_EXPIRY, [lc, tokens[2]] as Object[], TOKEN_EXPIRY, LocaleContextHolder.locale))
+        }
+
+        if(tokens.size() == 6) {
+          if(SecurityUtils.subject.isPermitted("app:administrator")) {
+            // Ensure login
+            if(tokens[4].size() < 1){
+              valid = false
+              errors.add(messageSource.getMessage(TOKEN_LOGIN, [lc, tokens[4]] as Object[], TOKEN_LOGIN, LocaleContextHolder.locale))
+            }
+
+            // Ensure password
+            if(tokens[5].size() < 8) {
+              valid = false
+              errors.add(messageSource.getMessage(TOKEN_PASSWORD, [lc, tokens[5]] as Object[], TOKEN_PASSWORD, LocaleContextHolder.locale))
+            }
+          } else {
+            // for non admins report token size error so login/password functionality isn't leaked
+            valid = false
+            errors.add(messageSource.getMessage(TOKEN_COUNT, [lc, tokens[0]] as Object[], TOKEN_COUNT, LocaleContextHolder.locale))
+          }
         }
       }
     }
@@ -171,21 +195,44 @@ class ManagedSubjectService {
         valid = false
       }
 
+      if(tokens.size() == 6) {
+        managedSubject.active = true
+        managedSubject.login = tokens[4]
+        managedSubject.plainPassword = tokens[5]
+        managedSubject.plainPasswordConfirmation = tokens[5]
+
+        if(!managedSubject.validate()) {
+          valid = false
+        }
+
+        def (validPassword, passwordErrors) = passwordValidationService.validate(managedSubject)
+        if(!validPassword) {
+          log.error "Error in password supplied for $managedSubject"
+          valid = false
+        } else {
+          cryptoService.generatePasswordHash(managedSubject)
+        }
+      }
+
       subjects.add(managedSubject)
     }
 
     if(valid) {
       // There is of course a small chance that someone else could create a ManagedSubject
-      // with the same values in the interim but there is minimal chance so we're not
-      // going to go nuts with locks. If it does happen the user will get a 500 and everything gets rolled back
+      // with the same values in the interim but it is unlikely.
       subjects.each { managedSubject ->
         managedSubject = register(managedSubject, false)
         log.info "Created $managedSubject from CSV file submitted by $subject"
       }
 
-      log.info "Created all subjects from CSV file submitted by $subject, emailing welcome messages"
+      log.info "Created all subjects from CSV file submitted by $subject"
       subjects.each { ms ->
-        sendConfirmation(ms)
+        if(!ms.login) {
+          log.info "Email account information and further instructions to $ms"
+          sendConfirmation(ms)
+        } else {
+          log.info "As account $ms has been provided login and password no email details where sent."
+        }
       }
 
       return [true, errors, subjects, lc]
