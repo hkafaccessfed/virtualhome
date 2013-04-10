@@ -37,15 +37,15 @@
   <aaf:lacksPermission target="aaf:administrator">
     <g:if test="${managedSubjectInstance.canMutate()}">
       <g:render template="show_actions_resend"/>
+      <li>
+        <g:link action="edit" id="${managedSubjectInstance.id}"><g:message code="label.editmanagedsubject"/></g:link>
+      </li>
       <g:if test="${managedSubjectInstance.functioning()}">
-        <li>
-          <g:link action="edit" id="${managedSubjectInstance.id}"><g:message code="label.editmanagedsubject"/></g:link>
-        </li>
         <li>
           <g:link action="admincode" id="${managedSubjectInstance.id}"><g:message code="label.generatepasswordresetcode"/></g:link>
         </li>
-        <li class="divider"></li>
       </g:if>
+      <li class="divider"></li>
       <g:render template="show_actions_toggle"/>
     </g:if>
     <g:else>

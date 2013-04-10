@@ -270,10 +270,10 @@
                 <td><g:fieldValue bean="${event}" field="category" /></td>
                 <td><g:fieldValue bean="${event}" field="reason" /></td>
                 <aaf:hasPermission target="app:administrator">
-                  <td><g:link controller="subject" action="show" id="${event.actionedBy?.id}"><g:fieldValue bean="${event}" field="actionedBy.cn" /></g:link></td>
+                  <td><g:link controller="subject" action="show" id="${event?.actionedBy?.id}"><g:fieldValue bean="${event}" field="actionedBy.cn" /></g:link></td>
                 </aaf:hasPermission>
                 <aaf:lacksPermission target="aaf:administrator">
-                  <td><g:fieldValue bean="${event}" field="actionedBy?.cn" /></td>
+                  <td><g:fieldValue bean="${event}" field="actionedBy.cn" /></td>
                 </aaf:lacksPermission>
                 <td>
                   <g:if test="${event.environment}">
