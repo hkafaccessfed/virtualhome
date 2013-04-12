@@ -154,7 +154,6 @@
       </div>
 
       <div id="tab-groups" class="tab-pane">     
-        <h4><g:message code="label.current"/></h4>
         <table class="table table-borderless table-sortable">
           <thead>
             <tr>
@@ -176,35 +175,34 @@
           </tbody>
         </table>
 
-        <hr>
-
-        <h4><g:message code="label.archived"/></h4>
-        <table class="table table-borderless table-sortable">
-          <thead>
-            <tr>
-              <th><g:message code="label.name" /></th> 
-              <th><g:message code="label.description" /></th> 
-              <th><g:message code="label.active" /></th> 
-              <th/>
-            </tr>
-          </thead>
-          <tbody>
-          <g:each in="${organizationInstance.groups.findAll{it.archived}}" status="i" var="groupInstance">
-            <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-              <td>${fieldValue(bean: groupInstance, field: "name")}</td>
-              <td>${fieldValue(bean: groupInstance, field: "description")}</td>
-              <td><g:formatBoolean boolean="${groupInstance?.active}" /></td>
-              <td><g:link action="show" controller="group" id="${groupInstance?.id}" class="btn btn-small"><g:message code="label.view"/></g:link></td>
-            </tr>
-          </g:each>
-          </tbody>
-        </table>
-
+        <g:if test="${organizationInstance.groups.findAll{it.archived}?.size() > 0}">
+          <hr>
+          <h4><g:message code="label.archived"/></h4>
+          <table class="table table-borderless table-sortable">
+            <thead>
+              <tr>
+                <th><g:message code="label.name" /></th> 
+                <th><g:message code="label.description" /></th> 
+                <th><g:message code="label.active" /></th> 
+                <th/>
+              </tr>
+            </thead>
+            <tbody>
+            <g:each in="${organizationInstance.groups.findAll{it.archived}}" status="i" var="groupInstance">
+              <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+                <td>${fieldValue(bean: groupInstance, field: "name")}</td>
+                <td>${fieldValue(bean: groupInstance, field: "description")}</td>
+                <td><g:formatBoolean boolean="${groupInstance?.active}" /></td>
+                <td><g:link action="show" controller="group" id="${groupInstance?.id}" class="btn btn-small"><g:message code="label.view"/></g:link></td>
+              </tr>
+            </g:each>
+            </tbody>
+          </table>
+        </g:if>
       </div>
 
       <aaf:hasPermission target="app:manage:organization:${organizationInstance.id}:manage:administrators">
         <div id="tab-managedsubjects" class="tab-pane">
-          <h4><g:message code="label.current"/></h4>
           <table class="table table-borderless table-sortable">
             <thead>
               <tr>
@@ -230,33 +228,34 @@
             </tbody>
           </table>
 
-          <hr>
-
-          <h4><g:message code="label.archived"/></h4>
-          <table class="table table-borderless table-sortable">
-            <thead>
-              <tr>
-                  <th><g:message code="label.login" /></th> 
-                  <th><g:message code="label.cn" /></th> 
-                  <th><g:message code="label.email" /></th> 
-                  <th/>
-              </tr>
-            </thead>
-            <tbody>
-            <g:each in="${organizationInstance.subjects.findAll{it.archived}}" status="i" var="managedSubjectInstance">
-              <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-                <td>${fieldValue(bean: managedSubjectInstance, field: "login")}</td>
-                <td>${fieldValue(bean: managedSubjectInstance, field: "cn")}</td>
-                <td>${fieldValue(bean: managedSubjectInstance, field: "email")}</td>
-                <td>
-                  <aaf:hasPermission target="app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:show">
-                    <g:link action="show" controller="managedSubject" id="${managedSubjectInstance.id}" class="btn btn-small"><g:message code="label.view"/></g:link>
-                  </aaf:hasPermission>
-                </td>
-              </tr>
-            </g:each>
-            </tbody>
-          </table>
+          <g:if test="${organizationInstance.subjects.findAll{it.archived}?.size() > 0}">
+            <hr>
+            <h4><g:message code="label.archived"/></h4>
+            <table class="table table-borderless table-sortable">
+              <thead>
+                <tr>
+                    <th><g:message code="label.login" /></th> 
+                    <th><g:message code="label.cn" /></th> 
+                    <th><g:message code="label.email" /></th> 
+                    <th/>
+                </tr>
+              </thead>
+              <tbody>
+              <g:each in="${organizationInstance.subjects.findAll{it.archived}}" status="i" var="managedSubjectInstance">
+                <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+                  <td>${fieldValue(bean: managedSubjectInstance, field: "login")}</td>
+                  <td>${fieldValue(bean: managedSubjectInstance, field: "cn")}</td>
+                  <td>${fieldValue(bean: managedSubjectInstance, field: "email")}</td>
+                  <td>
+                    <aaf:hasPermission target="app:manage:organization:${managedSubjectInstance.organization.id}:group:${managedSubjectInstance.group.id}:managedsubject:show">
+                      <g:link action="show" controller="managedSubject" id="${managedSubjectInstance.id}" class="btn btn-small"><g:message code="label.view"/></g:link>
+                    </aaf:hasPermission>
+                  </td>
+                </tr>
+              </g:each>
+              </tbody>
+            </table>
+          </g:if>
         </div>
       </aaf:hasPermission>
 
