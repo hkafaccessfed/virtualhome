@@ -272,8 +272,8 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     def roleTestInstance = Role.build(name:"organization:${organizationTestInstance.id}:administrators")
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> true
 
-    (1..10).each {
-      aaf.base.identity.Subject.build()
+    (1..10).each { i ->
+      aaf.base.identity.Subject.build(sharedToken:"abcd$i", enabled:true)
     }
 
     views['/templates/manageadministrators/_search.gsp'] = "count: \${subjects.size()} role:\${role.id}"
@@ -284,7 +284,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     controller.search()
 
     then:
-    response.text == "count: 11 role:${roleTestInstance.id}"
+    response.text == "count: 10 role:${roleTestInstance.id}"
   }
 
   def 'ensure search returns subjects that arent current admins'() {
@@ -294,7 +294,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     shiroSubject.isPermitted("app:manage:organization:${organizationTestInstance.id}:manage:administrators") >> true
 
     (1..10).each { i ->
-      def subject = aaf.base.identity.Subject.build()
+      aaf.base.identity.Subject.build(sharedToken:"abcd$i", enabled:true)
 
       if(i < 3) {
         roleTestInstance.addToSubjects(subject)
@@ -311,7 +311,7 @@ class ManageAdministratorsControllerSpec extends spock.lang.Specification {
     controller.search()
 
     then:
-    response.text == "count: 9 role:${roleTestInstance.id}"
+    response.text == "count: 10 role:${roleTestInstance.id}"
   }
 
   def 'ensure valid role/permissions required for search'() {

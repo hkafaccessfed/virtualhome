@@ -62,7 +62,6 @@ class BootStrap {
             throw new RuntimeException("Unable to populate initial user registration email template registered_managed_subject")
           }
         }
-
         
         def approved_new_organization = EmailTemplate.findWhere(name:'approved_new_organization') 
         if(!approved_new_organization) {

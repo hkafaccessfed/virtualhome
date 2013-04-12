@@ -1,4 +1,32 @@
-<legend><g:message code="label.addadministrator"/></legend>
+
+<h3>Add via email</h3>
+
+<g:if test="${invited}">
+  <div class="alert alert-success">
+    <strong>Success</strong><br>
+    The invitation was sent successfully via email.
+  </div>
+</g:if>
+
+<p>Invite a new administrator via email. The addresse will be sent an email containing a unique link which when clicked will give them administrative rights.</p>
+
+<g:form controller="manageAdministrators" action="invite" method="post" class="form">
+  <div class="control-group">
+    <label class="control-label" for="email"><g:message code="label.email"/></label>
+    <div class="controls">
+      <g:field type="email" name="email" required=""/>
+    </div>
+  </div>
+
+  <g:hiddenField name="type" value="${type}" />
+  <g:hiddenField name="id" value="${instance?.id}" />
+
+  <a class="invite-administrative-member btn btn-success"><g:message code="label.invite" /></a>
+</g:form>
+
+<hr>
+
+<h3>Add existing account</h3>
 <table class="table table-borderless table-sortable">
   <thead>
     <tr>
@@ -34,3 +62,4 @@
     </g:each>
   </tbody>
 </table>
+

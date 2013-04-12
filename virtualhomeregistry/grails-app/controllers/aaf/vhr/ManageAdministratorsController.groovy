@@ -5,14 +5,16 @@ import aaf.base.identity.Role
 import aaf.base.identity.Subject
 
 class ManageAdministratorsController {
+
+  def roleService
   
   def search() {
     def (role, instance) = validRoleInstance()
     if(role && instance) {
-      def subjects = Subject.list()
+      List subjects = Subject.list()?.findAll {it.sharedToken != null && it.enabled}
 
       if(role.subjects)
-        subjects.removeAll(role.subjects)
+        subjects?.removeAll(role.subjects)
 
       render (template: "/templates/manageadministrators/search", model:[subjects:subjects, role:role, type:params.type, instance:instance])
     }
@@ -35,13 +37,34 @@ class ManageAdministratorsController {
         response.sendError 500
       }
 
-      def subjects = Subject.list()
+      def subjects = Subject.list()?.findAll {it.sharedToken != null && it.enabled}
 
       if(role.subjects)
         subjects.removeAll(role.subjects)
 
       render (template: "/templates/manageadministrators/modifiedadministrators", model:[subjects:subjects, role:role, type:params.type, instance:instance])
     }
+  }
+
+  def invite() {
+    def (role, instance) = validRoleInstance()
+    def redirectTo, targetName
+    switch(params.type) {
+      case "organization":  redirectTo = createLink(controller:'organization', action:'show', id:params.id, absolute:true)
+                            targetName = "the ${instance.displayName} organisation"
+                            break
+      case "group":         redirectTo = createLink(controller:'group', action:'show', id:params.id, absolute:true)
+                            targetName = "the ${instance.name} group of the ${instance.organization.displayName} organisation"
+                            break
+    }
+    roleService.sendInvitation(targetName, params.email, redirectTo, role)
+
+    def subjects = Subject.list()?.findAll {it.sharedToken != null && it.enabled}
+
+    if(role.subjects)
+      subjects.removeAll(role.subjects)
+
+    render (template: "/templates/manageadministrators/modifiedadministrators", model:[invited:true, subjects:subjects, role:role, type:params.type, instance:instance])
   }
 
   def remove() {
@@ -61,7 +84,7 @@ class ManageAdministratorsController {
         response.sendError 500
       }
 
-      def subjects = Subject.list()
+      def subjects = Subject.list()?.findAll {it.sharedToken != null && it.enabled}
 
       if(role.subjects)
         subjects.removeAll(role.subjects)

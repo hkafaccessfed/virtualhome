@@ -45,6 +45,30 @@ $(document).on('click', '.add-administrative-member', function() {
   });
 });
 
+$(document).on('click', '.invite-administrative-member', function() {
+  aaf_base.set_button($(this));
+  var btn = $(this);
+  var form = btn.parent();
+  $.ajax({
+    type: "POST",
+    cache: false,
+    url: form.attr('action'),
+    data: form.serialize(),
+    success: function(res) {
+      var target = $("#administrative-members");
+      target.html(res);
+      aaf_base.applyBehaviourTo(target);
+      target.fadeIn();
+      
+      aaf_base.reset_button(btn);    
+    },
+    error: function (xhr, ajaxOptions, thrownError) {
+      aaf_base.reset_button(btn);
+      aaf_base.popuperror();
+    }
+  });
+});
+
 $(document).on('click', '.remove-administrative-member', function() {
   aaf_base.set_button($(this));
   var btn = $(this);
