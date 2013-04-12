@@ -1,0 +1,32 @@
+      <filter>
+        <filter-name>VhrFilter</filter-name>
+        <filter-class>aaf.vhr.idp.http.VhrFilter</filter-class>
+        <init-param>
+          <param-name>loginEndpoint</param-name>
+          <param-value><!-- https://VHR server address -->/login?ssourl=%s&amp;relyingparty=%s</param-value>
+        </init-param>
+        <init-param>
+          <param-name>apiServer</param-name>
+          <param-value><!-- https://VHR server address--></param-value>
+        </init-param>
+        <init-param>
+          <param-name>apiEndpoint</param-name>
+          <param-value>/api/v1/login/confirmsession/%s</param-value>
+        </init-param>
+        <init-param>
+          <param-name>apiToken</param-name>
+          <param-value><!-- FR API Subject --></param-value>
+        </init-param>
+        <init-param>
+          <param-name>apiSecret</param-name>
+          <param-value><!-- FR API Subject --></param-value>
+        </init-param>
+        <init-param>
+          <param-name>requestingHost</param-name>
+          <param-value><!-- local IP --></param-value>
+        </init-param>
+      </filter>
+      <filter-mapping>
+        <filter-name>VhrFilter</filter-name>
+        <url-pattern>/Authn/RemoteUser</url-pattern>
+      </filter-mapping>
