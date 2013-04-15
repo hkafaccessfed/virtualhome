@@ -1,4 +1,12 @@
 <h4><g:message code="label.coreattributes"/></h4>
+<div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'login', 'error')}">
+  <label class="control-label" for="login"><g:message code="label.username"/></label>
+  <div class="controls">
+    <g:textField name="login" required="" value="${managedSubjectInstance?.login}"/>
+    <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.managedsubject.login')}"><i class="icon icon-question-sign"></i></a>
+  </div>
+</div>
+
 <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'cn', 'error')}">
   <label class="control-label" for="cn"><g:message code="label.cn"/></label>
   <div class="controls">

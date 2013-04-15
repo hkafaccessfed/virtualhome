@@ -183,7 +183,7 @@ class ManagedSubjectController {
         return
       }
 
-      bindData(managedSubjectInstance, params, [include: ['cn', 'email', 'eduPersonAssurance', 'displayName', 'accountExpires', 
+      bindData(managedSubjectInstance, params, [include: ['login', 'cn', 'email', 'eduPersonAssurance', 'displayName', 'accountExpires', 
                                                           'givenName', 'surname', 'mobileNumber', 'telephoneNumber', 'postalAddress', 
                                                           'organizationalUnit']])
 
