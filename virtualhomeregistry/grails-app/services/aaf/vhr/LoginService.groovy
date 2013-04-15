@@ -31,17 +31,17 @@ class LoginService implements InitializingBean{
     loginCache.getIfPresent(sessionID)
   }
 
-  def webLogin(ManagedSubject managedSubjectInstance, String password, def request, def session, def params, boolean forceCaptcha) {
+  def webLogin(ManagedSubject managedSubjectInstance, String password, def request, def session, def params) {
     if(!managedSubjectInstance.canLogin()) {
       log.error "The ManagedSubject $managedSubjectInstance can not login at this time due to inactivty or locks"
       return [false, null]
     }
 
-    if( (forceCaptcha || managedSubjectInstance.requiresLoginCaptcha()) && !recaptchaService.verifyAnswer(session, request.getRemoteAddr(), params)) {
+    if( managedSubjectInstance.requiresLoginCaptcha() && !recaptchaService.verifyAnswer(session, request.getRemoteAddr(), params)) {
       String reason = "Recaptcha failed to verify user supplied captcha data as valid."
       String requestDetails = createRequestDetails(request)
 
-      managedSubjectInstance.failLogin(reason, 'login_attempt', requestDetails, null)
+      managedSubjectInstance.failCaptcha(reason, 'login_attempt', requestDetails, null)
 
       log.error "The recaptcha data supplied for ManagedSubject $managedSubjectInstance is not correct"
       return [false, null]

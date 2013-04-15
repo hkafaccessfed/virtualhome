@@ -9,7 +9,6 @@ import aaf.vhr.MigrateController
 
 class LoginController {
 
-  final String ATTEMPT_COUNT = "aaf.vhr.LoginController.ATTEMPT_COUNT"
   final String INVALID_USER = "aaf.vhr.LoginController.INVALID_USER"
   final String CURRENT_USER = "aaf.vhr.LoginController.CURRENT_USER"
   final String SSO_URL = "aaf.vhr.LoginController.SSO_URL"
@@ -28,11 +27,10 @@ class LoginController {
       }
     }
 
-    def attempts = session.getAttribute(ATTEMPT_COUNT) ?:0
     if(session.getAttribute(INVALID_USER)) {
       log.debug "INVALID_USER is true indicating invalid username being supplied. Rendering default login screen."
       session.removeAttribute(INVALID_USER)
-      return [loginError:true, requiresChallenge:attempts > grailsApplication.config.aaf.vhr.login.require_captcha_after_tries]
+      return [loginError:true, requiresChallenge:false]
     }
 
     if(session.getAttribute(CURRENT_USER)) {
@@ -40,7 +38,7 @@ class LoginController {
       if(managedSubjectInstance) {
         log.debug "CURRENT_USER is set indicating previous failure. Rendering default login screen."
         session.removeAttribute(CURRENT_USER)
-        return [loginError:true, requiresChallenge:(attempts > grailsApplication.config.aaf.vhr.login.require_captcha_after_tries || managedSubjectInstance.requiresLoginCaptcha())]
+        return [loginError:true, requiresChallenge:managedSubjectInstance.requiresLoginCaptcha()]
       }
     }
   }
@@ -60,10 +58,6 @@ class LoginController {
       return
     }
 
-    def attempts = session.getAttribute(ATTEMPT_COUNT) ?:0
-    attempts++
-    session.setAttribute(ATTEMPT_COUNT, attempts)
-
     def managedSubjectInstance = ManagedSubject.findWhere(login: username)
     if(!managedSubjectInstance) {
       log.error "No ManagedSubject represented by $username"
@@ -72,9 +66,7 @@ class LoginController {
       return
     }
 
-    int require_captcha_after_tries = grailsApplication.config.aaf.vhr.login.require_captcha_after_tries
-
-    def (loggedIn, sessionID) = loginService.webLogin(managedSubjectInstance, password, request, session, params, (attempts > require_captcha_after_tries))
+    def (loggedIn, sessionID) = loginService.webLogin(managedSubjectInstance, password, request, session, params)
 
     if(!loggedIn) {
       log.info "LoginService indicates failure for attempted login by $managedSubjectInstance"
@@ -95,7 +87,6 @@ class LoginController {
 
     session.removeAttribute(INVALID_USER)
     session.removeAttribute(CURRENT_USER)
-    session.removeAttribute(ATTEMPT_COUNT)
     session.removeAttribute(SSO_URL)
 
     redirect url: redirectURL

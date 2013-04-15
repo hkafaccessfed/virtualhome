@@ -780,13 +780,31 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
     ms.requiresLoginCaptcha() == requires
 
     where:
-    fails << [0,1,2,10]
+    fails << [0,1,3,10]
     requires << [false, false, true, true]
+  }
+
+  def 'ensure failCaptcha behaves correctly'() {
+    setup:
+    def s = ManagedSubject.build(failedLogins:1, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
+    s.organization.active = true
+
+    expect:
+    s.active
+    s.canLogin()
+
+    when:
+    s.failCaptcha("reason", "category", "environment", null)
+
+    then:
+    s.active
+    s.failedLogins == 1
+    s.stateChanges.toArray()[0].event == StateChangeType.FAILCAPTCHA
   }
 
   def 'ensure failLogin increments correctly'() {
     setup:
-    def s = ManagedSubject.build(failedLogins:1, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
+    def s = ManagedSubject.build(failedLogins:2, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
     s.organization.active = true
 
     expect:
@@ -799,7 +817,7 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
 
     then:
     s.active
-    s.failedLogins == 2
+    s.failedLogins == 3
     s.requiresLoginCaptcha()
     s.stateChanges.toArray()[0].event == StateChangeType.FAILLOGIN
   }

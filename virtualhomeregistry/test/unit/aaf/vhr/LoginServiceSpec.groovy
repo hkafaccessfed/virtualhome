@@ -57,30 +57,9 @@ class LoginServiceSpec extends spock.lang.Specification {
     ms.active = false
 
     when:
-    def (outcome, sessionID) = service.webLogin(ms, 'password', request, session, params, false)
+    def (outcome, sessionID) = service.webLogin(ms, 'password', request, session, params)
 
     then:
-    !outcome
-    sessionID == null
-  }
-
-  def 'Force Captcha requires captcha input'() {
-    setup:
-    def request = Mock(javax.servlet.http.HttpServletRequest)
-    def session = Mock(javax.servlet.http.HttpSession)
-    def params = [:]
-    ms.active = true
-    ms.organization.active = true
-
-    expect:
-    !ms.requiresLoginCaptcha()
-
-    when:
-    def (outcome, sessionID) = service.webLogin(ms, 'password', request, session, params, true)
-
-    then:
-    1 * recaptchaService.verifyAnswer(_,_,_) >> false
-
     !outcome
     sessionID == null
   }
@@ -98,7 +77,7 @@ class LoginServiceSpec extends spock.lang.Specification {
     ms.requiresLoginCaptcha()
 
     when:
-    def (outcome, sessionID) = service.webLogin(ms, 'password', request, session, params, false)
+    def (outcome, sessionID) = service.webLogin(ms, 'password', request, session, params)
 
     then:
     1 * recaptchaService.verifyAnswer(_,_,_) >> false
@@ -122,7 +101,7 @@ class LoginServiceSpec extends spock.lang.Specification {
     service.loginCache.size() == 0
 
     when:
-    def (outcome, sessionID) = service.webLogin(ms, 'password', request, session, params, false)
+    def (outcome, sessionID) = service.webLogin(ms, 'password', request, session, params)
 
     then:
     1 * cryptoService.verifyPasswordHash(_,_,) >> false
@@ -150,7 +129,7 @@ class LoginServiceSpec extends spock.lang.Specification {
     service.loginCache.size() == 0
 
     when:
-    def (outcome, sessionID) = service.webLogin(ms, 'password', request, session, params, false)
+    def (outcome, sessionID) = service.webLogin(ms, 'password', request, session, params)
 
     then:
     1 * cryptoService.verifyPasswordHash(_,_,) >> true
@@ -162,19 +141,5 @@ class LoginServiceSpec extends spock.lang.Specification {
     ms.stateChanges.toArray()[0].reason == "User supplied valid username and verified password at login prompt."
     service.loginCache.size() == 1
   }
-
-
-/* Takes to long to run - enable if you need it for some specific reason
-  def 'ensure content is auto expired in loginCache'() {
-    setup:
-    service.loginCache.put('abcd1234', 'testuser')
-
-    when:
-    sleep(2 * 60 * 1000 + 10)
-
-    then:
-    service.loginCache.getIfPresent('abcd1234') == null
-  }
-*/
 
 }

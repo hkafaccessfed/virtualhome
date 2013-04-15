@@ -153,7 +153,7 @@ class ManagedSubject {
   }
 
   public boolean requiresLoginCaptcha() {
-    this.failedLogins >= 2
+    this.failedLogins > 2
   }
 
   public boolean functioning() {
@@ -302,6 +302,19 @@ class ManagedSubject {
         log.error it
       }
       throw new RuntimeException ("Unable to save $this when setting deactive state")
+    }
+  }
+
+  public failCaptcha(String reason, String category, String environment, Subject actionedBy) {
+    def change = new StateChange(event:StateChangeType.FAILCAPTCHA, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
+    this.addToStateChanges(change)
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when setting failCaptcha state"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when setting failCaptcha state")
     }
   }
 

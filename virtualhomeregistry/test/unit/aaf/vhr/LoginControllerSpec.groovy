@@ -44,12 +44,9 @@ class LoginControllerSpec extends spock.lang.Specification {
     response.status == 200
   }
 
-  def "invalid user sets loginError and requiresChallenge"() {
+  def "invalid user sets loginError"() {
     setup:
-    grailsApplication.config.aaf.vhr.login.require_captcha_after_tries = 2
-
     session.setAttribute(controller.SSO_URL, "http://test.com")
-    session.setAttribute(controller.ATTEMPT_COUNT, 3)
     session.setAttribute(controller.INVALID_USER, true)
   
     when:
@@ -59,17 +56,14 @@ class LoginControllerSpec extends spock.lang.Specification {
     response.status == 200
     session.getAttribute(controller.INVALID_USER) == null
     model.loginError
-    model.requiresChallenge
+    !model.requiresChallenge
   }
 
   def "current user sets loginError"() {
     setup:
-    grailsApplication.config.aaf.vhr.login.require_captcha_after_tries = 3
-
     def ms = ManagedSubject.build()
 
     session.setAttribute(controller.SSO_URL, "http://test.com")
-    session.setAttribute(controller.ATTEMPT_COUNT, 2)
     session.setAttribute(controller.CURRENT_USER, ms.id)
   
     when:
@@ -95,21 +89,6 @@ class LoginControllerSpec extends spock.lang.Specification {
     session.getAttribute(MigrateController.MIGRATION_USER) == 'username'
   }
 
-  def "login increments attempt count regardless of username etc"() {
-    setup:
-    def ds = DeprecatedSubject.build(login:'username', migrated:true)
-
-    session.setAttribute(controller.SSO_URL, "http://test.com")
-    session.setAttribute(controller.ATTEMPT_COUNT, 2)
-  
-    when:
-    controller.login('username', 'passoword')
-
-    then:
-    response.status == 302
-    session.getAttribute(controller.ATTEMPT_COUNT) == 3
-  }
-
   def "login withouth redirectURL redirects to oops"() {
     when:
     controller.login('username', 'password')
@@ -131,12 +110,10 @@ class LoginControllerSpec extends spock.lang.Specification {
     response.redirectedUrl == "/login/index"
   }
 
-  def "failed login redirects to index and if attempts breaks count recaptcha is enforced"() {
+  def "failed login redirects to index"() {
     setup:
     session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
     def loginService = Mock(aaf.vhr.LoginService)
-    grailsApplication.config.aaf.vhr.login.require_captcha_after_tries = 3
-    session.setAttribute(controller.ATTEMPT_COUNT, 4)
 
     def ms = ManagedSubject.build(active:true, failedLogins: 0)
     ms.organization.active = true
@@ -147,28 +124,7 @@ class LoginControllerSpec extends spock.lang.Specification {
     controller.login(ms.login, 'password')
 
     then:
-    1 * loginService.webLogin(ms, _, _, _, _, true as Boolean) >> [false, null]
-    response.redirectedUrl == "/login/index"
-    session.getAttribute(controller.CURRENT_USER) == ms.id
-  }
-
-  def "failed login redirects to index and if attempts is less then count recaptcha is not enforced"() {
-    setup:
-    session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
-    def loginService = Mock(aaf.vhr.LoginService)
-    grailsApplication.config.aaf.vhr.login.require_captcha_after_tries = 3
-    session.setAttribute(controller.ATTEMPT_COUNT, 1)
-
-    def ms = ManagedSubject.build(active:true, failedLogins: 0)
-    ms.organization.active = true
-
-    controller.loginService = loginService
-
-    when:
-    controller.login(ms.login, 'password')
-
-    then:
-    1 * loginService.webLogin(ms, _, _, _, _, false as Boolean) >> [false, null]
+    1 * loginService.webLogin(ms, _, _, _, _) >> [false, null]
     response.redirectedUrl == "/login/index"
     session.getAttribute(controller.CURRENT_USER) == ms.id
   }
@@ -177,11 +133,9 @@ class LoginControllerSpec extends spock.lang.Specification {
     setup:
     session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
     def loginService = Mock(aaf.vhr.LoginService)
-    grailsApplication.config.aaf.vhr.login.require_captcha_after_tries = 3
     grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
     grailsApplication.config.aaf.vhr.login.ssl_only_cookie = true
-    session.setAttribute(controller.ATTEMPT_COUNT, 0)
-
+    
     def ms = ManagedSubject.build(active:true, failedLogins: 0)
     ms.organization.active = true
 
@@ -191,7 +145,7 @@ class LoginControllerSpec extends spock.lang.Specification {
     controller.login(ms.login, 'password')
 
     then:
-    1 * loginService.webLogin(ms, _, _, _, _, false as Boolean) >> [true, 'abcd']
+    1 * loginService.webLogin(ms, _, _, _, _) >> [true, 'abcd']
     response.redirectedUrl == "https://idp.test.com/shibboleth-idp/authn"
     response.cookies[0].maxAge == 1 * 60
     response.cookies[0].secure
@@ -201,11 +155,9 @@ class LoginControllerSpec extends spock.lang.Specification {
     setup:
     session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
     def loginService = Mock(aaf.vhr.LoginService)
-    grailsApplication.config.aaf.vhr.login.require_captcha_after_tries = 3
     grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
     grailsApplication.config.aaf.vhr.login.ssl_only_cookie = false
-    session.setAttribute(controller.ATTEMPT_COUNT, 0)
-
+    
     def ms = ManagedSubject.build(active:true, failedLogins: 0)
     ms.organization.active = true
 
@@ -215,7 +167,7 @@ class LoginControllerSpec extends spock.lang.Specification {
     controller.login(ms.login, 'password')
 
     then:
-    1 * loginService.webLogin(ms, _, _, _, _, false as Boolean) >> [true, 'abcd']
+    1 * loginService.webLogin(ms, _, _, _, _) >> [true, 'abcd']
     response.redirectedUrl == "https://idp.test.com/shibboleth-idp/authn"
     response.cookies[0].maxAge == 1 * 60
     !response.cookies[0].secure
