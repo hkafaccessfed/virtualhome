@@ -28,7 +28,7 @@
     <label class="control-label" for="description"><g:message encodeAs='HTML' code="label.description"/></label>
     <div class="controls">
       <g:textArea name="description" cols="40" rows="5" maxlength="2000" value="${organizationInstance?.description}"/>
-      <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.organization.description')}"><i class="icon icon-question-sign"></i></a>
+      <a href="#" rel="tooltip" title="${g.message(encodeAs:'HTML', code:'help.inline.aaf.vhr.organization.description')}"><i class="icon icon-question-sign"></i></a>
     </div>
   </div>
 
@@ -36,7 +36,7 @@
     <label class="control-label" for="orgScope"><g:message encodeAs='HTML' code="label.scope"/></label>
     <div class="controls">
       <g:textField name="orgScope" value="${organizationInstance?.orgScope}"/>
-      <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.organization.scope')}"><i class="icon icon-question-sign"></i></a>
+      <a href="#" rel="tooltip" title="${g.message(encodeAs:'HTML', code:'help.inline.aaf.vhr.organization.scope')}"><i class="icon icon-question-sign"></i></a>
     </div>
   </div>
 
