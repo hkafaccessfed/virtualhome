@@ -72,6 +72,7 @@ class LoginService implements InitializingBean{
   private String createRequestDetails(def request) {
 """User Agent: ${request.getHeader('User-Agent')}
 Remote Host: ${request.getRemoteHost()}
-Remote IP: ${request.getRemoteAddr()}"""
+Remote IP: ${request.getRemoteAddr()}
+URI: ${request.requestURI}"""
   }
 }

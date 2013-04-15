@@ -89,13 +89,13 @@
             <ul class="muted">
               <li><g:link controller="account" action="index">I'd like to view my account and <strong>get support contact details</strong></g:link></li>
               <li><g:link controller="lostPassword" action="start">I've lost my password</g:link></li>
-              <li><a href="http://support.aaf.edu.au/categories/20072053-end-users-and-researchers">I need an account</a></li>
+              <li><a href="http://support.aaf.edu.au/entries/22539753-I-m-collaborating-with-an-Institution-how-do-I-get-access-to-an-AAF-VH-account-">I need an account</a></li>
             </ul>
           </div>
         </div>
       </div>
 
-      <r:script type="text/javascript">
+    <r:script type="text/javascript">
       $(function () {
         extend_media_queries();
         $("#username").focus();

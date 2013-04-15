@@ -18,6 +18,14 @@
 
     <g:render template="/templates/flash" plugin="aafApplicationBase"/>
 
+    <g:if test="${!managedSubjectInstance.canLogin()}">
+      <div class="alert alert-warning">
+        <h3>Account unable to access AAF services</h3>
+        <p>Your account has been restricted and is currently unable to be used to access AAF services.</p>
+        <p>Please contact one of the administrators shown in the table <strong>Assistance with your account</strong> below for help in re-enabling your access.</p>
+      </div>
+    </g:if>
+
     <h3 class="muted">Your current account details <small style="font-size:0.5em;"><g:link action="logout">(This isn't me)</g:link></small></h3>
         
     <div class="row">
@@ -126,9 +134,9 @@
       </div>
     </div>
 
-    <h3 class="muted">Changing your account details</h3>
+    <h3 class="muted">Assistance with your account</h3>
     <p>You can <g:link action="changepassword">change your password</g:link> using this website.</p>
-    <p>In order to change your other details please contact one of the administrators of your account as shown below.</p>
+    <p>For all other queries relating to your account please contact one of the administrators of your account as shown below.</p>
 
     <g:render template="/templates/accountadministrators"/>
   </body>

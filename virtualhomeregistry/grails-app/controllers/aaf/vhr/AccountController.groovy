@@ -11,10 +11,39 @@ class AccountController {
 
   final CURRENT_USER = "aaf.vhr.AccountController.CURRENT_USER"
 
+  def loginService
   def cryptoService
   def passwordValidationService
 
   def index() { 
+  }
+
+  def login(String username, String password) {
+    def managedSubjectInstance = ManagedSubject.findWhere(login: username)
+
+    if(!managedSubjectInstance) {
+      log.error "No such ManagedSubject for $params.login"
+      
+      flash.type = 'error'
+      flash.message = 'controllers.aaf.vhr.account.login.error'
+      render view: 'index', model:[loginError:true]
+
+      return
+    }
+
+    def (loggedIn, sessionID) = loginService.webLogin(managedSubjectInstance, password, request, session, params)
+
+    if(!loggedIn) {
+      log.info "LoginService indicates failure for attempted login by $managedSubjectInstance to myaccount"
+      session.setAttribute(CURRENT_USER, managedSubjectInstance.id)
+      render view:'index', model:[loginError:true, requiresChallenge:managedSubjectInstance.requiresLoginCaptcha()]
+      return
+    }
+
+    log.info "LoginService indicates success for login by ${managedSubjectInstance} to myaccount. Established sessionID of $sessionID"
+    session.setAttribute(CURRENT_USER, managedSubjectInstance.id)
+
+    redirect action:'show'
   }
 
   def logout() {
@@ -26,34 +55,8 @@ class AccountController {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
 
     if(!managedSubjectInstance) {
-      if(!params.login) {
-        redirect action:'index'
-        return
-      }
-
-      managedSubjectInstance = ManagedSubject.findWhere(login: params.login)
-
-      if(!managedSubjectInstance || !managedSubjectInstance.hash) {
-        log.error "No such ManagedSubject for $params.login or password is not populated"
-        
-        flash.type = 'error'
-        flash.message = 'controllers.aaf.vhr.account.login.error'
-        render view: 'index'
-
-        return
-      }
-
-      if(!cryptoService.verifyPasswordHash(params.plainPassword, managedSubjectInstance)) {
-        log.error "Password invalid for $managedSubjectInstance"
-        
-        flash.type = 'error'
-        flash.message = 'controllers.aaf.vhr.account.login.password.error'
-        render view: 'index'
-
-        return
-      }
-
-      session.setAttribute(CURRENT_USER, managedSubjectInstance.id)
+      redirect action:'index'
+      return
     }
 
     flash.clear()
@@ -119,5 +122,11 @@ class AccountController {
     flash.type = 'success'
     flash.message = 'controllers.aaf.vhr.account.completepasswordchange.new.password.success'
     redirect action: 'show'
+  }
+
+  private String createRequestDetails(def request) {
+"""User Agent: ${request.getHeader('User-Agent')}
+Remote Host: ${request.getRemoteHost()}
+Remote IP: ${request.getRemoteAddr()}"""
   }
 }

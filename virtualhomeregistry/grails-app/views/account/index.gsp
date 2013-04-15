@@ -6,45 +6,78 @@
   </head>
   <body>
 
-    <h2 class="muted">Hello! <small>To view your account please provide your username and password below</small></h2>
+    <div class="row">
+      <div class="span6">
+        <h2 class="muted">My Account</h2>
 
-    <g:render template="/templates/flash" plugin="aafApplicationBase"/>
+        <p>Welcome to the AAF Virtual Home account management portal.</p>
+        <p>By logging in here you'll be able to:</p>
+        <ul>
+          <li>View your account details to assist with maintenance of your personal information;</li>
+          <li>Manage your password; and</li>
+          <li>Get details of who to contact for support with your account.</li>
+        </ul>
+      </div>
 
-    <g:form action="show" class="form-horizontal myaccount form-validating">
-      <div class="control-group">
-        <label class="control-label" for="login">Username</label>
-        <div class="controls">
-          <div class="span5">
-            <input class="required span5" name="login" id="login" type="text" autofocus="autofocus" autocomplete="off">
-          </div>
-          <div class="span4">
-            <span class="help-block">
-              <p>Please enter the username you selected when setting up your account.</p>
-            </span>
-          </div>
+      <div class="span6">
+        <div class="well well-small">            
+          <g:if test="${loginError}">
+            <div class="alert alert-block alert-error login-error">
+              <p><strong>Unable to validate account or password</strong>.</p>
+              <p>Please try again or use the account help links below.</p>
+            </div>
+          </g:if>
+
+          <g:form action="login" method="post" class="form form-login form-validating">
+            <h2>Login <span class="service-name"></span></h2>
+            <fieldset>
+              <div class="control-group">
+                <label class="control-label" for="username">Username</label>
+                <div class="controls">
+                  <input id="username" name="username" type="text" autofocus="autofocus" class="required"/>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="password">Password</label>
+                <div class="controls">
+                  <input id="password" name="password" type="password" class="required"/>
+                </div>
+              </div>
+              
+              <g:if test="${requiresChallenge}">
+                <div class="control-group">
+                  <label class="control-label" for="password">Challenge Response</label>
+                  <div class="controls">
+                    <recaptcha:ifEnabled>
+                      <recaptcha:recaptcha theme="white" class="required"/>
+                    </recaptcha:ifEnabled>
+                    <p class="">
+                      <small>
+                        Due to repeated errors please provide the above
+                        challenge response answers <strong>in addition to your username and password</strong>
+                        so we can validate your account.
+                      </small>
+                    </p>
+                  </div>
+                  
+                </div>
+                <br>
+              </g:if>
+
+              <button type="submit" value="Login" class="btn btn-large btn-info">Login</button>
+            
+            </fieldset>
+          </g:form>
+
+          <h4 class="muted">How else can we help?</h4>
+          <ul class="muted">
+            <li><g:link controller="lostPassword" action="start">I've lost my password</g:link></li>
+            <li><a href="http://support.aaf.edu.au/entries/22539753-I-m-collaborating-with-an-Institution-how-do-I-get-access-to-an-AAF-VH-account-">I need an account</a></li>
+          </ul>
         </div>
       </div>
-
-      <hr>
-
-      <div class="control-group">
-        <label class="control-label" for="plainPassword">Password</label><br>
-        <div class="controls">
-          <div class="span5">
-            <input class="span5 required" id="plainPassword" name="plainPassword" type="password" autocomplete="off">
-          </div>
-          <div class="span4">
-            <span class="help-block">
-              <p>Please ensure you keep your password secure, you should not share it with anyone.</p>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn btn-info btn-large"><i class="icon-user icon-white"></i> Show me my account</button>
-      </div>
-    </g:form>
+    </div>
 
   </body>
 </html>

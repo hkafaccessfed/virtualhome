@@ -20,6 +20,40 @@ class AccountControllerSpec extends spock.lang.Specification {
     true
   }
 
+  def "failed login renders to index"() {
+    setup:
+    def loginService = Mock(aaf.vhr.LoginService)
+
+    def ms = ManagedSubject.build(active:true, failedLogins: 0)
+    ms.organization.active = true
+
+    controller.loginService = loginService
+
+    when:
+    controller.login(ms.login, 'password')
+
+    then:
+    1 * loginService.webLogin(ms, _, _, _, _) >> [false, null]
+    view == '/account/index'
+  }
+
+  def "successful login redirect to show"() {
+    setup:
+    def loginService = Mock(aaf.vhr.LoginService)
+
+    def ms = ManagedSubject.build(active:true, failedLogins: 0)
+    ms.organization.active = true
+
+    controller.loginService = loginService
+
+    when:
+    controller.login(ms.login, 'password')
+
+    then:
+    1 * loginService.webLogin(ms, _, _, _, _) >> [true, ms]
+    response.redirectedUrl == "/account/show"
+  }
+
   def 'ensure logout invalidate session'() {
     setup:
     session.setAttribute('test', 'value')
@@ -35,66 +69,12 @@ class AccountControllerSpec extends spock.lang.Specification {
     response.redirectedUrl == "/dashboard/welcome"
   }
 
-  def 'show without session ManagedSubjectInstance or params.login throws to index'(){
+  def 'show without session ManagedSubjectInstance directs to index'(){
     when:
     controller.show()
 
     then:
     response.redirectedUrl == "/account/index"
-  }
-
-  def 'show without session ManagedSubjectInstance and invalid login value renders index'() {
-    setup:
-    params.login = 'invalidlogin'
-
-    when:
-    controller.show()
-
-    then:
-    view == '/account/index'
-    flash.type == 'error'
-    flash.message == 'controllers.aaf.vhr.account.login.error'
-  }
-
-  def 'show with valid login value checks password and renders index on failure'() {
-    setup:
-    def cryptoService = Mock(aaf.vhr.CryptoService)
-
-    def managedSubjectTestInstance = ManagedSubject.build(login:'validlogin', hash:'E9mF0hd97Y6Z0h8TkySUz69wmxlUU8IZOlQrVDLkSm09XmxBBhbnojdxUEkh')
-    params.login = 'validlogin'
-    params.plainPassword = 'password'
-
-    controller.cryptoService = cryptoService
-
-    when:
-    controller.show()
-
-    then:
-    1 * cryptoService.verifyPasswordHash(_ as String, _ as ManagedSubject) >>> false
-
-    view == '/account/index'
-    flash.type == 'error'
-    flash.message == 'controllers.aaf.vhr.account.login.password.error'
-  }
-
-  def 'show with valid login value checks password and renders view, stores object in session on success'() {
-    setup:
-    def cryptoService = Mock(aaf.vhr.CryptoService)
-
-    def managedSubjectTestInstance = ManagedSubject.build(login:'validlogin', hash:'E9mF0+d97Y6Z0+8TkySUz69wmxlUU8IZOlQrVDLkSm09XmxBB+bnojdxUEkh')
-    params.login = 'validlogin'
-    params.plainPassword = 'password'
-
-    controller.cryptoService = cryptoService
-
-    when:
-    def model = controller.show()
-
-    then:
-    1 * cryptoService.verifyPasswordHash(_ as String, _ as ManagedSubject) >>> true
-    response.status == 200
-    model.managedSubjectInstance == managedSubjectTestInstance
-    session.getAttribute(controller.CURRENT_USER) == managedSubjectTestInstance.id
   }
 
   def 'show with exisiting session stored subject renders view'() {
@@ -180,8 +160,8 @@ class AccountControllerSpec extends spock.lang.Specification {
     params.plainPassword = 'newpassword'
     params.plainPasswordConfirmation = 'newpassword'
 
-    controller.cryptoService = cryptoService
     controller.passwordValidationService = passwordValidationService
+    controller.cryptoService = cryptoService
 
     when:
     controller.completepasswordchange()

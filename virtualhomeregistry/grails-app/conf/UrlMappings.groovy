@@ -35,6 +35,10 @@ class UrlMappings {
       controller="account"
       action="index"
     }
+    "/myaccount/login" {
+      controller="account"
+      action="login"
+    }
     "/myaccount/logout" {
       controller="account"
       action="logout"
