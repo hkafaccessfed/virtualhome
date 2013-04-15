@@ -16,7 +16,7 @@
     <g:render template="/templates/errors_bean" model="['bean':managedSubjectInstance]" plugin="aafApplicationBase"/>
 
     <h2><g:message code="views.aaf.vhr.managedsubject.create.heading" args="${[managedSubjectInstance.group.name]}"/></h2>
-    
+    <g:render template="reminder"/>
     <g:form action="save" class="form-validating form-horizontal">
       <g:render template="form"/>
       <div class="form-actions">

@@ -44,7 +44,7 @@
     </g:if>
 
     <h2><g:message code="views.aaf.vhr.managedsubject.createcsv.heading" args="${[groupInstance.name]}"/></h2>
-
+    <g:render template="reminder"/>
     <p>
       <g:message code="views.aaf.vhr.managedsubject.createcsv.description"/>
     </p>
