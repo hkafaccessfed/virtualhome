@@ -67,7 +67,7 @@
 
 
         <div class="form-actions">
-          <p class="text-muted"><i class="icon-info-sign"></i> <strong>Intensive cryptography coming up!! Your browser will take a few seconds to talk with VHR after you click, there is no need to refresh.</strong></p>
+          <p class="text-muted"><i class="icon-info-sign"></i> <strong>Intensive cryptography coming up!! Your browser will take a few seconds to talk with the AAF Virtual Home after you click, there is no need to refresh.</strong></p>
 
           <button type="submit" class="btn btn-info btn-large"><i class="icon-user icon-white"></i> Finalise your account</button>
           
