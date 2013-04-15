@@ -2,10 +2,10 @@
   <table class="table table-borderless">
     <thead>
       <tr>
-        <th><g:message code="label.name" /></th>
-        <th><g:message code="label.email" /></th>
+        <th><g:message encodeAs='HTML' code="label.name" /></th>
+        <th><g:message encodeAs='HTML' code="label.email" /></th>
         <aaf:hasPermission target="app:administrator">
-          <th><g:message code="label.sharedtoken" /></th>
+          <th><g:message encodeAs='HTML' code="label.sharedtoken" /></th>
         </aaf:hasPermission>
         <th/>
       </tr>
@@ -21,12 +21,12 @@
           <td class="pull-right">         
             <g:form controller="manageAdministrators" action="remove" method="post">
               <aaf:hasPermission target="app:administrator">
-                <g:link controller="subject" action="show" id="${subject.id}" class="btn btn-small"><g:message code="label.view" /></g:link>
+                <g:link controller="subject" action="show" id="${subject.id}" class="btn btn-small"><g:message encodeAs='HTML' code="label.view" /></g:link>
               </aaf:hasPermission>
               <g:hiddenField name="type" value="${type}" />
               <g:hiddenField name="id" value="${instance?.id}" />
               <g:hiddenField name="subjectID" value="${subject.id}" />
-              <a class="remove-administrative-member btn btn-small btn-danger"><g:message code="label.remove"/></a>
+              <a class="remove-administrative-member btn btn-small btn-danger"><g:message encodeAs='HTML' code="label.remove"/></a>
             </g:form>
           </td>
         </tr>
@@ -36,10 +36,10 @@
 </g:if>
 <g:else>
   <g:if test="${type == 'group'}">
-    <p class="alert alert-info"><g:message code="templates.aaf.vhr.manageadministrators.group.role.members.none" args="[createLink(controller:'organization', action:'show', id:instance.organization.id, absolute:true, fragment:'tab-administrators'), instance.organization.displayName]"/></p>
+    <p class="alert alert-info"><g:message encodeAs='HTML' code="templates.aaf.vhr.manageadministrators.group.role.members.none" args="[createLink(controller:'organization', action:'show', id:instance.organization.id, absolute:true, fragment:'tab-administrators'), instance.organization.displayName]"/></p>
   </g:if>
   <g:else>
-    <p class="alert alert-info"><g:message code="templates.aaf.vhr.manageadministrators.role.members.none"/></p>
+    <p class="alert alert-info"><g:message encodeAs='HTML' code="templates.aaf.vhr.manageadministrators.role.members.none"/></p>
   </g:else>
 </g:else>
 

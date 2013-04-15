@@ -2,8 +2,8 @@
 <table class="table table-borderless">
   <thead>
     <tr>
-      <th><g:message code="label.name" /></th>
-      <th><g:message code="label.email" /></th>
+      <th><g:message encodeAs='HTML' code="label.name" /></th>
+      <th><g:message encodeAs='HTML' code="label.email" /></th>
     </tr>
   </thead>
   <tbody>
@@ -20,8 +20,8 @@
 <table class="table table-borderless">
   <thead>
     <tr>
-      <th><g:message code="label.name" /></th>
-      <th><g:message code="label.email" /></th>
+      <th><g:message encodeAs='HTML' code="label.name" /></th>
+      <th><g:message encodeAs='HTML' code="label.email" /></th>
     </tr>
   </thead>
   <tbody>

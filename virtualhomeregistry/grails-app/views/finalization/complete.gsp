@@ -17,30 +17,30 @@
         <table class="table table-borderless">
         <tbody>
 
-          <tr><td colspan="2"><h4><g:message code="label.coreattributes"/></h4></tr></td>
+          <tr><td colspan="2"><h4><g:message encodeAs='HTML' code="label.coreattributes"/></h4></tr></td>
           
           <tr>
-            <th class="span4"><span id="cn-label"><strong><g:message code="label.cn" /></strong></span></th>
+            <th class="span4"><span id="cn-label"><strong><g:message encodeAs='HTML' code="label.cn" /></strong></span></th>
             <td><span aria-labelledby="cn-label"><g:fieldValue bean="${managedSubjectInstance}" field="cn"/></span></td>
           </tr>
         
           <tr>
-            <th class="span4"><span id="email-label"><strong><g:message code="label.email" /></strong></span></th>
+            <th class="span4"><span id="email-label"><strong><g:message encodeAs='HTML' code="label.email" /></strong></span></th>
             <td><span aria-labelledby="email-label"><g:fieldValue bean="${managedSubjectInstance}" field="email"/></span></td>
           </tr>
         
           <tr>
-            <th class="span4"><span id="edupersonassurance-label"><strong><g:message code="label.edupersonassurance" /></strong></span></th>
+            <th class="span4"><span id="edupersonassurance-label"><strong><g:message encodeAs='HTML' code="label.edupersonassurance" /></strong></span></th>
             <td><span aria-labelledby="edupersonassurance-label"><g:fieldValue bean="${managedSubjectInstance}" field="eduPersonAssurance"/></span></td>
           </tr>
         
           <tr>
-            <th class="span4"><span id="edupersonaffiliation-label"><strong><g:message code="label.edupersonaffiliation" /></strong></span></th>
+            <th class="span4"><span id="edupersonaffiliation-label"><strong><g:message encodeAs='HTML' code="label.edupersonaffiliation" /></strong></span></th>
             <td><span aria-labelledby="edupersonaffiliation-label"><g:fieldValue bean="${managedSubjectInstance}" field="eduPersonAffiliation"/></span></td>
           </tr>
 
           <tr>
-            <th class="span4"><span id="displayname-label"><strong><g:message code="label.displayname" /></strong></span></th>
+            <th class="span4"><span id="displayname-label"><strong><g:message encodeAs='HTML' code="label.displayname" /></strong></span></th>
             <td><span aria-labelledby="displayname-label"><g:fieldValue bean="${managedSubjectInstance}" field="displayName"/></span></td>
           </tr>
         </tbody>
@@ -50,35 +50,35 @@
       <div class="span5 offset2">
         <table class="table table-borderless">
         <tbody>
-          <tr><td colspan="2"><h4><g:message code="label.optionalattributes"/></h4></tr></td>
+          <tr><td colspan="2"><h4><g:message encodeAs='HTML' code="label.optionalattributes"/></h4></tr></td>
 
           <tr>
-            <th class="span4"><span id="givenname-label"><strong><g:message code="label.givenname" /></strong></span></th>
+            <th class="span4"><span id="givenname-label"><strong><g:message encodeAs='HTML' code="label.givenname" /></strong></span></th>
             <td><span aria-labelledby="givenname-label"><g:fieldValue bean="${managedSubjectInstance}" field="givenName"/></span>
           </tr>
         
           <tr>
-            <th class="span4"><span id="surname-label"><strong><g:message code="label.surname" /></strong></span></th>
+            <th class="span4"><span id="surname-label"><strong><g:message encodeAs='HTML' code="label.surname" /></strong></span></th>
             <td><span aria-labelledby="surname-label"><g:fieldValue bean="${managedSubjectInstance}" field="surname"/></span>
           </tr>
         
           <tr>
-            <th class="span4"><span id="telephonenumber-label"><strong><g:message code="label.telephonenumber" /></strong></span></th>
+            <th class="span4"><span id="telephonenumber-label"><strong><g:message encodeAs='HTML' code="label.telephonenumber" /></strong></span></th>
             <td><span aria-labelledby="telephonenumber-label"><g:fieldValue bean="${managedSubjectInstance}" field="telephoneNumber"/></span>
           </tr>
 
           <tr>
-            <th class="span4"><span id="mobilenumber-label"><strong><g:message code="label.mobilenumber" /></strong></span></th>
+            <th class="span4"><span id="mobilenumber-label"><strong><g:message encodeAs='HTML' code="label.mobilenumber" /></strong></span></th>
             <td><span aria-labelledby="mobilenumber-label"><g:fieldValue bean="${managedSubjectInstance}" field="mobileNumber"/></span>
           </tr>
         
           <tr>
-            <th class="span4"><span id="postaladdress-label"><strong><g:message code="label.postaladdress" /></strong></span></th>
+            <th class="span4"><span id="postaladdress-label"><strong><g:message encodeAs='HTML' code="label.postaladdress" /></strong></span></th>
             <td><span aria-labelledby="postaladdress-label"><g:fieldValue bean="${managedSubjectInstance}" field="postalAddress"/></span>
           </tr>
         
           <tr>
-            <th class="span4"><span id="organizationalunit-label"><strong><g:message code="label.organizationalunit" /></strong></span></th>
+            <th class="span4"><span id="organizationalunit-label"><strong><g:message encodeAs='HTML' code="label.organizationalunit" /></strong></span></th>
             <td><span aria-labelledby="organizationalunit-label"><g:fieldValue bean="${managedSubjectInstance}" field="organizationalUnit"/></span>
           </tr>
 

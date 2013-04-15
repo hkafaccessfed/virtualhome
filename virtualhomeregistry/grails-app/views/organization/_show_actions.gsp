@@ -2,10 +2,10 @@
 
   <aaf:hasPermission target="app:administrator">
     <li>
-      <g:link action="createaccount" params='['id':"${organizationInstance.id}"]'><g:message code="label.createmanagedsubject"/></g:link>
+      <g:link action="createaccount" params='['id':"${organizationInstance.id}"]'><g:message encodeAs='HTML' code="label.createmanagedsubject"/></g:link>
     </li>
     <li>
-      <g:link action="create" controller="group" params='['organization.id':"${organizationInstance.id}"]'><g:message code="label.creategroup"/></g:link>
+      <g:link action="create" controller="group" params='['organization.id':"${organizationInstance.id}"]'><g:message encodeAs='HTML' code="label.creategroup"/></g:link>
     </li>
 
     <li class="divider"></li>
@@ -15,7 +15,7 @@
     </li>
     <li class="divider"></li>
     <li>
-      <g:link action="edit" id="${organizationInstance.id}"><g:message code="label.editorganization"/></g:link>
+      <g:link action="edit" id="${organizationInstance.id}"><g:message encodeAs='HTML' code="label.editorganization"/></g:link>
     </li>
     <li>
       <g:render template="show_actions_toggle"/>
@@ -26,10 +26,10 @@
     <li>
       <a href="#" onclick="$(this).next('form').submit();">
         <g:if test="${organizationInstance.archived}">
-          <g:message code="views.aaf.vhr.organization.show.unarchive"/>
+          <g:message encodeAs='HTML' code="views.aaf.vhr.organization.show.unarchive"/>
         </g:if>
         <g:else>
-          <g:message code="views.aaf.vhr.organization.show.archive"/>
+          <g:message encodeAs='HTML' code="views.aaf.vhr.organization.show.archive"/>
         </g:else>
       </a>
       <g:form action="toggleArchive" method="post">
@@ -41,10 +41,10 @@
     <li>
       <a href="#" onclick="$(this).next('form').submit();">
         <g:if test="${organizationInstance.blocked}">
-          <g:message code="views.aaf.vhr.organization.show.unblock"/>
+          <g:message encodeAs='HTML' code="views.aaf.vhr.organization.show.unblock"/>
         </g:if>
         <g:else>
-          <g:message code="views.aaf.vhr.organization.show.block"/>
+          <g:message encodeAs='HTML' code="views.aaf.vhr.organization.show.block"/>
         </g:else>
       </a>
       <g:form action="toggleBlocked" method="post">
@@ -54,7 +54,7 @@
     </li>
     </li>
     <li>
-      <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.organization.confirm.remove')}"><g:message code="label.deleteorganization"/></a>
+      <a href="#" class="delete-ensure" data-confirm="${message(code:'views.aaf.vhr.organization.confirm.remove')}"><g:message encodeAs='HTML' code="label.deleteorganization"/></a>
       <g:form action="delete" method="delete">
         <g:hiddenField name="id" value="${organizationInstance.id}" />
       </g:form>
@@ -64,10 +64,10 @@
   <aaf:lacksPermission target="aaf:administrator">
     <g:if test="${organizationInstance.canMutate()}">
       <li>
-        <g:link action="createaccount" params='['id':"${organizationInstance.id}"]'><g:message code="label.createmanagedsubject"/></g:link>
+        <g:link action="createaccount" params='['id':"${organizationInstance.id}"]'><g:message encodeAs='HTML' code="label.createmanagedsubject"/></g:link>
       </li>
       <li>
-        <g:link action="create" controller="group" params='['organization.id':"${organizationInstance.id}"]'><g:message code="label.creategroup"/></g:link>
+        <g:link action="create" controller="group" params='['organization.id':"${organizationInstance.id}"]'><g:message encodeAs='HTML' code="label.creategroup"/></g:link>
       </li>
       <li class="divider"></li>
       <li>
@@ -75,14 +75,14 @@
       </li>
       <li class="divider"></li>
       <li>
-        <g:link action="edit" id="${organizationInstance.id}"><g:message code="label.editorganization"/></g:link>
+        <g:link action="edit" id="${organizationInstance.id}"><g:message encodeAs='HTML' code="label.editorganization"/></g:link>
       </li>
       <li>
         <g:render template="show_actions_toggle"/>
       </li>
     </g:if>
     <g:else>
-      <li><span class="label label-important" style="margin:6px;"><g:message code="label.noactions"/></span></li>
+      <li><span class="label label-important" style="margin:6px;"><g:message encodeAs='HTML' code="label.noactions"/></span></li>
     </g:else>
   </aaf:lacksPermission>
 

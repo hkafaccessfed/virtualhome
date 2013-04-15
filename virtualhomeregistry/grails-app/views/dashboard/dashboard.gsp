@@ -9,7 +9,7 @@
     <div class="row dashboardrow">
       <div class="span6">
         <div class="well well-small administering">
-          <h2><g:message code="views.aaf.vhr.dashboard.myorganizations"/></h2>
+          <h2><g:message encodeAs='HTML' code="views.aaf.vhr.dashboard.myorganizations"/></h2>
           <g:if test="${organizationInstanceList.sort{it.displayName}}">
             <ul class="unstyled">
             <g:each in="${organizationInstanceList.sort{it.displayName}}" var="org">
@@ -18,16 +18,16 @@
             </ul>
           </g:if>
           <g:else>
-            <p><g:message code="views.aaf.vhr.dashboard.noorganizations"/></p>
+            <p><g:message encodeAs='HTML' code="views.aaf.vhr.dashboard.noorganizations"/></p>
           </g:else>
           <br>
-          <div class="view-all"><g:link controller="organization" action="list" class="btn btn-small btn-info"><g:message code="views.aaf.vhr.dashboard.organizations.view"/></g:link></div>
+          <div class="view-all"><g:link controller="organization" action="list" class="btn btn-small btn-info"><g:message encodeAs='HTML' code="views.aaf.vhr.dashboard.organizations.view"/></g:link></div>
         </div>
       </div>
 
       <div class="span6">
         <div class="well well-small administering">
-          <h2><g:message code="views.aaf.vhr.dashboard.mygroups"/></h2>
+          <h2><g:message encodeAs='HTML' code="views.aaf.vhr.dashboard.mygroups"/></h2>
           <g:if test="${groupInstanceList}">
             
             <g:each in="${groupInstanceList.sort{it.key}}" var="entry">
@@ -41,11 +41,11 @@
             
           </g:if>
           <g:else>
-            <p><g:message code="views.aaf.vhr.dashboard.nogroups"/></p>
+            <p><g:message encodeAs='HTML' code="views.aaf.vhr.dashboard.nogroups"/></p>
           </g:else>
           <aaf:hasPermission target="app:administrator">
             <br>
-            <div class="view-all"><g:link controller="group" action="list" class="btn btn-small btn-info"><g:message code="views.aaf.vhr.dashboard.groups.view"/></g:link></div>
+            <div class="view-all"><g:link controller="group" action="list" class="btn btn-small btn-info"><g:message encodeAs='HTML' code="views.aaf.vhr.dashboard.groups.view"/></g:link></div>
           </aaf:hasPermission>
         </div>
       </div>
@@ -53,25 +53,25 @@
 
     <hr>
 
-    <h2><g:message code="views.aaf.vhr.dashboard.statistics.heading"/></h2>
+    <h2><g:message encodeAs='HTML' code="views.aaf.vhr.dashboard.statistics.heading"/></h2>
     <div class="row">
       <div class="span4">
         <div class="well well-small statistic">
-          <h3><g:message code="views.aaf.vhr.dashboard.total.organizations"/></h3>
+          <h3><g:message encodeAs='HTML' code="views.aaf.vhr.dashboard.total.organizations"/></h3>
           <hr>
           <span class="lead">${statistics.organizations}</span>
         </div>
       </div>
       <div class="span4">
         <div class="well well-small statistic">
-          <h3><g:message code="views.aaf.vhr.dashboard.total.groups"/></h3>
+          <h3><g:message encodeAs='HTML' code="views.aaf.vhr.dashboard.total.groups"/></h3>
           <hr>
           <span class="lead">${statistics.groups}</span>
         </div>
       </div>
       <div class="span4">
         <div class="well well-small statistic">
-          <h3><g:message code="views.aaf.vhr.dashboard.total.managedsubjects"/></h3>
+          <h3><g:message encodeAs='HTML' code="views.aaf.vhr.dashboard.total.managedsubjects"/></h3>
           <hr>
           <span class="lead">${statistics.managedSubjects}</span>
         </div>
@@ -80,8 +80,8 @@
 
     <div class="row content-spacer">
       <div class="span12">
-        <h3><g:message code="views.aaf.vhr.dashboard.vhr.sessions"/></h3>
-        <p><g:message code="views.aaf.vhr.dashboard.vhr.sessions.detail"/></p>
+        <h3><g:message encodeAs='HTML' code="views.aaf.vhr.dashboard.vhr.sessions"/></h3>
+        <p><g:message encodeAs='HTML' code="views.aaf.vhr.dashboard.vhr.sessions.detail"/></p>
         <div id="sessionschart">
         </div>    
       </div>

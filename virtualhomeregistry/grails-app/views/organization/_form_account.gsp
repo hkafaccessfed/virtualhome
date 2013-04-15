@@ -3,7 +3,7 @@
 
   <g:hiddenField name="eduPersonAssurance" value='urn:mace:aaf.edu.au:iap:id:1' />
 
-  <h4><g:message code="label.group"/></h4>
+  <h4><g:message encodeAs='HTML' code="label.group"/></h4>
   <div class="control-group">
     <div class="controls">
       <g:select name="group.id"

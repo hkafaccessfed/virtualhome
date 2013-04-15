@@ -49,7 +49,7 @@
       <div class="form-actions">
         <p class="text-muted"><i class="icon-info-sign"></i> <strong>Intensive cryptography coming up!! Your browser will take a few seconds to process the request after you click. There is no need to refresh.</strong></p>
         <button type="submit" class="btn btn-success btn-large">Change Password</button>
-        <g:link action="show" class="btn btn-large"><g:message code="label.cancel"/></g:link>
+        <g:link action="show" class="btn btn-large"><g:message encodeAs='HTML' code="label.cancel"/></g:link>
       </div>
     </g:form>
 

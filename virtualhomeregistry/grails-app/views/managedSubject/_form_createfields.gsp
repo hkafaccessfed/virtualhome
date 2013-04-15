@@ -10,7 +10,7 @@
 </g:if>
 
 <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'cn', 'error')}">
-  <label class="control-label" for="cn"><g:message code="label.cn"/></label>
+  <label class="control-label" for="cn"><g:message encodeAs='HTML' code="label.cn"/></label>
   <div class="controls">
     <g:textField name="cn" required="" value="${managedSubjectInstance?.cn}"/>
     <a href="#" rel="tooltip" title="${g.message(code:'help.inline.aaf.vhr.managedsubject.cn')}"><i class="icon icon-question-sign"></i></a>
@@ -18,7 +18,7 @@
 </div>
 
 <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'email', 'error')}">
-  <label class="control-label" for="email"><g:message code="label.email"/></label>
+  <label class="control-label" for="email"><g:message encodeAs='HTML' code="label.email"/></label>
   <div class="controls">
     <g:field type="email" name="email" required="" value="${managedSubjectInstance?.email}"/>
 
@@ -29,7 +29,7 @@
 <aaf:hasPermission target="app:administrator">
   <g:if test="${actionName != 'create'}">
     <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'sharedToken', 'error')}">
-      <label class="control-label" for="sharedToken"><g:message code="label.sharedtoken"/></label>
+      <label class="control-label" for="sharedToken"><g:message encodeAs='HTML' code="label.sharedtoken"/></label>
       <div class="controls">
         <g:textField name="sharedToken" value="${managedSubjectInstance?.sharedToken}" placeholder="automatically created if blank"/>
 
@@ -40,7 +40,7 @@
 </aaf:hasPermission>
 
 <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'eduPersonAffiliation', 'error')}">
-  <label class="control-label" for="eduPersonAffiliation"><g:message code="label.edupersonaffiliation"/></label>
+  <label class="control-label" for="eduPersonAffiliation"><g:message encodeAs='HTML' code="label.edupersonaffiliation"/></label>
   <div class="controls">
     <g:select name="eduPersonAffiliation" from="${managedSubjectInstance.affiliations}" 
     value="${managedSubjectInstance?.eduPersonAffiliation ?managedSubjectInstance?.eduPersonAffiliation.split(';') as List : 'member'}" 
@@ -51,7 +51,7 @@
 </div>
 
 <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'eduPersonEntitlement', 'error')}">
-  <label class="control-label" for="eduPersonEntitlement"><g:message code="label.edupersonentitlement"/></label>
+  <label class="control-label" for="eduPersonEntitlement"><g:message encodeAs='HTML' code="label.edupersonentitlement"/></label>
   <div class="controls">
     <g:textArea name="eduPersonEntitlement" value="${managedSubjectInstance?.eduPersonEntitlement?.replace(';', '\n')}"
     class="input-xxlarge" rows="10" placeholder="urn:mace:aaf.edu.au:domain.edu.au:registered:delegation"/>
@@ -63,7 +63,7 @@
 
 
 <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'accountExpires', 'error')}">
-  <label class="control-label" for="accountExpires"><g:message code="label.accountexpires"/></label>
+  <label class="control-label" for="accountExpires"><g:message encodeAs='HTML' code="label.accountexpires"/></label>
   <div class="controls">
     <g:checkBox id="wantexpirydate" name="wantexpirydate" value="${managedSubjectInstance.accountExpires ? true:false}" /> <small><strong>set expiry date</strong> (active forever unless expiry date set</small>
     <br><br>
@@ -78,7 +78,7 @@
 
 <g:if test="${actionName == 'edit' || actionName == 'update'}">
   <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'displayName', 'error')}">
-    <label class="control-label" for="displayName"><g:message code="label.displayname"/></label>
+    <label class="control-label" for="displayName"><g:message encodeAs='HTML' code="label.displayname"/></label>
     <div class="controls">
       <g:textField name="displayName" value="${managedSubjectInstance?.displayName}"/>
 
@@ -88,10 +88,10 @@
 
   <hr>
 
-  <h4><g:message code="label.optionalattributes"/></h4>
+  <h4><g:message encodeAs='HTML' code="label.optionalattributes"/></h4>
 
   <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'givenName', 'error')}">
-    <label class="control-label" for="givenName"><g:message code="label.givenname"/></label>
+    <label class="control-label" for="givenName"><g:message encodeAs='HTML' code="label.givenname"/></label>
     <div class="controls">
       <g:textField name="givenName" value="${managedSubjectInstance?.givenName}"/>
 
@@ -100,7 +100,7 @@
   </div>
 
   <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'surname', 'error')}">
-    <label class="control-label" for="surname"><g:message code="label.surname"/></label>
+    <label class="control-label" for="surname"><g:message encodeAs='HTML' code="label.surname"/></label>
     <div class="controls">
       <g:textField name="surname" value="${managedSubjectInstance?.surname}"/>
 
@@ -109,7 +109,7 @@
   </div>
 
   <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'telephoneNumber', 'error')}">
-    <label class="control-label" for="telephoneNumber"><g:message code="label.telephonenumber"/></label>
+    <label class="control-label" for="telephoneNumber"><g:message encodeAs='HTML' code="label.telephonenumber"/></label>
     <div class="controls">
       <g:textField name="telephoneNumber" value="${managedSubjectInstance?.telephoneNumber}"/>
 
@@ -118,7 +118,7 @@
   </div>
 
   <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'mobileNumber', 'error')}">
-    <label class="control-label" for="mobileNumber"><g:message code="label.mobilenumber"/></label>
+    <label class="control-label" for="mobileNumber"><g:message encodeAs='HTML' code="label.mobilenumber"/></label>
     <div class="controls">
       <g:textField name="mobileNumber" value="${managedSubjectInstance?.mobileNumber}"/>
 
@@ -127,7 +127,7 @@
   </div>
 
   <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'postalAddress', 'error')}">
-    <label class="control-label" for="postalAddress"><g:message code="label.postaladdress"/></label>
+    <label class="control-label" for="postalAddress"><g:message encodeAs='HTML' code="label.postaladdress"/></label>
     <div class="controls">
       <g:textField name="postalAddress" value="${managedSubjectInstance?.postalAddress}"/>
 
@@ -136,7 +136,7 @@
   </div>
 
   <div class="control-group ${hasErrors(bean: managedSubjectInstance, field: 'organizationalUnit', 'error')}">
-    <label class="control-label" for="organizationalUnit"><g:message code="label.organizationalunit"/></label>
+    <label class="control-label" for="organizationalUnit"><g:message encodeAs='HTML' code="label.organizationalunit"/></label>
     <div class="controls">
       <g:textField name="organizationalUnit" value="${managedSubjectInstance?.organizationalUnit}"/>
 

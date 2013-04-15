@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><g:message code='branding.application.name'/></title>
+    <title><g:message encodeAs='HTML' code='branding.application.name'/></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="${resource(dir:'images', file:'logo.png')}" />
@@ -29,15 +29,15 @@
 
             <ul class="nav">
               <li>
-                <g:link controller="dashboard" action="welcome"><g:message code="branding.nav.welcome" /></g:link>
+                <g:link controller="dashboard" action="welcome"><g:message encodeAs='HTML' code="branding.nav.welcome" /></g:link>
               </li>
-              <li><a href="http://support.aaf.edu.au" target="_blank"><g:message code="branding.nav.support" /></a></li>
+              <li><a href="http://support.aaf.edu.au" target="_blank"><g:message encodeAs='HTML' code="branding.nav.support" /></a></li>
             </ul>
 
             <g:if test="${managedSubjectInstance}">
               <ul class="nav pull-right">
                 <li>
-                  <g:link action="logout"><g:message code="branding.nav.logout" /></g:link>
+                  <g:link action="logout"><g:message encodeAs='HTML' code="branding.nav.logout" /></g:link>
                 </li>
               </ul>
             </g:if>

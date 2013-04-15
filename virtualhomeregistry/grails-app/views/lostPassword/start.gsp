@@ -47,7 +47,7 @@
           <g:checkBox name="resetcodes" value="${true}" /> Please <strong>reset my security codes</strong> as I've lost them <br/><br/>
         </g:if>
         <button type="submit" class="btn btn-info btn-large">Next</button>
-        <g:link controller="dashboard" action="welcome" class="btn btn-large"><g:message code="label.cancel"/></g:link>
+        <g:link controller="dashboard" action="welcome" class="btn btn-large"><g:message encodeAs='HTML' code="label.cancel"/></g:link>
       </div>
     </g:form>
 

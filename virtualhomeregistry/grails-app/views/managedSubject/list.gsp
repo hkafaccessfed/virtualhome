@@ -5,25 +5,25 @@
   </head>
   <body>
     <ul class="breadcrumb">
-      <li><g:link controller="dashboard"><g:message code="branding.application.name"/></g:link> <span class="divider">/</span></li>
-      <li class="active"><g:message code="branding.nav.breadcrumb.managedsubject"/></li>
+      <li><g:link controller="dashboard"><g:message encodeAs='HTML' code="branding.application.name"/></g:link> <span class="divider">/</span></li>
+      <li class="active"><g:message encodeAs='HTML' code="branding.nav.breadcrumb.managedsubject"/></li>
     </ul>
 
     <g:render template="/templates/flash" plugin="aafApplicationBase"/>
 
-    <h2><g:message code="views.aaf.vhr.managedsubject.list.heading" /></h2>
+    <h2><g:message encodeAs='HTML' code="views.aaf.vhr.managedsubject.list.heading" /></h2>
     
       <table class="table table-borderless table-sortable">
         <thead>
           <tr>
-            <th><g:message code="label.login" /></th> 
-            <th><g:message code="label.cn" /></th> 
-            <th><g:message code="label.email" /></th>
+            <th><g:message encodeAs='HTML' code="label.login" /></th> 
+            <th><g:message encodeAs='HTML' code="label.cn" /></th> 
+            <th><g:message encodeAs='HTML' code="label.email" /></th>
             <aaf:hasPermission target="app:administrator">
-              <th><g:message code="label.sharedtoken" /></th>
+              <th><g:message encodeAs='HTML' code="label.sharedtoken" /></th>
             </aaf:hasPermission>
-            <th><g:message code="label.functioning" /></th> 
-            <th><g:message code="label.group" /></th> 
+            <th><g:message encodeAs='HTML' code="label.functioning" /></th> 
+            <th><g:message encodeAs='HTML' code="label.group" /></th> 
             <th/>
           </tr>
         </thead>
@@ -38,7 +38,7 @@
             </aaf:hasPermission>
             <td><g:formatBoolean boolean="${managedSubjectInstance.functioning()}"/></td>
             <td><g:link action="show" controller="group" id="${managedSubjectInstance.group.id}">${fieldValue(bean: managedSubjectInstance, field: "group.name")}</g:link></td>
-            <td><g:link action="show" id="${managedSubjectInstance.id}" class="btn btn-small"><g:message code="label.view"/></g:link></td>
+            <td><g:link action="show" id="${managedSubjectInstance.id}" class="btn btn-small"><g:message encodeAs='HTML' code="label.view"/></g:link></td>
           </tr>
         </g:each>
         </tbody>

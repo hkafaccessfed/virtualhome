@@ -2,8 +2,8 @@
   <table class="table table-borderless">
     <thead>
       <tr>
-        <th><g:message code="label.name" /></th>
-        <th><g:message code="label.email" /></th>
+        <th><g:message encodeAs='HTML' code="label.name" /></th>
+        <th><g:message encodeAs='HTML' code="label.email" /></th>
       </tr>
     </thead>
     <tbody>
@@ -17,5 +17,5 @@
   </table>
 </g:if>
 <g:else>
-  <p class="alert alert-info"><g:message code="templates.aaf.vhr.manageadministrators.role.members.none"/></p>
+  <p class="alert alert-info"><g:message encodeAs='HTML' code="templates.aaf.vhr.manageadministrators.role.members.none"/></p>
 </g:else>

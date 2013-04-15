@@ -2,10 +2,10 @@
   <li>
     <a href="#" onclick="$(this).next('form').submit();">
       <g:if test="${managedSubjectInstance.active}">
-        <g:message code="views.aaf.vhr.managedsubject.show.deactivate"/>
+        <g:message encodeAs='HTML' code="views.aaf.vhr.managedsubject.show.deactivate"/>
       </g:if>
       <g:else>
-        <g:message code="views.aaf.vhr.managedsubject.show.activate"/>
+        <g:message encodeAs='HTML' code="views.aaf.vhr.managedsubject.show.activate"/>
       </g:else>
     </a>
     <g:form action="toggleActive" method="post">
@@ -18,10 +18,10 @@
 <li>
   <a href="#" onclick="$(this).next('form').submit();">
     <g:if test="${managedSubjectInstance.locked}">
-      <g:message code="views.aaf.vhr.managedsubject.show.admin.unlock"/>
+      <g:message encodeAs='HTML' code="views.aaf.vhr.managedsubject.show.admin.unlock"/>
     </g:if>
     <g:else>
-      <g:message code="views.aaf.vhr.managedsubject.show.admin.lock"/>
+      <g:message encodeAs='HTML' code="views.aaf.vhr.managedsubject.show.admin.lock"/>
     </g:else>
   </a>
   <g:form action="toggleLock" method="post">
@@ -33,10 +33,10 @@
 <li>
   <a href="#" class="archive-ensure" data-confirm="${message(code:'views.aaf.vhr.managedsubject.confirm.archive')}">
     <g:if test="${managedSubjectInstance.archived}">
-      <g:message code="views.aaf.vhr.managedsubject.show.unarchive"/>
+      <g:message encodeAs='HTML' code="views.aaf.vhr.managedsubject.show.unarchive"/>
     </g:if>
     <g:else>
-      <g:message code="views.aaf.vhr.managedsubject.show.archive"/>
+      <g:message encodeAs='HTML' code="views.aaf.vhr.managedsubject.show.archive"/>
     </g:else>
   </a>
   <g:form action="toggleArchive" method="post">

@@ -70,7 +70,7 @@
 
       <div class="form-actions">
         <button type="submit" class="btn btn-success btn-large">Reset Password</button>
-        <g:link controller="dashboard" action="welcome" class="btn btn-large"><g:message code="label.cancel"/></g:link>
+        <g:link controller="dashboard" action="welcome" class="btn btn-large"><g:message encodeAs='HTML' code="label.cancel"/></g:link>
       </div>
     </g:form>
 

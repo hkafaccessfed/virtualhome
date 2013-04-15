@@ -1,9 +1,9 @@
 <a href="#" onclick="$(this).next('form').submit();">
   <g:if test="${organizationInstance.active}">
-    <g:message code="views.aaf.vhr.organization.show.deactivate"/>
+    <g:message encodeAs='HTML' code="views.aaf.vhr.organization.show.deactivate"/>
   </g:if>
   <g:else>
-    <g:message code="views.aaf.vhr.organization.show.activate"/>
+    <g:message encodeAs='HTML' code="views.aaf.vhr.organization.show.activate"/>
   </g:else>
 </a>
 <g:form action="toggleActive" method="post">
