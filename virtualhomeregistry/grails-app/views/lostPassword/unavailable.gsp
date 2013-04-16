@@ -11,7 +11,7 @@
       <p>If you believe your account should be available please <g:link action="start">try again</g:link>.</p>
     </div>
 
-    <p><g:message encodeAs='HTML' code="branding.application.supportdesk"/></p>
+    <p><g:message code="branding.application.supportdesk"/></p>
 
   </body>
 </html>
