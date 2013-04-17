@@ -43,7 +43,7 @@ grails.mime.types = [ html: ['text/html', 'application/xhtml+xml'],
   multipartForm: 'multipart/form-data'
 ]
 
-grails.views.default.codec = "none"
+grails.views.default.codec = "HTML"
 grails.views.gsp.encoding = "UTF-8"
 grails.converters.encoding = "UTF-8"
 
