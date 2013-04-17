@@ -36,7 +36,7 @@
       This URL has terminated cookies associated with a basic Shibboleth IdP session to assist with use of functional testing tools. 
     </p>
     <p>
-      It is not considered to a logout mechanism or officially supported by the Australian Access Federation.
+      It is not considered to be a logout mechanism or officially supported by the Australian Access Federation.
     </p>
   </body>
 </html>
