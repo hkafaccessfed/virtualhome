@@ -19,8 +19,8 @@ if(org) {
     throw new RuntimeException("Attempt to process activate in script organization_approval. Failed due to ${org.displayName} fault on save")
   }
 
-  def emailTemplate = EmailTemplate.findWhere(name:"approved_new_organization")
-  emailManagerService.send('support@aaf.edu.au', "New AAF Virtual Home organization: ${org.displayName}", emailTemplate, [organization:org])
+  // def emailTemplate = EmailTemplate.findWhere(name:"approved_new_organization")
+  // emailManagerService.send('support@example.edu.au', "New Virtual Home organization: ${org.displayName}", emailTemplate, [organization:org])
 
   workflowTaskService.complete(env.taskInstanceID.toLong(), 'organizationactivated')
 }
