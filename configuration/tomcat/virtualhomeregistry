@@ -1,0 +1,31 @@
+# description: VHR Start Stop Restart  
+# processname: tomcat  
+# chkconfig: 3 20 80 
+
+JAVA_HOME=/usr/lib/jvm/jre-1.7.0-openjdk.x86_64 
+export JAVA_HOME  
+PATH=$JAVA_HOME/bin:$PATH  
+export PATH  
+CATALINA_HOME=/opt/virtualhomeregistry/tomcat/current
+  
+export JAVA_OPTS="-server -Xms768m -Xmx1280m -XX:MaxPermSize=512m"
+
+OLDUMASK=`umask`
+umask 003
+
+case $1 in  
+start)  
+su tomcatweb -c $CATALINA_HOME/bin/startup.sh
+umask $OLDUMASK  
+;;   
+stop)     
+su tomcatweb -c $CATALINA_HOME/bin/shutdown.sh
+umask $OLDUMASK  
+;;   
+restart)  
+su tomcatweb -c $CATALINA_HOME/bin/shutdown.sh  
+su tomcatweb -c $CATALINA_HOME/bin/startup.sh
+umask $OLDUMASK  
+;;   
+esac      
+exit 0

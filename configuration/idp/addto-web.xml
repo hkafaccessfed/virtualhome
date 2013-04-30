@@ -15,18 +15,18 @@
         </init-param>
         <init-param>
           <param-name>apiToken</param-name>
-          <param-value><!-- FR API Subject --></param-value>
+          <param-value><!-- API Subject --></param-value>
         </init-param>
         <init-param>
           <param-name>apiSecret</param-name>
-          <param-value><!-- FR API Subject --></param-value>
+          <param-value><!-- API Secret --></param-value>
         </init-param>
         <init-param>
           <param-name>requestingHost</param-name>
-          <param-value><!-- local IP --></param-value>
+          <param-value><!-- VHR SERVER IP --></param-value>
         </init-param>
-      </filter>
-      <filter-mapping>
+       </filter>
+       <filter-mapping>
         <filter-name>VhrFilter</filter-name>
         <url-pattern>/Authn/RemoteUser</url-pattern>
-      </filter-mapping>
+       </filter-mapping>
