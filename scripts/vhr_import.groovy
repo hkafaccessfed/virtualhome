@@ -1,11 +1,11 @@
 import aaf.base.identity.*
 import aaf.vhr.*
-import aaf.vhr.shibboleth.*
 import aaf.vhr.switchch.vho.*
 import grails.converters.*
 import org.codehaus.groovy.grails.web.json.*
 import java.text.SimpleDateFormat
 import java.util.Date
+import groovy.sql.Sql
 
 /*
 Grab JSON data from SWITCH VHO output and populate into FR.
@@ -18,10 +18,14 @@ There is some terribly awful shit in here but I hope to only ever need to use it
 commit = true
 verbose = false
 updateOrgs = false
-mappingFile = "/tmp/old_vho_test_fr_mapping.txt"
-dataFile = "/tmp/old_vho_test.json"
+mappingFile = "/tmp/old_vho_prd_fr_mapping.txt"
+dataFile = "/tmp/old_vho_prd.json"
 
 // Shouldn't need to modify anything below here
+
+dataSource = ctx.dataSource
+sql = new Sql(dataSource)
+
 if(updateOrgs) {
   organizationService = ctx.getBean('organizationService')
   organizationService.populate()
@@ -99,19 +103,8 @@ def createManagedSubject(def s, def group) {
       }
 
       s.storedid.each { sid ->
-        def storedID = new StoredIDConnector()
-        storedID.localEntity = sid.localEntity
-        storedID.peerEntity = sid.peerEntity
-        storedID.persistentId = sid.persistentId
-        storedID.peerProvidedId = sid.peerProvidedId
-        storedID.creationDate = sdf.parse(sid.creationDate)
-        storedID.principalName = managedSubject.login
-        storedID.localId = managedSubject.eptidKey
-
-        if(!storedID.save()) {
-          storedID.errors.each {println it}
-          throw new RuntimeException("Error creating storedID for $managedSubject")
-        }
+        sql.execute('INSERT INTO shibpid (creationDate, localEntity, localId, peerEntity, peerProvidedId, persistentId, principalName) VALUES (?,?,?,?,?,?,?)',
+                    [sdf.parse(sid.creationDate), sid.localEntity, managedSubject.eptidKey, sid.peerEntity, sid.peerProvidedId ?:null, sid.persistentId, managedSubject.login])
       }
     }
     

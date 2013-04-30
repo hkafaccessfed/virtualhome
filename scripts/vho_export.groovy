@@ -13,11 +13,9 @@ There is some terribly awful shit in here but I hope to only ever need to use it
 */
 
 // VHO specific config
-database = 'old_vho_test'
+database = 'old_vho_prd'
 dbusername = 'root'
 dbpassword = ''
-
-discardIntervalMonths = 3
 
 // You shouldn't really have to haxor below here
 sql = Sql.newInstance( "jdbc:mysql://localhost:3306/$database", dbusername, dbpassword, 'com.mysql.jdbc.Driver' )
@@ -73,11 +71,9 @@ def populateSubjectFromUser(def u) {
     subject
 }
 
-def userCount = sql.firstRow( 'select count(*) as total from vho_Users' ).total
-def activeUsers = sql.rows( 'select * from vho_Users where dateExpire > DATE_SUB(now(), INTERVAL ? MONTH) and state = "active"', discardIntervalMonths )
-def activeCount = activeUsers.size()
+def activeUsers = sql.rows( 'select * from vho_Users where state = "active"' )
 
-println "A total of ${userCount - activeCount} of $userCount VHO accounts are disabled (${(userCount - activeCount)/userCount * 100}%), leaving $activeCount to possibly be migrated"
+println "A total of ${activeUsers.size()} to possibly be migrated"
 
 println "\nLets have a look at the quality of our user data..."
 
@@ -115,7 +111,7 @@ activeUsers.eachWithIndex { user, i ->
 activeUsers.removeAll(invalidUsers)
 
 activeCount = activeUsers.size()
-println "\nAfter data validation a total of ${userCount - activeCount} of $userCount VHO accounts are not going to be migrated (${(userCount - activeCount)/userCount * 100}%), leaving $activeCount to be migrated"
+println "A total of ${activeUsers.size()} to be migrated after further clean up"
 
 def groupCount = sql.firstRow( 'select count(*) as total from vho_Groups' ).total
 
