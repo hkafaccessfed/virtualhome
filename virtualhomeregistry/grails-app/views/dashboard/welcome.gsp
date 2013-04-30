@@ -6,7 +6,6 @@
   </head>
   <body>
 
-    
     <div class="hero-unit">
       <h2>Welcome to the AAF Virtual Home</h2>
       <h3>Which best describes you?</h3>

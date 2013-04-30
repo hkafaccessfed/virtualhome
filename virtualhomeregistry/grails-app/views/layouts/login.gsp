@@ -29,6 +29,23 @@
       <g:render template='/templates/branding/header' />
     </header>
 
+    <nav>
+      <div class="container">
+        <div class="navbar">
+          <div class="navbar-inner">
+
+            <ul class="nav">
+              <li>
+                <g:link controller="dashboard" action="welcome"><g:message encodeAs='HTML' code="branding.nav.welcome" /></g:link>
+              </li>
+              <li><a href="http://support.aaf.edu.au" target="_blank"><g:message encodeAs='HTML' code="branding.nav.support" /></a></li>
+            </ul>
+
+          </div>
+        </div>
+      </div>
+    </nav>
+
     <section>
       <div class="container">
         <div class='notifications top-right'></div>

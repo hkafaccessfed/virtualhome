@@ -26,7 +26,7 @@
       </div>
     </g:if>
 
-    <h3 class="muted">Your current account details <small style="font-size:0.5em;"><g:link action="logout">(This isn't me)</g:link></small></h3>
+    <h3 class="muted">Your current account details</h3>
         
     <div class="row">
       <div class="span5">
