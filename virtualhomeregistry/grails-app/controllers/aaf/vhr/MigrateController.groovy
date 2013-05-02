@@ -147,6 +147,11 @@ class MigrateController {
 
   }
 
+  def logout() {
+    session.invalidate()
+    redirect controller:'dashboard', action:'welcome'
+  }
+
   boolean validMigrationUser() {
     if(!session.getAttribute(MigrateController.MIGRATION_USER)) {
       redirect action: 'oops'
