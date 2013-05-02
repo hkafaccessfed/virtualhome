@@ -7,6 +7,7 @@ import org.springframework.context.i18n.LocaleContextHolder
 
 import aaf.base.identity.Role
 import aaf.base.admin.EmailTemplate
+import aaf.vhr.switchch.vho.DeprecatedSubject
 
 class LostPasswordController {
 
@@ -144,6 +145,12 @@ class LostPasswordController {
 
     cryptoService.generatePasswordHash(managedSubjectInstance)
     managedSubjectInstance.successfulLostPassword()
+
+    def deprecatedSubject = DeprecatedSubject.findWhere(login:managedSubjectInstance.login, migrated:false)
+    if(deprecatedSubject) {
+      deprecatedSubject.migrated = true 
+      deprecatedSubject.save()
+    }
 
     session.invalidate()
 

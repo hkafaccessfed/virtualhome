@@ -9,7 +9,7 @@ import spock.lang.*
 import aaf.base.identity.*
 
 @TestFor(aaf.vhr.LostPasswordController)
-@Build([aaf.vhr.Organization, aaf.vhr.Group, aaf.vhr.ManagedSubject, aaf.base.admin.EmailTemplate, aaf.base.identity.Subject, aaf.base.identity.Role])
+@Build([aaf.vhr.Organization, aaf.vhr.Group, aaf.vhr.ManagedSubject, aaf.base.admin.EmailTemplate, aaf.base.identity.Subject, aaf.base.identity.Role, aaf.vhr.switchch.vho.DeprecatedSubject])
 class LostPasswordControllerSpec extends spock.lang.Specification {
 
   def recaptchaService
