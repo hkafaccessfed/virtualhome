@@ -137,7 +137,7 @@ class PasswordValidationServiceSpec extends UnitSpec {
     }
 
     where:
-      val << ['Ab1!deXgh', 'Ab1!password', 'Abraham1!deXgh', 'Ab1!Xylic', 'Ab1!ZEBRA']
+      val << ['Ab1!deXgh', 'Ab1!password', 'DirectoR1!deXgh', 'Ab1!DEaTh', 'Ab1!PEOPLE']
       expected << [true, false, false, false, false]
   }
 
