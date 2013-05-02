@@ -20,9 +20,14 @@
         </p>
 
         <p>
-          <br><br>
-          <g:link controller="login" action="index" class="btn btn-large btn-info"><i class="icon-white icon-globe"></i> Great! - Take me to my service</g:link>
-          <br><small>You'll need to login first, <strong>be sure to use your new password!</strong>.</small>
+          <g:if test="${session.getAttribute('aaf.vhr.LoginController.SSO_URL') != null}">
+            <br><br>
+            <g:link controller="login" action="index" class="btn btn-large btn-info"><i class="icon-white icon-globe"></i> Great! - Take me to my service</g:link>
+            <br><small>You'll need to login first, <strong>be sure to use your new password!</strong>.</small>
+          </g:if>
+          <g:else>
+            You can now access all your favourite services, thanks!.
+          </g:else>
         </p>
       </div>
     </div>

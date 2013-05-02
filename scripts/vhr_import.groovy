@@ -174,32 +174,37 @@ Organization.withTransaction {
             }
             
             org.groups.each { g ->
-                def groupInstance = new Group()
-                groupInstance.name = g.name
-                groupInstance.description = g.description
-                groupInstance.organization = organization
-                organization.addToGroups(groupInstance)
-                
-                if(commit) {
-                  if (!groupInstance.save(flush:true)) {
-                      groupInstance.errors.each { println it }
-                      throw new RuntimeException("Failed adding $groupInstance to $organization") 
-                  }
-                }
-                
-                def groupRole = new Role(name:"group:${groupInstance.id}:administrators", description: "Administrators for the Group ${groupInstance.name} of Organization ${groupInstance.organization.displayName}")
-                def groupPermission = new Permission(type: Permission.wildcardPerm, target: "app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:*", role:groupRole)
-                groupRole.addToPermissions(groupPermission)
+                def groupInstance = Group.findWhere(organization: organization, name:g.name)
 
-                if(commit) {
-                  if(!groupRole.save(flush:true)) {
-                     throw new RuntimeException("Failed adding $groupRole for admin rights to $groupInsteance")
+                if(!groupInstance) {
+                  groupInstance = new Group()
+
+                  groupInstance.name = g.name
+                  groupInstance.description = g.description
+                  groupInstance.organization = organization
+                  organization.addToGroups(groupInstance)
+                  
+                  if(commit) {
+                    if (!groupInstance.save(flush:true)) {
+                        groupInstance.errors.each { println it }
+                        throw new RuntimeException("Failed adding $groupInstance to $organization") 
+                    }
                   }
+                  
+                  def groupRole = new Role(name:"group:${groupInstance.id}:administrators", description: "Administrators for the Group ${groupInstance.name} of Organization ${groupInstance.organization.displayName}")
+                  def groupPermission = new Permission(type: Permission.wildcardPerm, target: "app:manage:organization:${groupInstance.organization.id}:group:${groupInstance.id}:*", role:groupRole)
+                  groupRole.addToPermissions(groupPermission)
+
+                  if(commit) {
+                    if(!groupRole.save(flush:true)) {
+                       throw new RuntimeException("Failed adding $groupRole for admin rights to $groupInsteance")
+                    }
+                  }
+                  
+                  if(verbose)
+                    println "Created group [${groupInstance.id}]${groupInstance.name} in organisation [${organization.id}]${organization.displayName} with administrative role [${groupRole.id}]${groupRole.name}"
                 }
-                
-                if(verbose)
-                  println "Created group [${groupInstance.id}]${groupInstance.name} in organisation [${organization.id}]${organization.displayName} with administrative role [${groupRole.id}]${groupRole.name}"
-                
+
                 g.subjects.each { s ->
                    createManagedSubject(s, groupInstance) 
                 }
