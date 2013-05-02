@@ -14,7 +14,7 @@ class PasswordValidationService {
 
   public PasswordValidationService() {
     def readers = new java.io.Reader[1]
-    readers[0] = new InputStreamReader(getClass().getResourceAsStream('dictionary-web2.txt'))
+    readers[0] = new InputStreamReader(getClass().getResourceAsStream('dictionary-top5000.txt'))
     awl = WordLists.createFromReader(readers, false, new ArraysSort());
 
     msgs = new Properties()
