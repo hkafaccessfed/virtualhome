@@ -55,6 +55,17 @@ class ManagedSubjectService {
     }
 
     cryptoService.generatePasswordHash(managedSubject)
+
+    if(!managedSubject.validate()) {
+      log.warn "Unable to finalize $managedSubject as data is invalid"
+
+      managedSubject.errors.each {
+        log.warn it
+      }
+      
+      return [false, managedSubject]
+    }
+
     managedSubject.active = true
     
     if(!managedSubject.save()) {

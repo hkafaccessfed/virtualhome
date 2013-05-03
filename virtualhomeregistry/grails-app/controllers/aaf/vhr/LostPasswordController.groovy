@@ -152,6 +152,8 @@ class LostPasswordController {
       deprecatedSubject.save()
     }
 
+    log.error "Successful LostPassword reset for $managedSubjectInstance"
+
     session.invalidate()
 
     flash.type = 'success'
