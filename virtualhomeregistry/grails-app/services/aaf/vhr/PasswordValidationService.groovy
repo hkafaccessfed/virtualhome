@@ -123,8 +123,10 @@ class PasswordValidationService {
 
     RuleResult result = validator.validate(passwordData)
 
-    if(result.isValid())
+    if(result.isValid()) {
+      log.info "New password valid for ${subject}"
       [true, null]
+    }
     else {
       validator.getMessages(result).unique().each { e ->
         subject.errors.rejectValue('plainPassword', e)
