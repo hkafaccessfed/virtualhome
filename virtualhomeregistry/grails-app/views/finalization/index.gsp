@@ -59,7 +59,8 @@
                 <p>Please provide your mobile number.</p>
                 <p>We <strong>only use</strong> your mobile number to assist in ensuring security if you forget your password and need to reset it.</p>
                 <p>International numbers are supported. If you're located outside Australia please be sure to add your <a href="http://en.wikipedia.org/wiki/List_of_mobile_phone_number_series_by_country" target="_blank">international prefix</a> to the start of your number.
-                <p>If you elect not to supply your mobile number and forget your password you'll need to manually contact administrators which may take some time to complete preventing your access to AAF connected services in the interim.</p>
+                <p>An example of an internationally formatted mobile number is <strong>+1 555 555 5555</strong> which is valid for numbers in the United States. All international numbers are in the format <em>+[code] [number]</em>.</p>
+                <p>If you elect not to supply your mobile number and forget your password you'll need to contact administrators directly which may take some time to complete preventing your access to AAF connected services in the interim.</p>
               </div>
             </div>
           </div>
