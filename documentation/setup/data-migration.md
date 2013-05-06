@@ -40,7 +40,7 @@ If any organization is **not supplied** an FR mapping all accounts linked to tha
 
 1. Clear the script. Copy and paste scripts/vhr_import.groovy to the window.
 
-1. Modify your mappingFile and dataFile variables according to the files you uploaded from the vho_export process.
+1. Modify your mappingFile and dataFile variables according to the files you uploaded from the vho_export process. Set updateOrgs to true.
 
 1. Execute the script, ensure there are no errors.
 
