@@ -28,8 +28,7 @@ class AccountController {
       return
     }
 
-    def managedSubjectInstance = ManagedSubject.findWhere(login: username)
-
+    def managedSubjectInstance = ManagedSubject.findWhere(login: username, [lock:true])
     if(!managedSubjectInstance) {
       log.error "No such ManagedSubject for $params.login"
       
@@ -94,7 +93,6 @@ class AccountController {
 
   def completepasswordchange() {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
-
     if(!managedSubjectInstance) {
       log.error "A valid session does not already exist to allow completepassworchange to function"
       

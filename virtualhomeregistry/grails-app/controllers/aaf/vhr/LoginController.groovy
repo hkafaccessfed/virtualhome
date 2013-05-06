@@ -58,7 +58,7 @@ class LoginController {
       return
     }
 
-    def managedSubjectInstance = ManagedSubject.findWhere(login: username)
+    def managedSubjectInstance = ManagedSubject.findWhere(login: username, [lock:true])
     if(!managedSubjectInstance) {
       log.error "No ManagedSubject represented by $username"
       session.setAttribute(INVALID_USER, true)
