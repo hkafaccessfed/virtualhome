@@ -1,7 +1,5 @@
 ## Tomcat Setup
 
-Requires: General Setup
-
 Before proceeding be sure to download the latest Apache Tomcat 7.x from http://tomcat.apache.org
 
 **Console commands as ROOT**

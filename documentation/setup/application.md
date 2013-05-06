@@ -1,7 +1,5 @@
 ## Application Setup
 
-Requires: Database Setup, General Web Server Setup, Tomcat Setup
-
 Before proceeding be sure to have compiled the virtualhomeregistry-x.y.z.war file and copied it to your server.
 
 **Console commands as ROOT**
