@@ -10,6 +10,7 @@ import aaf.vhr.crypto.BCrypt
 
 @TestFor(aaf.vhr.CryptoService)
 @Build([ManagedSubject, ChallengeResponse, EmailReset])
+@Mock([Organization, Group, ManagedSubject])
 class CryptoServiceSpec extends UnitSpec {
 
   def cs

@@ -9,6 +9,7 @@ import aaf.vhr.ManagedSubject
 
 @TestFor(aaf.vhr.ManagedSubject)
 @Build([ManagedSubject])
+@Mock([Organization, Group])
 class PasswordValidationServiceSpec extends UnitSpec {
 
   def pv
