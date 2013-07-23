@@ -17,7 +17,7 @@ If you did not request your username please contact support@aaf.edu.au immediate
   If you have also lost your password, you may initiate a password reset using the <strong>Recover your lost password</strong> link on the AAF Virtual Home login page.
 </g:if>
 <g:else>
-  <h5>Your email address was not associated with an account in AAF Virtual Home.</h5>
+  <h5>Your email address is not associated with an account in AAF Virtual Home.</h5>
 
   If you believe this message to be in error, please contact your organisation's IT Support<br><br>
 
