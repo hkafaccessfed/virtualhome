@@ -19,7 +19,7 @@ If you did not request your username please contact support@aaf.edu.au immediate
 <g:else>
   <h5>Your email address is not associated with an account in AAF Virtual Home.</h5>
 
-  If you believe this message to be in error, please contact your organisation's IT Support<br><br>
+  If you believe this message to be in error, please contact your organisation's IT Support.<br><br>
 
-  For further assistance, please contact support@aaf.edu.au
+  For further assistance, please contact support@aaf.edu.au.
 </g:else>
