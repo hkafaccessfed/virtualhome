@@ -26,7 +26,7 @@ If using an existing database you will only need a subset of the instructions pr
     mysql> drop database test;
     mysql> delete from mysql.user where not (host="localhost" and user="root");
     mysql> FLUSH PRIVILEGES;
-    mysql> SET PASSWORD FOR 'root'@'localhost' = PASSWORD('18AkP45!@hlHLtN0xsyFs1SA');
+    mysql> SET PASSWORD FOR 'root'@'localhost' = PASSWORD('SECURE PASSWORD');
     mysql> DELETE FROM mysql.user WHERE User = '';
     mysql> FLUSH PRIVILEGES;
     mysql> CREATE DATABASE virtualhomeregistry DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
