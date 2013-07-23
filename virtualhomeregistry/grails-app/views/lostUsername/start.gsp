@@ -25,6 +25,24 @@
         </div>
       </div>
 
+      <hr>
+
+      <div class="control-group">
+        <label class="control-label" for="plainPassword">Challenge Question</label><br>
+        <div class="controls">
+          <div class="span5">
+            <recaptcha:ifEnabled>
+              <recaptcha:recaptcha theme="white"/>
+            </recaptcha:ifEnabled>
+          </div>
+          <div class="span4">
+            <span class="help-block">
+              <p>Please enter the two words shown at the left so we can ensure you're a real person and not an automated bot.</p>
+            </span>
+          </div>
+        </div>
+      </div>
+
       <div class="form-actions">
         <button type="submit" class="btn btn-info btn-large">Retrieve</button>
         <g:link controller="dashboard" action="welcome" class="btn btn-large"><g:message encodeAs="HTML" code="label.cancel"/></g:link>
