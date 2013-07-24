@@ -297,7 +297,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     1 | 2 | "Test User,testuser@testdomain.com,staff,rubbish,username,password\nTest User,testuser2@testdomain.com,staff,0"
     1 | 2 | "Mr Test User,testuser@testdomain.com,staff,0\nTest User,testuser2@testdomain.com,staff,0"
     3 | 3 | "Test User,testuser@testdomain.com,staff,0,password\nMr Test User2,testuser2@testdomain.com,staff,rubbish,username\nTest User,testuser3@testdomain.com,staff,"
-    4 | 3 | "Test,testuser@testdomain.com,staff,\nMr Test User3,testuser2@testdomain.com,staff,hello,,password\nTest User,testuser3@testdomain.com,staff,0"
+    3 | 3 | "Test,testuser@testdomain.com,staff,\nMr Test User3,testuser2@testdomain.com,staff,hello,,password\nTest User,testuser3@testdomain.com,staff,0"
     1 | 3 | "Test User,testuser@testdomain.com,staff,rubbish\nTest User,testuser2@testdomain.com,staff,0\nTest User2,testuser3@testdomain.com,staff,0,testuser2,password"
   }
 
