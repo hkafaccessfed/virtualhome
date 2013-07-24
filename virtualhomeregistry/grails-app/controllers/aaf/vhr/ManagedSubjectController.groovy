@@ -182,6 +182,7 @@ class ManagedSubjectController {
     if(!SecurityUtils.subject.isPermitted('app:administrator') && managedSubjectInstance.login == null) {
       log.warn "Attempt to do administrative ManagedSubject edit by $subject was denied - not global administrator, and account has not been finalized"
       response.sendError 403
+      return
     }
 
     if(managedSubjectInstance.canMutate()) {
