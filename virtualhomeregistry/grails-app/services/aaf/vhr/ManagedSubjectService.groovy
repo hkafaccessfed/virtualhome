@@ -23,6 +23,7 @@ class ManagedSubjectService {
   private final String TOKEN_COUNT = 'aaf.vhr.managedsubjectservice.registerfromcsv.invalidtokens'
   private final String TOKEN_CN = 'aaf.vhr.managedsubjectservice.registerfromcsv.invalidcn'
   private final String TOKEN_EMAIL = 'aaf.vhr.managedsubjectservice.registerfromcsv.invalidemail'
+  private final String TOKEN_EMAIL_UNIQUENESS = 'aaf.vhr.managedsubjectservice.registerfromcsv.emailconflict'
   private final String TOKEN_AFFILIATION ='aaf.vhr.managedsubjectservice.registerfromcsv.invalidaffiliation'
   private final String TOKEN_EXPIRY ='aaf.vhr.managedsubjectservice.registerfromcsv.expiry'
   private final String TOKEN_LOGIN = 'aaf.vhr.managedsubjectservice.registerfromcsv.invalidlogin'
@@ -120,6 +121,8 @@ class ManagedSubjectService {
 
     def lc = 0
 
+    def reservedEmails = [:]
+
     ByteArrayInputStream is = new ByteArrayInputStream(csv)
     is.eachCsvLine { tokens ->
       lc++
@@ -145,6 +148,13 @@ class ManagedSubjectService {
         if(email.size() < 1 || !emailValidator.isValid(email)) {
           valid = false
           errors.add(messageSource.getMessage(TOKEN_EMAIL, [lc, email] as Object[], TOKEN_EMAIL, LocaleContextHolder.locale))
+        }
+
+        if(reservedEmails.containsKey(email)) {
+          valid = false
+          errors.add(messageSource.getMessage(TOKEN_EMAIL_UNIQUENESS, [lc, email, reservedEmails[email]] as Object[], TOKEN_EMAIL_UNIQUENESS, LocaleContextHolder.locale))
+        } else {
+          reservedEmails[email] = lc
         }
 
         // Ensure affiliation
