@@ -56,21 +56,6 @@ class LostPasswordController {
       return
     }
 
-    // Restart codes if user requests
-    if(params.resetcodes) {
-      managedSubjectInstance.resetCode = null
-      managedSubjectInstance.resetCodeExternal = null
-
-      if(!managedSubjectInstance.save()) {
-        log.error "Unable to save $managedSubjectInstance when resetting password codes"
-        managedSubjectInstance.errors.each {
-          log.error it
-        }
-        redirect action: 'unavailable'
-        return
-      }
-    }
-
     redirect action: 'reset'
   }
 
