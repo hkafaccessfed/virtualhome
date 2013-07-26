@@ -92,6 +92,8 @@ aaf {
     session_warning = 50 
     session_decision_time = 5
 
+    fake_sms = false
+
     // Deployed AAF environment [development | test | production]
     deployment_environment = "development"
 
