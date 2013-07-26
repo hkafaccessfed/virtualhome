@@ -41,7 +41,7 @@ class ManagedSubjectService {
   def finalize(ManagedSubjectInvitation invitation, String login, String plainPassword, String plainPasswordConfirmation, String mobileNumber) {
     def managedSubject = invitation.managedSubject
 
-    if(invitation.utilized || managedSubject.login != null)
+    if(invitation.utilized || managedSubject.finalized)
       return [false, messageSource.getMessage(INVITATION_INVALID, [] as Object[], INVITATION_INVALID, LocaleContextHolder.locale)]
 
     managedSubject.login = login
