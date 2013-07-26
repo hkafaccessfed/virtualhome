@@ -59,6 +59,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     ManagedSubject.count() == 1
     ManagedSubjectInvitation.count() == 1
     !ms.functioning()
+    !ms.finalized
     ms.login == null
     ms.hash == null
     o.subjects.size() == 1
@@ -76,6 +77,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     managedSubject.login == 'usert'
     managedSubject.mobileNumber == '+61413123456'
     cryptoService.verifyPasswordHash('thisisalongpasswordtotest', managedSubject)
+    ms.finalized
     ms.functioning()
   }
 
