@@ -5,6 +5,12 @@
     <r:require modules="pwmask" />
   </head>
   <body>
+    <g:if test="${allowResend}">
+      <div class="alert alert-info">
+        <strong class="lead">Didn't get your codes?</strong> Please allow 5 minutes for messages to be delivered.
+        <g:link action="resend">Click here to try sending them again.</g:link>
+      </div>
+    </g:if>
 
     <h2>Password reset for <g:fieldValue bean="${managedSubjectInstance}" field="cn"/> <small>Please provide the information requested below</small></h2>
 
