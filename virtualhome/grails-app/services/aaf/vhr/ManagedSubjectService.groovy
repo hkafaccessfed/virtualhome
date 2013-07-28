@@ -169,7 +169,7 @@ class ManagedSubjectService {
           errors.add(messageSource.getMessage(TOKEN_EXPIRY, [lc, expiry] as Object[], TOKEN_EXPIRY, LocaleContextHolder.locale))
         }
 
-        if(login || password) {
+        if(login) {
           if(SecurityUtils.subject.isPermitted("app:administrator")) {
             // Ensure login
             if(login && login.size() < 1){
