@@ -157,7 +157,6 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
 
     then:
     !result
-    error == "The invitation code that is attempting to be claimed is invalid"
   }
 
   def 'ensure failed finalize for ManagedSubject that has no unutilized invite'() {
