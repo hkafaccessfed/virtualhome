@@ -11,7 +11,8 @@
       <div class="span12">
         <g:if test="${allowResend}">
           <p>
-            <strong class="muted">Didn't get your codes?</strong> - Your reset codes wil take <strong>up to 5 minutes to be delivered</strong>. In case of congestion this could be longer. <g:link action="resend">Click here to try sending them again.</g:link>
+            <g:message code="views.aaf.vhr.lostpassword.reset.resend.info"/>
+            <g:link action="resend"><g:message code="views.aaf.vhr.lostpassword.reset.resend.link" encodeAs="HTML"/></g:link>
           </p>
         </g:if>
       </div>
