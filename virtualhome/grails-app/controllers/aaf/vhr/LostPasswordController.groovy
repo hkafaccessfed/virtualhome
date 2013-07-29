@@ -82,7 +82,7 @@ class LostPasswordController {
 
     use(TimeCategory) {
       def t = managedSubjectInstance.lastCodeResend
-      if (t && t > 1.minute.ago) {
+      if (t && t > 4.minutes.ago) {
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.lostpassword.resend.error'
       } else {
