@@ -739,7 +739,7 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
 
   def 'ensure canLogin fails if not password set'() {
     setup:
-    def ms = ManagedSubject.build()
+    def ms = ManagedSubject.build(hash: null)
     ms.organization.active = true
 
     when:
