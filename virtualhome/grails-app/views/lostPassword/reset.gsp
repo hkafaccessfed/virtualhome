@@ -5,17 +5,22 @@
     <r:require modules="pwmask" />
   </head>
   <body>
-    <g:if test="${allowResend}">
-      <div class="alert alert-info">
-        <strong class="lead">Didn't get your codes?</strong> Please allow 5 minutes for messages to be delivered.
-        <g:link action="resend">Click here to try sending them again.</g:link>
-      </div>
-    </g:if>
-
     <h2>Password reset for <g:fieldValue bean="${managedSubjectInstance}" field="cn"/> <small>Please provide the information requested below</small></h2>
+
+    <div class="row">
+      <div class="span12">
+        <g:if test="${allowResend}">
+          <p>
+            <strong class="muted">Didn't get your codes?</strong> - Your reset codes wil take <strong>up to 5 minutes to be delivered</strong>. In case of congestion this could be longer. <g:link action="resend">Click here to try sending them again.</g:link>
+          </p>
+        </g:if>
+      </div>
+    </div>
 
     <g:render template="/templates/flash" plugin="aafApplicationBase"/>
     <g:render template="/templates/errors_bean" model="['bean':managedSubjectInstance]" plugin="aafApplicationBase"/>
+
+    <hr>
 
     <g:form action="validatereset" class="form-horizontal myaccount" name="accountform" id="accountform">
 
