@@ -306,7 +306,7 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
     then:
     0 * emailManagerService._
     flash.type == 'error'
-    flash.message =~ /too quickly/
+    flash.message == 'controllers.aaf.vhr.lostpassword.resend.error'
     response.status == 302
   }
 
