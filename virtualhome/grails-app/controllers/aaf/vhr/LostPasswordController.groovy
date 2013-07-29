@@ -84,7 +84,7 @@ class LostPasswordController {
       def t = managedSubjectInstance.lastCodeResend
       if (t && t > 1.minute.ago) {
         flash.type = 'error'
-        flash.message = "You are attempting to send the reset codes again too quickly. Please wait longer before attempting again."
+        flash.message = 'controllers.aaf.vhr.lostpassword.resend.error'
       } else {
         sendResetCodes(managedSubjectInstance)
 
@@ -92,7 +92,7 @@ class LostPasswordController {
         managedSubjectInstance.save()
 
         flash.type = 'info'
-        flash.message = "Your password reset codes have been sent again. Please allow some time for them to be delivered."
+        flash.message = 'controllers.aaf.vhr.lostpassword.resend.success'
       }
     }
 
