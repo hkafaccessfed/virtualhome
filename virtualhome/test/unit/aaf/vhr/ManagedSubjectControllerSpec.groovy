@@ -535,7 +535,7 @@ class ManagedSubjectControllerSpec  extends spock.lang.Specification {
     setup:
     def group = Group.build()
     group.organization.active = true
-    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization)
+    def managedSubjectTestInstance = ManagedSubject.build(group:group, organization:group.organization, hash:'0'*60)
     shiroSubject.isPermitted("app:manage:organization:${group.organization.id}:group:${group.id}:managedsubject:${managedSubjectTestInstance.id}:edit") >> true
 
     when:

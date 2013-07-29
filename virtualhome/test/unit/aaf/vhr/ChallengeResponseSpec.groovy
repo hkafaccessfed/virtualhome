@@ -9,7 +9,7 @@ import aaf.vhr.ManagedSubject
 
 @TestFor(aaf.vhr.ChallengeResponse)
 @Build([ManagedSubject, ChallengeResponse])
-@Mock([Organization, Group, ManagedSubject])
+@Mock([Organization, Group, ManagedSubject, ChallengeResponse])
 class ChallengeResponseSpec extends UnitSpec {
 
   def 'ensure challenge must not be null or blank and be at least 6 characters long'() {
