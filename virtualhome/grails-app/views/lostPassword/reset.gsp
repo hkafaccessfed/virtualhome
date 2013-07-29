@@ -5,7 +5,7 @@
     <r:require modules="pwmask" />
   </head>
   <body>
-    <h2>Password reset for <g:fieldValue bean="${managedSubjectInstance}" field="cn"/> <small>Please provide the information requested below</small></h2>
+    <h2>Password reset for <g:fieldValue bean="${managedSubjectInstance}" field="cn"/></h2>
 
     <div class="row">
       <div class="span12">
