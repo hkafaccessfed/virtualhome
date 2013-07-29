@@ -8,4 +8,4 @@ For other federations you may like to start at https://wiki.shibboleth.net/confl
 
 Be sure to configure the SP for a Java application environment per https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPJavaInstall noting especially the `attributePrefix="AJP_"` requirement.
 
-Required Shibboleth mappings are covered in the provided in configuration/apache/vho.conf (essentially '/').
+Required Shibboleth mappings are covered in the provided configuration/apache/vho.conf (essentially '/').
