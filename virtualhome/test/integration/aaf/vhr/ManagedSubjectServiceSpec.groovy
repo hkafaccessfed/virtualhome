@@ -116,7 +116,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     setup:
     def o = Organization.build()
     def g = Group.build(organization: o)
-    def ms = ManagedSubject.build(organization:o, group:g, login:null)
+    def ms = ManagedSubject.build(organization:o, group:g, login:null, hash: null)
     def inv = new ManagedSubjectInvitation(managedSubject: ms).save()
 
     expect:
@@ -185,7 +185,7 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     setup:
     def o = Organization.build()
     def g = Group.build(organization: o)
-    def ms = ManagedSubject.build(organization:o, group:g, login:null)
+    def ms = ManagedSubject.build(organization:o, group:g, login:null, hash: null)
     def inv = ManagedSubjectInvitation.build(managedSubject: ms)
 
     expect:
