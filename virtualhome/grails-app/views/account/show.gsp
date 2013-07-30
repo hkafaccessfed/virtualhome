@@ -11,7 +11,9 @@
       </div>
       <div class="span6">
         <div class="pull-right">
-          <g:link action="changedetails" class="btn btn-info btn-large">Change your password</g:link>
+          <g:link action="changedetails" class="btn btn-info btn-large">
+            <g:message code="views.aaf.vhr.account.show.changedetails" encodeAs="HTML"/>
+          </g:link>
         </div>
       </div>
     </div>

@@ -80,7 +80,7 @@ class AccountController {
 
     if(!managedSubjectInstance) {
       log.error "No ManagedSubject stored in session, requesting login before accessing details change"
-      
+
       flash.type = 'info'
       flash.message = 'controllers.aaf.vhr.account.changedetails.requireslogin'
       redirect action: 'index'
@@ -95,7 +95,7 @@ class AccountController {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
     if(!managedSubjectInstance) {
       log.error "A valid session does not already exist to allow completedetailschange to function"
-      
+
       response.sendError 403
 
       return
@@ -103,7 +103,7 @@ class AccountController {
 
     if(!cryptoService.verifyPasswordHash(params.currentPassword, managedSubjectInstance)) {
       log.error "Password invalid for $managedSubjectInstance"
-      
+
       flash.type = 'error'
       flash.message = 'controllers.aaf.vhr.account.completedetailschange.password.error'
       render view: 'changedetails', model: [managedSubjectInstance:managedSubjectInstance]
@@ -111,23 +111,38 @@ class AccountController {
       return
     }
 
-    managedSubjectInstance.plainPassword = params.plainPassword
-    managedSubjectInstance.plainPasswordConfirmation = params.plainPasswordConfirmation
+    if (params.mobileNumber) {
+      managedSubjectInstance.mobileNumber = params.mobileNumber
+      if (!managedSubjectInstance.validate()) {
+        log.error "New mobile number is invalid for $managedSubjectInstance"
 
-    def (validPassword, errors) = passwordValidationService.validate(managedSubjectInstance)
-    if(!validPassword) {
-      log.error "New password is invalid for $managedSubjectInstance"
-      
-      flash.type = 'error'
-      flash.message = 'controllers.aaf.vhr.account.completedetailschange.new.password.invalid'
-      render view: 'changedetails', model: [managedSubjectInstance:managedSubjectInstance]
-
-      return
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.account.completedetailschange.mobileNumber.invalid'
+        render view: 'changedetails', model: [managedSubjectInstance: managedSubjectInstance]
+        return
+      }
     }
 
-    cryptoService.generatePasswordHash(managedSubjectInstance)
+    if (params.plainPassword || params.plainPasswordConfirmation) {
+      managedSubjectInstance.plainPassword = params.plainPassword
+      managedSubjectInstance.plainPasswordConfirmation = params.plainPasswordConfirmation
+
+      def (validPassword, errors) = passwordValidationService.validate(managedSubjectInstance)
+      if(!validPassword) {
+        log.error "New password is invalid for $managedSubjectInstance"
+
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.account.completedetailschange.password.invalid'
+        render view: 'changedetails', model: [managedSubjectInstance:managedSubjectInstance]
+
+        return
+      }
+
+      cryptoService.generatePasswordHash(managedSubjectInstance)
+    }
+
     flash.type = 'success'
-    flash.message = 'controllers.aaf.vhr.account.completedetailschange.new.password.success'
+    flash.message = 'controllers.aaf.vhr.account.completedetailschange.success'
     redirect action: 'show'
   }
 
