@@ -6,12 +6,12 @@
   </head>
   <body>
 
-    <h2><g:message code='views.aaf.vhr.account.changepassword.hello' args="${[managedSubjectInstance.cn.encodeAsHTML()]}"/></h2>
+    <h2><g:message code='views.aaf.vhr.account.changedetails.hello' args="${[managedSubjectInstance.cn.encodeAsHTML()]}"/></h2>
 
     <g:render template="/templates/flash" plugin="aafApplicationBase"/>
     <g:render template="/templates/errors_bean" model="['bean':managedSubjectInstance]" plugin="aafApplicationBase"/>
 
-    <g:form action="completepasswordchange" class="form-horizontal myaccount form-validating" name="accountform">
+    <g:form action="completedetailschange" class="form-horizontal myaccount form-validating" name="accountform">
       <div class="control-group">
         <label class="control-label" for="login"><g:message code="label.username"/></label>
         <div class="controls">
@@ -31,7 +31,7 @@
           </div>
           <div class="span4">
             <span class="help-block">
-              <p><g:message code="views.aaf.vhr.account.changepassword.currentpassword.help"/></p>
+              <p><g:message code="views.aaf.vhr.account.changedetails.currentpassword.help"/></p>
             </span>
           </div>
         </div>
@@ -42,8 +42,8 @@
       <g:render template="/templates/passwordinput"/>
 
       <div class="form-actions">
-        <p class="text-muted"><i class="icon-info-sign"></i> <g:message code="views.aaf.vhr.account.changepassword.crypto"/></p>
-        <button type="submit" class="btn btn-success btn-large"><g:message code="label.changepassword"/></button>
+        <p class="text-muted"><i class="icon-info-sign"></i> <g:message code="views.aaf.vhr.account.changedetails.crypto"/></p>
+        <button type="submit" class="btn btn-success btn-large"><g:message code="label.changedetails"/></button>
         <g:link action="show" class="btn btn-large"><g:message encodeAs='HTML' code="label.cancel"/></g:link>
       </div>
     </g:form>

@@ -9,7 +9,7 @@ import aaf.vhr.MigrateController
 
 class AccountController {
 
-  static allowedMethods = [completepasswordchange: 'POST']
+  static allowedMethods = [completedetailschange: 'POST']
 
   final CURRENT_USER = "aaf.vhr.AccountController.CURRENT_USER"
 
@@ -75,14 +75,14 @@ class AccountController {
     [managedSubjectInstance:managedSubjectInstance, groupRole:groupRole, organizationRole:organizationRole]
   }
 
-  def changepassword() {
+  def changedetails() {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
 
     if(!managedSubjectInstance) {
-      log.error "No ManagedSubject stored in session, requesting login before accessing password change"
+      log.error "No ManagedSubject stored in session, requesting login before accessing details change"
       
       flash.type = 'info'
-      flash.message = 'controllers.aaf.vhr.account.changepassword.requireslogin'
+      flash.message = 'controllers.aaf.vhr.account.changedetails.requireslogin'
       redirect action: 'index'
 
       return
@@ -91,10 +91,10 @@ class AccountController {
     [managedSubjectInstance:managedSubjectInstance]
   }
 
-  def completepasswordchange() {
+  def completedetailschange() {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
     if(!managedSubjectInstance) {
-      log.error "A valid session does not already exist to allow completepassworchange to function"
+      log.error "A valid session does not already exist to allow completedetailschange to function"
       
       response.sendError 403
 
@@ -105,8 +105,8 @@ class AccountController {
       log.error "Password invalid for $managedSubjectInstance"
       
       flash.type = 'error'
-      flash.message = 'controllers.aaf.vhr.account.completepasswordchange.password.error'
-      render view: 'changepassword', model: [managedSubjectInstance:managedSubjectInstance]
+      flash.message = 'controllers.aaf.vhr.account.completedetailschange.password.error'
+      render view: 'changedetails', model: [managedSubjectInstance:managedSubjectInstance]
 
       return
     }
@@ -119,15 +119,15 @@ class AccountController {
       log.error "New password is invalid for $managedSubjectInstance"
       
       flash.type = 'error'
-      flash.message = 'controllers.aaf.vhr.account.completepasswordchange.new.password.invalid'
-      render view: 'changepassword', model: [managedSubjectInstance:managedSubjectInstance]
+      flash.message = 'controllers.aaf.vhr.account.completedetailschange.new.password.invalid'
+      render view: 'changedetails', model: [managedSubjectInstance:managedSubjectInstance]
 
       return
     }
 
     cryptoService.generatePasswordHash(managedSubjectInstance)
     flash.type = 'success'
-    flash.message = 'controllers.aaf.vhr.account.completepasswordchange.new.password.success'
+    flash.message = 'controllers.aaf.vhr.account.completedetailschange.new.password.success'
     redirect action: 'show'
   }
 
