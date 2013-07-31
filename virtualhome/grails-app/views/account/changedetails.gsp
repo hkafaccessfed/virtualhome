@@ -28,6 +28,10 @@
 
       <hr>
 
+      <g:render template="/templates/passwordinput" model="[newPasswordRequired: false]"/>
+
+      <hr>
+
       <div class="control-group">
         <label class="control-label" for="mobileNumber"><g:message code="label.mobilenumber"/></label>
         <div class="controls">
@@ -41,10 +45,6 @@
           </div>
         </div>
       </div>
-
-      <hr>
-
-      <g:render template="/templates/passwordinput" model="[newPasswordRequired: false]"/>
 
       <div class="form-actions">
         <p class="text-muted"><i class="icon-info-sign"></i> <g:message code="views.aaf.vhr.account.changedetails.crypto"/></p>
