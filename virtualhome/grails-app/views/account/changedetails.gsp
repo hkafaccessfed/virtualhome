@@ -13,10 +13,15 @@
 
     <g:form action="completedetailschange" class="form-horizontal myaccount form-validating" name="accountform">
       <div class="control-group">
-        <label class="control-label" for="login"><g:message code="label.username"/></label>
+        <label class="control-label" for="currentPassword"><g:message code="label.currentpassword"/></label>
         <div class="controls">
           <div class="span5">
-            <input class="required span5" name="login" id="login" type="text" autofocus="autofocus" autocomplete="off" value="${managedSubjectInstance.login}" disabled="true">
+            <input class="span5 required" id="currentPassword" name="currentPassword" type="password" autocomplete="off" autofocus="autofocus">
+          </div>
+          <div class="span4">
+            <span class="help-block">
+              <p><g:message code="views.aaf.vhr.account.changedetails.currentpassword.help"/></p>
+            </span>
           </div>
         </div>
       </div>
@@ -27,27 +32,11 @@
         <label class="control-label" for="mobileNumber"><g:message code="label.mobilenumber"/></label>
         <div class="controls">
           <div class="span5">
-            <input class="required span5" name="mobileNumber" id="mobileNumber" type="text" autofocus="autofocus" autocomplete="off" value="${managedSubjectInstance.mobileNumber}">
+            <input class="required span5" name="mobileNumber" id="mobileNumber" type="text" autocomplete="off" value="${managedSubjectInstance.mobileNumber}">
           </div>
           <div class="span4">
             <span class="help-block">
               <p><g:message code="views.aaf.vhr.account.changedetails.mobilenumber.help"/></p>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <hr>
-
-      <div class="control-group">
-        <label class="control-label" for="currentPassword"><g:message code="label.currentpassword"/></label>
-        <div class="controls">
-          <div class="span5">
-            <input class="span5 required" id="currentPassword" name="currentPassword" type="password" autocomplete="off">
-          </div>
-          <div class="span4">
-            <span class="help-block">
-              <p><g:message code="views.aaf.vhr.account.changedetails.currentpassword.help"/></p>
             </span>
           </div>
         </div>
