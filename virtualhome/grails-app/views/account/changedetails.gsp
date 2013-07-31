@@ -55,7 +55,7 @@
 
       <hr>
 
-      <g:render template="/templates/passwordinput" model="[isRequired: false]"/>
+      <g:render template="/templates/passwordinput" model="[newPasswordRequired: false]"/>
 
       <div class="form-actions">
         <p class="text-muted"><i class="icon-info-sign"></i> <g:message code="views.aaf.vhr.account.changedetails.crypto"/></p>

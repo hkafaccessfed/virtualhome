@@ -4,7 +4,7 @@
   </label>
   <div class="controls">
     <div class="span5">
-      <g:if test="${required}">
+      <g:if test="${newPasswordRequired}">
         <input class="span5 required" id="plainPassword" name="plainPassword" type="password" autocomplete="off" data-typetoggle="#showpassword">
       </g:if>
       <g:else>
