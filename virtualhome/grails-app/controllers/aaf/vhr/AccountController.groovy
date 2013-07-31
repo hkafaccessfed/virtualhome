@@ -121,6 +121,8 @@ class AccountController {
         render view: 'changedetails', model: [managedSubjectInstance: managedSubjectInstance]
         return
       }
+    } else {
+      managedSubjectInstance.mobileNumber = null
     }
 
     if (params.plainPassword || params.plainPasswordConfirmation) {
