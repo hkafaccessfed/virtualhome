@@ -57,6 +57,13 @@ class LostPasswordController {
       return
     }
 
+    if(!managedSubjectInstance.isFinalized()) {
+      log.error "Unable to reset password for $managedSubjectInstance as account has not been finalized"
+      redirect action: 'support'
+
+      return
+    }
+
     redirect action: 'reset'
   }
 

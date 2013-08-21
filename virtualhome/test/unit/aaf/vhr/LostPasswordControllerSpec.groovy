@@ -138,6 +138,20 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
     response.redirectedUrl == "/lostPassword/support"
   }
 
+  def 'obtainsubject errors if account has not been finalized'() {
+    setup:
+    def ms = ManagedSubject.build(login:'testuser2')
+    ms.hash = null
+    params.login = 'testuser2'
+
+    when:
+    controller.obtainsubject()
+
+    then:
+    1 * recaptchaService.verifyAnswer(_,_,_) >> true
+    response.redirectedUrl == "/lostPassword/support"
+  }
+
   def 'obtainsubject does not reset codes if not requested'() {
     setup:
     def o = Organization.build()
