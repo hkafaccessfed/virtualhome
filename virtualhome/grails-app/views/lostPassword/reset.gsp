@@ -46,7 +46,7 @@
               <label class="control-label" for="resetCodeExternal">SMS Code</label>
               <div class="controls">
                 <div class="span5">
-                  <input class="required" name="resetCodeExternal" id="resetCodeExternal" type="text" autocomplete="off">
+                  <input class="required resetCodeExternal" name="resetCodeExternal" id="resetCodeExternal" type="text" autocomplete="off">
                 </div>
                 <div class="span4">
                   <span class="help-block">
@@ -63,7 +63,7 @@
               <label class="control-label" for="resetCodeExternal">Administrator Code</label>
               <div class="controls">
                 <div class="span5">
-                  <input class="required" name="resetCodeExternal" id="resetCodeExternal" type="text" autofocus="autofocus" autocomplete="off">
+                  <input class="required resetCodeExternal" name="resetCodeExternal" id="resetCodeExternal" type="text" autofocus="autofocus" autocomplete="off">
                 </div>
                 <div class="span4">
                   <span class="help-block">
