@@ -223,6 +223,31 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
     model.organizationRole
   }
 
+  def 'reset does not resend email if no mobileNumber and no externalcode'() {
+    setup:
+    def ms = ManagedSubject.build(resetCode: '123456')
+    session.setAttribute(controller.CURRENT_USER, ms.id)
+
+    grailsApplication.config.aaf.vhr.passwordreset.second_factor_required = true
+    grailsApplication.config.aaf.vhr.passwordreset.reset_code_length = 6
+    grailsApplication.config.aaf.vhr.passwordreset.reset_sms_text = '{0}'
+
+    Role.build(name:"group:${ms.group.id}:administrators")
+    Role.build(name:"organization:${ms.organization.id}:administrators")
+
+    expect:
+    ms.resetCode != null
+    ms.resetCodeExternal == null
+    ms.mobileNumber == null
+
+    when:
+    def model = controller.reset()
+
+    then:
+    0 * emailManagerService.send(ms.email, _, _, [managedSubject:ms])
+    0 * smsDeliveryService.send(_,_)
+  }
+
   def 'reset does send sms if mobileNumber but redirects to unavailable on fault'() {
     setup:
     def ms = ManagedSubject.build(mobileNumber:'+61413234567')
