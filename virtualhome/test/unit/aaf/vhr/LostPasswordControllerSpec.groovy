@@ -59,7 +59,7 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
 
     then:
     !result
-    response.redirectedUrl == "/lostPassword/locked"
+    response.redirectedUrl == "/lostPassword/support"
   }
 
   def 'validManagedSubjectInstance errors if managedsubject in session has met failed attempts amount'() {
@@ -78,7 +78,7 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
     ms.stateChanges.size() == 1
     ms.stateChanges.toArray()[0].reason == "Locked by forgotten password process due to many failed login attempts"
 
-    response.redirectedUrl == "/lostPassword/locked"
+    response.redirectedUrl == "/lostPassword/support"
   }
 
   def 'validManagedSubjectInstance succeeds if valid managedsubject in session'() {
@@ -135,7 +135,7 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
 
     then:
     1 * recaptchaService.verifyAnswer(_,_,_) >> true
-    response.redirectedUrl == "/lostPassword/locked"
+    response.redirectedUrl == "/lostPassword/support"
   }
 
   def 'obtainsubject does not reset codes if not requested'() {
@@ -450,15 +450,15 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
     response.redirectedUrl == "/lostPassword/complete"
   }
 
-  def 'ensure locked reverts to start if no session object'() {
+  def 'ensure support reverts to start if no session object'() {
     when:
-    controller.locked()
+    controller.support()
 
     then:
     response.redirectedUrl == "/lostPassword/start"
   }
 
-  def 'ensure correct functioning of locked'() {
+  def 'ensure correct functioning of support'() {
     setup:
     def ms = ManagedSubject.build(failedResets:1, resetCode:'1234', resetCodeExternal:'5678')
     session.setAttribute(controller.CURRENT_USER, ms.id)
@@ -467,7 +467,7 @@ class LostPasswordControllerSpec extends spock.lang.Specification {
     def or = Role.build(name:"organization:${ms.organization.id}:administrators")
 
     when:
-    def model = controller.locked()
+    def model = controller.support()
 
     then:
     model.managedSubjectInstance == ms

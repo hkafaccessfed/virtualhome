@@ -21,7 +21,7 @@ class LostPasswordController {
   def emailManagerService
   def smsDeliveryService
 
-  def beforeInterceptor = [action: this.&validManagedSubjectInstance, except: ['start', 'obtainsubject', 'complete', 'unavailable', 'locked']]
+  def beforeInterceptor = [action: this.&validManagedSubjectInstance, except: ['start', 'obtainsubject', 'complete', 'unavailable', 'support']]
 
   def start() {
   }
@@ -52,7 +52,7 @@ class LostPasswordController {
 
     if(!managedSubjectInstance.canChangePassword()) {
       log.error "Unable to reset password for $managedSubjectInstance as account is not currently able to change passwords"
-      redirect action: 'locked'
+      redirect action: 'support'
 
       return
     }
@@ -161,11 +161,11 @@ class LostPasswordController {
 
   def unavailable() { }
 
-  def locked() {
+  def support() {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
 
     if(!managedSubjectInstance) {
-      log.error "Unable to present account locked details as managedSubjectInstance doesn't appear in session."
+      log.error "Unable to present account support details as managedSubjectInstance doesn't appear in session."
       redirect action: 'start'
       return
     }
@@ -204,7 +204,7 @@ Remote IP: ${request.getRemoteAddr()}"""
         managedSubjectInstance.lock(reason, 'lost_password_max_attempts_reached', requestDetails, null)
       }
 
-      redirect action: 'locked'
+      redirect action: 'support'
       return false
     }
 
