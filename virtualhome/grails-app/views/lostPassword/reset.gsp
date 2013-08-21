@@ -23,7 +23,7 @@
 
     <hr>
 
-    <g:form action="validatereset" class="form-horizontal myaccount" name="accountform" id="accountform">
+    <g:form action="validatereset" class="form-horizontal myaccount" name="accountform">
 
         <div class="control-group">
           <label class="control-label" for="resetCode">Email Code</label>
