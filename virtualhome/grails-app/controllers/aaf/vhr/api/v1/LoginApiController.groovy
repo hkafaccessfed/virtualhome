@@ -9,6 +9,9 @@ import aaf.base.identity.Permission
 import groovy.json.*
 
 class LoginApiController extends aaf.base.api.ApiBaseController {
+
+  def beforeInterceptor = [action: this.&validateRequest]
+
   def loginService
 
   def confirmsession() {
