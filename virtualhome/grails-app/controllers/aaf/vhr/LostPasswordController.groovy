@@ -60,9 +60,11 @@ class LostPasswordController {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
 
     if(managedSubjectInstance.resetCode == null || (managedSubjectInstance.mobileNumber && managedSubjectInstance.resetCodeExternal == null)) {
-      managedSubjectInstance.resetCode = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(grailsApplication.config.aaf.vhr.passwordreset.reset_code_length)
       if(grailsApplication.config.aaf.vhr.passwordreset.second_factor_required && managedSubjectInstance.mobileNumber) {
         managedSubjectInstance.resetCodeExternal = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(grailsApplication.config.aaf.vhr.passwordreset.reset_code_length)
+      } else {
+        // When second factor is disabled (i.e no SMS such as in the test federation) do it over email.
+        managedSubjectInstance.resetCode = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(grailsApplication.config.aaf.vhr.passwordreset.reset_code_length)
       }
       sendResetCodes(managedSubjectInstance)
     }
@@ -98,21 +100,22 @@ class LostPasswordController {
   def validatereset() {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
 
-    if(managedSubjectInstance.resetCode != params.resetCode) {
-      managedSubjectInstance.increaseFailedResets()
-
-      flash.type = 'error'
-      flash.message = 'controllers.aaf.vhr.lostpassword.emailcode.error'
-      redirect action: 'reset'
-      return
-    }
-
     if(grailsApplication.config.aaf.vhr.passwordreset.second_factor_required) {
       if(managedSubjectInstance.resetCodeExternal != params.resetCodeExternal) {
         managedSubjectInstance.increaseFailedResets()
 
         flash.type = 'error'
         flash.message = 'controllers.aaf.vhr.lostpassword.externalcode.error'
+        redirect action: 'reset'
+        return
+      }
+    } else {
+      // When second factor is disabled (i.e no SMS such as in the test federation) validate email code.
+      if(managedSubjectInstance.resetCode != params.resetCode) {
+        managedSubjectInstance.increaseFailedResets()
+
+        flash.type = 'error'
+        flash.message = 'controllers.aaf.vhr.lostpassword.emailcode.error'
         redirect action: 'reset'
         return
       }
@@ -208,11 +211,6 @@ Remote IP: ${request.getRemoteAddr()}"""
   }
 
   private void sendResetCodes(ManagedSubject managedSubjectInstance) {
-    // Email reset code
-    def emailSubject = messageSource.getMessage(EMAIL_CODE_SUBJECT, [] as Object[], EMAIL_CODE_SUBJECT, LocaleContextHolder.locale)
-    def emailTemplate = EmailTemplate.findWhere(name:"email_password_code")
-    emailManagerService.send(managedSubjectInstance.email, emailSubject, emailTemplate, [managedSubject:managedSubjectInstance])
-
     if(grailsApplication.config.aaf.vhr.passwordreset.second_factor_required) {
       // SMS reset code (UI asks to contact admin if no mobile)
       if(managedSubjectInstance.mobileNumber) {
@@ -221,6 +219,11 @@ Remote IP: ${request.getRemoteAddr()}"""
           return
         }
       }
+    } else {
+      // When second factor is disabled (i.e no SMS such as in the test federation) do it over email.
+      def emailSubject = messageSource.getMessage(EMAIL_CODE_SUBJECT, [] as Object[], EMAIL_CODE_SUBJECT, LocaleContextHolder.locale)
+      def emailTemplate = EmailTemplate.findWhere(name:"email_password_code")
+      emailManagerService.send(managedSubjectInstance.email, emailSubject, emailTemplate, [managedSubject:managedSubjectInstance])
     }
   }
 
