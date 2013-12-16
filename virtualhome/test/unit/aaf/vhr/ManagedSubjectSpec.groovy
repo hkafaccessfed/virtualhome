@@ -81,6 +81,22 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
     'unique' == s.errors['login']
   }
 
+  def 'ensure totpKey can be null'() {
+    setup:
+    def s = ManagedSubject.build(totpKey:'1234')
+    mockForConstraintsTests(ManagedSubject, [s])
+
+    expect:
+    s.validate()
+    s.totpKey != null
+
+    when:
+    s.totpKey = null
+
+    then:
+    s.save()
+  }
+
   def 'ensure subject stores attribute values'() {
     setup:
     def s = ManagedSubject.build()

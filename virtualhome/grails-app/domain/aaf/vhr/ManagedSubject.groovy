@@ -1,5 +1,7 @@
 package aaf.vhr
 
+import com.bloomhealthco.jasypt.GormEncryptedStringType
+
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
@@ -22,6 +24,8 @@ class ManagedSubject {
 
   String login
   String hash
+
+  String totpKey              // Time-base One Time Password - used with Google Authenticator
 
   String apiKey               // Use for local account management context
   String eptidKey             // Used as input for EPTID generation so login changes don't impact us - should never be altered.
@@ -77,6 +81,7 @@ class ManagedSubject {
   static constraints = {
     login nullable:true, blank: false, unique: true, size: 3..100,  validator: { val -> if (val?.contains(' ')) return 'value.contains.space' }
     hash nullable:true, blank:false, minSize:60, maxSize:60
+    totpKey nullable:true
     
     resetCode nullable:true
     resetCodeExternal nullable:true, validator: {val, obj ->
@@ -117,6 +122,7 @@ class ManagedSubject {
 
   static mapping = {
     eduPersonEntitlement type: "text"
+    totpKey type: GormEncryptedStringType
   }
 
   def beforeValidate() {
