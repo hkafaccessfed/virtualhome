@@ -31,14 +31,20 @@ class LoginService implements InitializingBean{
     loginCache.getIfPresent(sessionID)
   }
 
-  def webLogin(ManagedSubject managedSubjectInstance, String password, def request, def session, def params) {
+  def passwordLogin(ManagedSubject managedSubjectInstance, String password, def request, def session, def params) {
+    println "herez"
     if(!managedSubjectInstance.canLogin()) {
+      String reason = "User attempted login but account is disabled."
+      String requestDetails = createRequestDetails(request)
+
+      managedSubjectInstance.failLogin(reason, 'login_attempt', requestDetails, null)
+
       log.error "The ManagedSubject $managedSubjectInstance can not login at this time due to inactivty or locks"
       return [false, null]
     }
 
     if( managedSubjectInstance.requiresLoginCaptcha() && !recaptchaService.verifyAnswer(session, request.getRemoteAddr(), params)) {
-      String reason = "Recaptcha failed to verify user supplied captcha data as valid."
+      String reason = "User provided invalid captcha data."
       String requestDetails = createRequestDetails(request)
 
       managedSubjectInstance.failCaptcha(reason, 'login_attempt', requestDetails, null)
@@ -48,7 +54,7 @@ class LoginService implements InitializingBean{
     }
 
     if(!cryptoService.verifyPasswordHash(password, managedSubjectInstance)) {
-      String reason = "CryptoService failed to verify user supplied password as valid."
+      String reason = "User provided an incorrect password."
       String requestDetails = createRequestDetails(request)
 
       managedSubjectInstance.failLogin(reason, 'login_attempt', requestDetails, null)
@@ -57,9 +63,9 @@ class LoginService implements InitializingBean{
       return [false, null]
     }
 
-    log.info "The password supplied for ManagedSubject $managedSubjectInstance was valid. Creating sso cookie and redirecting to IdP."
+    log.info "The password supplied for ManagedSubject $managedSubjectInstance was valid."
 
-    String reason = "User supplied valid username and verified password at login prompt."
+    String reason = "User provided correct password at login."
     String requestDetails = createRequestDetails(request)
     managedSubjectInstance.successfulLogin(reason, 'login_attempt', requestDetails, null)
 

@@ -58,10 +58,13 @@ class LoginServiceSpec extends spock.lang.Specification {
     ms.active = false
 
     when:
-    def (outcome, sessionID) = service.webLogin(ms, 'password', request, session, params)
+    def (outcome, sessionID) = service.passwordLogin(ms, 'password', request, session, params)
 
     then:
     !outcome
+    ms.stateChanges.size() == 1
+    ms.stateChanges.toArray()[0].category == 'login_attempt'
+    ms.stateChanges.toArray()[0].reason == "User attempted login but account is disabled."
     sessionID == null
   }
 
@@ -78,7 +81,7 @@ class LoginServiceSpec extends spock.lang.Specification {
     ms.requiresLoginCaptcha()
 
     when:
-    def (outcome, sessionID) = service.webLogin(ms, 'password', request, session, params)
+    def (outcome, sessionID) = service.passwordLogin(ms, 'password', request, session, params)
 
     then:
     1 * recaptchaService.verifyAnswer(_,_,_) >> false
@@ -102,7 +105,7 @@ class LoginServiceSpec extends spock.lang.Specification {
     service.loginCache.size() == 0
 
     when:
-    def (outcome, sessionID) = service.webLogin(ms, 'password', request, session, params)
+    def (outcome, sessionID) = service.passwordLogin(ms, 'password', request, session, params)
 
     then:
     1 * cryptoService.verifyPasswordHash(_,_,) >> false
@@ -111,7 +114,7 @@ class LoginServiceSpec extends spock.lang.Specification {
     sessionID == null
     ms.stateChanges.size() == 1
     ms.stateChanges.toArray()[0].category == 'login_attempt'
-    ms.stateChanges.toArray()[0].reason == "CryptoService failed to verify user supplied password as valid."
+    ms.stateChanges.toArray()[0].reason == "User provided an incorrect password."
     service.loginCache.size() == 0
   }
 
@@ -130,7 +133,7 @@ class LoginServiceSpec extends spock.lang.Specification {
     service.loginCache.size() == 0
 
     when:
-    def (outcome, sessionID) = service.webLogin(ms, 'password', request, session, params)
+    def (outcome, sessionID) = service.passwordLogin(ms, 'password', request, session, params)
 
     then:
     1 * cryptoService.verifyPasswordHash(_,_,) >> true
@@ -139,7 +142,7 @@ class LoginServiceSpec extends spock.lang.Specification {
     sessionID.size() == 64
     ms.stateChanges.size() == 1
     ms.stateChanges.toArray()[0].category == 'login_attempt'
-    ms.stateChanges.toArray()[0].reason == "User supplied valid username and verified password at login prompt."
+    ms.stateChanges.toArray()[0].reason == "User provided correct password at login."
     service.loginCache.size() == 1
   }
 

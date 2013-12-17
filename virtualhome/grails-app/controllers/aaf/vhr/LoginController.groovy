@@ -66,7 +66,9 @@ class LoginController {
       return
     }
 
-    def (loggedIn, sessionID) = loginService.webLogin(managedSubjectInstance, password, request, session, params)
+    println "here"
+    def (loggedIn, sessionID) = loginService.passwordLogin(managedSubjectInstance, password, request, session, params)
+    println "here2"
 
     if(!loggedIn) {
       log.info "LoginService indicates failure for attempted login by $managedSubjectInstance"

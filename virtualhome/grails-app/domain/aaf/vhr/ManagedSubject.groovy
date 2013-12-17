@@ -37,7 +37,7 @@ class ManagedSubject {
   // Last time the password reset codes were resent to the user. Used for throttling.
   Date lastCodeResend
 
-  Date accountExpires         
+  Date accountExpires
 
   // AAF Core
   String cn                   // oid:2.5.4.3
@@ -47,7 +47,7 @@ class ManagedSubject {
   String eduPersonAssurance   // oid:1.3.6.1.4.1.5923.1.1.1.11
   String eduPersonAffiliation // oid:1.3.6.1.4.1.5923.1.1.1.1 - stored seperated by ; for IdP resolver simplification
   String eduPersonEntitlement // oid:1.3.6.1.4.1.5923.1.1.1.7 - stored seperated by ; for IdP resolver simplification
-  
+
   // AAF Optional
   String givenName            // oid:2.5.4.42
   String surname              // oid:2.5.4.4

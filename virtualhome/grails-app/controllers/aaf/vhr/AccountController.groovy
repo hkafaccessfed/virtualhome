@@ -17,7 +17,7 @@ class AccountController {
   def cryptoService
   def passwordValidationService
 
-  def index() { 
+  def index() {
   }
 
   def login(String username, String password) {
@@ -31,7 +31,7 @@ class AccountController {
     def managedSubjectInstance = ManagedSubject.findWhere(login: username, [lock:true])
     if(!managedSubjectInstance) {
       log.error "No such ManagedSubject for $params.login"
-      
+
       flash.type = 'error'
       flash.message = 'controllers.aaf.vhr.account.login.error'
       render view: 'index', model:[loginError:true]
@@ -39,7 +39,7 @@ class AccountController {
       return
     }
 
-    def (loggedIn, sessionID) = loginService.webLogin(managedSubjectInstance, password, request, session, params)
+    def (loggedIn, sessionID) = loginService.passwordLogin(managedSubjectInstance, password, request, session, params)
 
     if(!loggedIn) {
       log.info "LoginService indicates failure for attempted login by $managedSubjectInstance to myaccount"
