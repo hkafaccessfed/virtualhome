@@ -125,7 +125,7 @@ class LoginControllerSpec extends spock.lang.Specification {
     controller.login(ms.login, 'password')
 
     then:
-    1 * loginService.passwordLogin(ms, _, _, _, _) >> [false, null]
+    1 * loginService.passwordLogin(ms, _, _, _, _) >> false
     response.redirectedUrl == "/login/index"
     session.getAttribute(controller.CURRENT_USER) == ms.id
   }
@@ -146,7 +146,7 @@ class LoginControllerSpec extends spock.lang.Specification {
     controller.login(ms.login, 'password')
 
     then:
-    1 * loginService.passwordLogin(ms, _, _, _, _) >> [true, 'abcd']
+    1 * loginService.passwordLogin(ms, _, _, _, _) >> true
     response.redirectedUrl == "https://idp.test.com/shibboleth-idp/authn"
     response.cookies[0].maxAge == 1 * 60
     response.cookies[0].secure
@@ -168,7 +168,7 @@ class LoginControllerSpec extends spock.lang.Specification {
     controller.login(ms.login, 'password')
 
     then:
-    1 * loginService.passwordLogin(ms, _, _, _, _) >> [true, 'abcd']
+    1 * loginService.passwordLogin(ms, _, _, _, _) >> true
     response.redirectedUrl == "https://idp.test.com/shibboleth-idp/authn"
     response.cookies[0].maxAge == 1 * 60
     !response.cookies[0].secure

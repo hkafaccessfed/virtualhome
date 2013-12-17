@@ -58,14 +58,13 @@ class LoginServiceSpec extends spock.lang.Specification {
     ms.active = false
 
     when:
-    def (outcome, sessionID) = service.passwordLogin(ms, 'password', request, session, params)
+    def outcome = service.passwordLogin(ms, 'password', request, session, params)
 
     then:
     !outcome
     ms.stateChanges.size() == 1
     ms.stateChanges.toArray()[0].category == 'login_attempt'
     ms.stateChanges.toArray()[0].reason == "User attempted login but account is disabled."
-    sessionID == null
   }
 
   def 'managedSubject that requires captcha must input one'() {
@@ -81,13 +80,16 @@ class LoginServiceSpec extends spock.lang.Specification {
     ms.requiresLoginCaptcha()
 
     when:
-    def (outcome, sessionID) = service.passwordLogin(ms, 'password', request, session, params)
+    def outcome = service.passwordLogin(ms, 'password', request, session, params)
 
     then:
     1 * recaptchaService.verifyAnswer(_,_,_) >> false
 
     !outcome
-    sessionID == null
+    ms.stateChanges.size() == 1
+    ms.stateChanges.toArray()[0].category == 'login_attempt'
+    ms.stateChanges.toArray()[0].reason == "User provided invalid captcha data."
+    service.loginCache.size() == 0
   }
 
   def 'an invalid password fails authentication'() {
@@ -105,13 +107,12 @@ class LoginServiceSpec extends spock.lang.Specification {
     service.loginCache.size() == 0
 
     when:
-    def (outcome, sessionID) = service.passwordLogin(ms, 'password', request, session, params)
+    def outcome = service.passwordLogin(ms, 'password', request, session, params)
 
     then:
     1 * cryptoService.verifyPasswordHash(_,_,) >> false
 
     !outcome
-    sessionID == null
     ms.stateChanges.size() == 1
     ms.stateChanges.toArray()[0].category == 'login_attempt'
     ms.stateChanges.toArray()[0].reason == "User provided an incorrect password."
@@ -133,17 +134,17 @@ class LoginServiceSpec extends spock.lang.Specification {
     service.loginCache.size() == 0
 
     when:
-    def (outcome, sessionID) = service.passwordLogin(ms, 'password', request, session, params)
+    def outcome = service.passwordLogin(ms, 'password', request, session, params)
 
     then:
     1 * cryptoService.verifyPasswordHash(_,_,) >> true
 
     outcome
-    sessionID.size() == 64
+   // sessionID.size() == 64
     ms.stateChanges.size() == 1
     ms.stateChanges.toArray()[0].category == 'login_attempt'
     ms.stateChanges.toArray()[0].reason == "User provided correct password at login."
-    service.loginCache.size() == 1
+    service.loginCache.size() == 0
   }
 
 }

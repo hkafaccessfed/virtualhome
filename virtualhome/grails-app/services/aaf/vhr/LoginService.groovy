@@ -31,8 +31,7 @@ class LoginService implements InitializingBean{
     loginCache.getIfPresent(sessionID)
   }
 
-  def passwordLogin(ManagedSubject managedSubjectInstance, String password, def request, def session, def params) {
-    println "herez"
+  public boolean passwordLogin(ManagedSubject managedSubjectInstance, String password, def request, def session, def params) {
     if(!managedSubjectInstance.canLogin()) {
       String reason = "User attempted login but account is disabled."
       String requestDetails = createRequestDetails(request)
@@ -40,7 +39,7 @@ class LoginService implements InitializingBean{
       managedSubjectInstance.failLogin(reason, 'login_attempt', requestDetails, null)
 
       log.error "The ManagedSubject $managedSubjectInstance can not login at this time due to inactivty or locks"
-      return [false, null]
+      return false
     }
 
     if( managedSubjectInstance.requiresLoginCaptcha() && !recaptchaService.verifyAnswer(session, request.getRemoteAddr(), params)) {
@@ -50,7 +49,7 @@ class LoginService implements InitializingBean{
       managedSubjectInstance.failCaptcha(reason, 'login_attempt', requestDetails, null)
 
       log.error "The recaptcha data supplied for ManagedSubject $managedSubjectInstance is not correct"
-      return [false, null]
+      return false
     }
 
     if(!cryptoService.verifyPasswordHash(password, managedSubjectInstance)) {
@@ -60,7 +59,7 @@ class LoginService implements InitializingBean{
       managedSubjectInstance.failLogin(reason, 'login_attempt', requestDetails, null)
 
       log.error "The password supplied for ManagedSubject $managedSubjectInstance is not correct"
-      return [false, null]
+      return false
     }
 
     log.info "The password supplied for ManagedSubject $managedSubjectInstance was valid."
@@ -69,10 +68,18 @@ class LoginService implements InitializingBean{
     String requestDetails = createRequestDetails(request)
     managedSubjectInstance.successfulLogin(reason, 'login_attempt', requestDetails, null)
 
+    true
+  }
+
+  public boolean totpLogin() {
+
+  }
+
+  public String establishSession(ManagedSubject managedSubjectInstance) {
     def sessionID = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(64)
     loginCache.put(sessionID, managedSubjectInstance.login)
 
-    return [true, sessionID]
+    sessionID
   }
 
   private String createRequestDetails(def request) {

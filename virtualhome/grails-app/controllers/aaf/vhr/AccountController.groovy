@@ -30,7 +30,7 @@ class AccountController {
 
     def managedSubjectInstance = ManagedSubject.findWhere(login: username, [lock:true])
     if(!managedSubjectInstance) {
-      log.error "No such ManagedSubject for $params.login"
+      log.error "No such ManagedSubject for ${params.login} when attempting myaccount login"
 
       flash.type = 'error'
       flash.message = 'controllers.aaf.vhr.account.login.error'
@@ -39,16 +39,17 @@ class AccountController {
       return
     }
 
-    def (loggedIn, sessionID) = loginService.passwordLogin(managedSubjectInstance, password, request, session, params)
+    def validPassword = loginService.passwordLogin(managedSubjectInstance, password, request, session, params)
 
-    if(!loggedIn) {
-      log.info "LoginService indicates failure for attempted login by $managedSubjectInstance to myaccount"
+    if(!validPassword) {
+      log.info "LoginService indicates failure for password login by $managedSubjectInstance to myaccount"
       session.setAttribute(CURRENT_USER, managedSubjectInstance.id)
       render view:'index', model:[loginError:true, requiresChallenge:managedSubjectInstance.requiresLoginCaptcha()]
       return
     }
 
-    log.info "LoginService indicates success for login by ${managedSubjectInstance} to myaccount. Established sessionID of $sessionID"
+    def sessionID = loginService.establishSession(managedSubjectInstance)
+    log.info "Password only login by ${managedSubjectInstance} to myaccount was completed successfully. Associated new sessionID of $sessionID."
     session.setAttribute(CURRENT_USER, managedSubjectInstance.id)
 
     redirect action:'show'

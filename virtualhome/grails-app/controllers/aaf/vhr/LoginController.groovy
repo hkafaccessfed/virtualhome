@@ -66,18 +66,17 @@ class LoginController {
       return
     }
 
-    println "here"
-    def (loggedIn, sessionID) = loginService.passwordLogin(managedSubjectInstance, password, request, session, params)
-    println "here2"
+    def validPassword = loginService.passwordLogin(managedSubjectInstance, password, request, session, params)
 
-    if(!loggedIn) {
+    if(!validPassword) {
       log.info "LoginService indicates failure for attempted login by $managedSubjectInstance"
       session.setAttribute(CURRENT_USER, managedSubjectInstance.id)
       redirect action:"index"
       return
     }
 
-    log.info "LoginService indicates success for attempted login by ${managedSubjectInstance}. Established sessionID of $sessionID"
+    def sessionID = loginService.establishSession(managedSubjectInstance)
+    log.info "Single factor login by ${managedSubjectInstance} was completed successfully. Associated new sessionID of $sessionID."
 
     // Setup SSO cookie for use with Shib IdP VHR filter
     int maxAge = grailsApplication.config.aaf.vhr.login.validity_period_minutes * 60
