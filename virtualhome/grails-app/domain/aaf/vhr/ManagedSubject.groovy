@@ -169,6 +169,10 @@ class ManagedSubject {
     this.failedLogins > 2
   }
 
+  public boolean requiresTotpLogin() {
+    this.totpKey != null
+  }
+
   public boolean functioning() {
     active && !isExpired() && !locked && !blocked && !archived && group?.functioning()
   }
