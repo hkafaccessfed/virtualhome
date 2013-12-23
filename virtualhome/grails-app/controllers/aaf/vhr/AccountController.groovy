@@ -7,15 +7,18 @@ import aaf.base.identity.Role
 import aaf.vhr.switchch.vho.DeprecatedSubject
 import aaf.vhr.MigrateController
 
+import aaf.vhr.crypto.GoogleAuthenticator
+
 class AccountController {
 
   static allowedMethods = [completedetailschange: 'POST']
 
-  final CURRENT_USER = "aaf.vhr.AccountController.CURRENT_USER"
+  static final CURRENT_USER = "aaf.vhr.AccountController.CURRENT_USER"
 
   def loginService
   def cryptoService
   def passwordValidationService
+  def grailsApplication
 
   def index() {
   }
@@ -48,10 +51,31 @@ class AccountController {
       return
     }
 
-    def sessionID = loginService.establishSession(managedSubjectInstance)
-    log.info "Password only login by ${managedSubjectInstance} to myaccount was completed successfully. Associated new sessionID of $sessionID."
-    session.setAttribute(CURRENT_USER, managedSubjectInstance.id)
+    if(managedSubjectInstance.isUsingTwoStepLogin()){
+      render(view: "twostep", model: [managedSubjectInstance: managedSubjectInstance])
+      return
+    }
 
+    session.setAttribute(CURRENT_USER, managedSubjectInstance.id)
+    redirect action:'show'
+  }
+
+  def twosteplogin(long id, long totp) {
+    def managedSubjectInstance = ManagedSubject.get(id)
+    if(!managedSubjectInstance) {
+      log.error "No ManagedSubject represented by $id in extendedlogin"
+      session.setAttribute(INVALID_USER, true)
+      redirect action:"index"
+      return
+    }
+
+    if(!loginService.totpLogin(managedSubjectInstance, totp, request)) {
+      log.info "LoginService indicates totp failure for attempted login by $managedSubjectInstance"
+      render(view: "twostep", model: [managedSubjectInstance: managedSubjectInstance, loginError:true])
+      return
+    }
+
+    session.setAttribute(CURRENT_USER, managedSubjectInstance.id)
     redirect action:'show'
   }
 
@@ -73,7 +97,11 @@ class AccountController {
     def groupRole = Role.findWhere(name:"group:${managedSubjectInstance.group.id}:administrators")
     def organizationRole = Role.findWhere(name:"organization:${managedSubjectInstance.organization.id}:administrators")
 
-    [managedSubjectInstance:managedSubjectInstance, groupRole:groupRole, organizationRole:organizationRole]
+    def totpURL = null
+    if(managedSubjectInstance.isUsingTwoStepLogin())
+      totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, "VHO", managedSubjectInstance.totpKey)
+
+    [managedSubjectInstance:managedSubjectInstance, totpURL: totpURL, groupRole:groupRole, organizationRole:organizationRole]
   }
 
   def changedetails() {
@@ -96,9 +124,7 @@ class AccountController {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
     if(!managedSubjectInstance) {
       log.error "A valid session does not already exist to allow completedetailschange to function"
-
       response.sendError 403
-
       return
     }
 
@@ -147,6 +173,58 @@ class AccountController {
     flash.type = 'success'
     flash.message = 'controllers.aaf.vhr.account.completedetailschange.success'
     redirect action: 'show'
+  }
+
+  def setuptotp() {
+    def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
+    if(!managedSubjectInstance) {
+      log.error "A valid session does not already exist to allow completedetailschange to function"
+      response.sendError 403
+      return
+    }
+
+    managedSubjectInstance.totpKey = GoogleAuthenticator.generateSecretKey()
+    if(!managedSubjectInstance.save()) {
+      log.error "Unable to persist totpKey for $managedSubjectInstance"
+      response.sendError 500
+      return
+    }
+
+    redirect action:'show'
+  }
+
+  def setuptwostep() {
+    def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
+    if(!managedSubjectInstance) {
+      log.error "A valid session does not already exist to allow completedetailschange to function"
+      response.sendError 403
+      return
+    }
+
+    def groupRole = Role.findWhere(name:"group:${managedSubjectInstance.group.id}:administrators")
+    def organizationRole = Role.findWhere(name:"organization:${managedSubjectInstance.organization.id}:administrators")
+
+    [managedSubjectInstance:managedSubjectInstance, groupRole:groupRole, organizationRole:organizationRole]
+  }
+
+  def completesetuptwostep() {
+    def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
+    if(!managedSubjectInstance) {
+      log.error "A valid session does not already exist to allow completedetailschange to function"
+      response.sendError 403
+      return
+    }
+
+    managedSubjectInstance.totpKey = GoogleAuthenticator.generateSecretKey()
+    if(!managedSubjectInstance.save()) {
+      log.error "Unable to persist totpKey for $managedSubjectInstance"
+      response.sendError 500
+      return
+    }
+
+    def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, "VHO", managedSubjectInstance.totpKey)
+
+    [managedSubjectInstance:managedSubjectInstance, totpURL:totpURL]
   }
 
   private String createRequestDetails(def request) {

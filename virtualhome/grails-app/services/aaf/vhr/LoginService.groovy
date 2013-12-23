@@ -4,6 +4,8 @@ import org.springframework.beans.factory.InitializingBean
 import java.util.concurrent.TimeUnit
 import com.google.common.cache.*
 
+import aaf.vhr.crypto.GoogleAuthenticator
+
 class LoginService implements InitializingBean{
 
   boolean transactional = true
@@ -71,8 +73,34 @@ class LoginService implements InitializingBean{
     true
   }
 
-  public boolean totpLogin() {
+  public boolean totpLogin(ManagedSubject managedSubjectInstance, long code, def request) {
+    if(!managedSubjectInstance.canLogin()) {
+      String reason = "User attempted login but account is disabled (TOTP)."
+      String requestDetails = createRequestDetails(request)
 
+      managedSubjectInstance.failLogin(reason, 'login_attempt', requestDetails, null)
+
+      log.error "The ManagedSubject $managedSubjectInstance can not use login at this time due to inactivty or locks (TOTP)."
+      return false
+    }
+
+    if(!GoogleAuthenticator.checkCode(managedSubjectInstance.totpKey, code, System.currentTimeMillis())) {
+      String reason = "User provided invalid code at login (TOTP)."
+      String requestDetails = createRequestDetails(request)
+
+      managedSubjectInstance.failLogin(reason, 'login_attempt', requestDetails, null)
+
+      log.error "The TOTP code supplied for ManagedSubject $managedSubjectInstance is not correct or does not match the stored totpKey."
+      return false
+    }
+
+    log.info "The TOTP code supplied for ManagedSubject $managedSubjectInstance was valid."
+
+    String reason = "User provided valid code at login (TOTP)."
+    String requestDetails = createRequestDetails(request)
+    managedSubjectInstance.successfulLogin(reason, 'login_attempt', requestDetails, null)
+
+    true
   }
 
   public String establishSession(ManagedSubject managedSubjectInstance) {

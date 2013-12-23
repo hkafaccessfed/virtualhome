@@ -26,6 +26,7 @@ class ManagedSubject {
   String hash
 
   String totpKey              // Time-base One Time Password - used with Google Authenticator
+  boolean totpForce           // This account must setup TOTP and can't opt out
 
   String apiKey               // Use for local account management context
   String eptidKey             // Used as input for EPTID generation so login changes don't impact us - should never be altered.
@@ -169,8 +170,12 @@ class ManagedSubject {
     this.failedLogins > 2
   }
 
-  public boolean requiresTotpLogin() {
+  public boolean isUsingTwoStepLogin() {
     this.totpKey != null
+  }
+
+  public boolean enforceTwoStepLogin() {
+    this.totpForce
   }
 
   public boolean functioning() {

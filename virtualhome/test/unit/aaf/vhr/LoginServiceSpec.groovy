@@ -140,11 +140,31 @@ class LoginServiceSpec extends spock.lang.Specification {
     1 * cryptoService.verifyPasswordHash(_,_,) >> true
 
     outcome
-   // sessionID.size() == 64
     ms.stateChanges.size() == 1
     ms.stateChanges.toArray()[0].category == 'login_attempt'
     ms.stateChanges.toArray()[0].reason == "User provided correct password at login."
     service.loginCache.size() == 0
+  }
+
+  def 'session identifier is established'() {
+    setup:
+    def request = Mock(javax.servlet.http.HttpServletRequest)
+    def session = Mock(javax.servlet.http.HttpSession)
+    def params = [:]
+
+    ms.failedLogins = 0
+    ms.active = true
+    ms.organization.active = true
+
+    expect:
+    service.loginCache.size() == 0
+
+    when:
+    def sessionID = service.establishSession(ms)
+
+    then:
+    sessionID.size() == 64
+    service.loginCache.size() == 1
   }
 
 }

@@ -10,7 +10,6 @@ testDataConfig {
       hash = {-> '$2a$04$42Oi6EJ3T9JceCfNGv4e3u.LhYM6XgVOPWVbXwsC6CnZ46oKS7QZm'} // password == "test"
       email = {-> "testuser${i++}@testdomain.com" }
       sharedToken = {-> "sharedtoken${i++}"}
-      totpKey = {-> "secrets${i++}"}
     }
     'aaf.vhr.Group' {
       def i = 1

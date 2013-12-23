@@ -51,13 +51,6 @@ class LoginController {
       return
     }
 
-    def redirectURL = session.getAttribute(SSO_URL)
-    if(!redirectURL) {
-      log.error "No redirectURL set for login, redirecting to oops"
-      redirect action: "oops"
-      return
-    }
-
     def managedSubjectInstance = ManagedSubject.findWhere(login: username, [lock:true])
     if(!managedSubjectInstance) {
       log.error "No ManagedSubject represented by $username"
@@ -75,22 +68,37 @@ class LoginController {
       return
     }
 
-    def sessionID = loginService.establishSession(managedSubjectInstance)
-    log.info "Single factor login by ${managedSubjectInstance} was completed successfully. Associated new sessionID of $sessionID."
+    if(managedSubjectInstance.enforceTwoStepLogin() && !managedSubjectInstance.isUsingTwoStepLogin()){
+      // This account needs to be updated before they can login
+      session.setAttribute(AccountController.CURRENT_USER, managedSubjectInstance.id)
+      redirect controller:'account', action:'setuptwostep'
+      return
+    }
 
-    // Setup SSO cookie for use with Shib IdP VHR filter
-    int maxAge = grailsApplication.config.aaf.vhr.login.validity_period_minutes * 60
-    Cookie cookie = new Cookie(SSO_COOKIE_NAME, sessionID)
-    cookie.maxAge = maxAge
-    cookie.secure = grailsApplication.config.aaf.vhr.login.ssl_only_cookie
-    cookie.path = grailsApplication.config.aaf.vhr.login.path
-    response.addCookie(cookie)
+    if(managedSubjectInstance.isUsingTwoStepLogin()){
+      render(view: "twostep", model: [managedSubjectInstance: managedSubjectInstance])
+      return
+    }
 
-    session.removeAttribute(INVALID_USER)
-    session.removeAttribute(CURRENT_USER)
-    session.removeAttribute(SSO_URL)
+    redirect url: establishSession(managedSubjectInstance)
+  }
 
-    redirect url: redirectURL
+  def twosteplogin(long id, long totp) {
+    def managedSubjectInstance = ManagedSubject.get(id)
+    if(!managedSubjectInstance) {
+      log.error "No ManagedSubject represented by $id in extendedlogin"
+      session.setAttribute(INVALID_USER, true)
+      redirect action:"index"
+      return
+    }
+
+    if(!loginService.totpLogin(managedSubjectInstance, totp, request)) {
+      log.info "LoginService indicates totp failure for attempted login by $managedSubjectInstance"
+      render(view: "twostep", model: [managedSubjectInstance: managedSubjectInstance, loginError:true])
+      return
+    }
+
+    redirect url: establishSession(managedSubjectInstance)
   }
 
   def oops() {
@@ -115,5 +123,30 @@ class LoginController {
         }
 
      }
-  }  
+  }
+
+  private String establishSession(ManagedSubject managedSubjectInstance) {
+    def redirectURL = session.getAttribute(SSO_URL)
+    if(!redirectURL) {
+      log.error "No redirectURL set for login, redirecting to oops"
+      return createLink(action: 'oops')
+    }
+
+    def sessionID = loginService.establishSession(managedSubjectInstance)
+    log.info "Login by ${managedSubjectInstance} was completed successfully. Associated new sessionID of $sessionID."
+
+    // Setup SSO cookie for use with Shib IdP VHR filter
+    int maxAge = grailsApplication.config.aaf.vhr.login.validity_period_minutes * 60
+    Cookie cookie = new Cookie(SSO_COOKIE_NAME, sessionID)
+    cookie.maxAge = maxAge
+    cookie.secure = grailsApplication.config.aaf.vhr.login.ssl_only_cookie
+    cookie.path = grailsApplication.config.aaf.vhr.login.path
+    response.addCookie(cookie)
+
+    session.removeAttribute(INVALID_USER)
+    session.removeAttribute(CURRENT_USER)
+    session.removeAttribute(SSO_URL)
+
+    redirectURL
+  }
 }

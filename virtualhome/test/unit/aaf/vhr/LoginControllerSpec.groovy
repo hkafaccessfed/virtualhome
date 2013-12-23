@@ -33,7 +33,6 @@ class LoginControllerSpec extends spock.lang.Specification {
     response.status == 200
   }
 
-
   def "index success if ssourl provided in session"() {
     setup:
     session.setAttribute(controller.SSO_URL, "http://test.com")
@@ -90,14 +89,6 @@ class LoginControllerSpec extends spock.lang.Specification {
     session.getAttribute(MigrateController.MIGRATION_USER) == 'username'
   }
 
-  def "login withouth redirectURL redirects to oops"() {
-    when:
-    controller.login('username', 'password')
-
-    then:
-    response.redirectedUrl == "/login/oops"
-  }
-
   def "login without valid managedSubject sets INVALID_USER"() {
     setup:
     session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
@@ -152,13 +143,33 @@ class LoginControllerSpec extends spock.lang.Specification {
     response.cookies[0].secure
   }
 
+  def "successful login without redirectURL redirects to oops"() {
+    setup:
+    def loginService = Mock(aaf.vhr.LoginService)
+    grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
+    grailsApplication.config.aaf.vhr.login.ssl_only_cookie = true
+
+    def ms = ManagedSubject.build(active:true, failedLogins: 0)
+    ms.organization.active = true
+
+    controller.loginService = loginService
+
+    when:
+    controller.login(ms.login, 'password')
+
+    then:
+    1 * loginService.passwordLogin(ms, _, _, _, _) >> true
+    response.redirectedUrl == "/login/oops"
+    response.cookies.size() == 0
+  }
+
   def "successful login sets insecure cookie and redirects to IdP login ssourl"() {
     setup:
     session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
     def loginService = Mock(aaf.vhr.LoginService)
     grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
     grailsApplication.config.aaf.vhr.login.ssl_only_cookie = false
-    
+
     def ms = ManagedSubject.build(active:true, failedLogins: 0)
     ms.organization.active = true
 
@@ -174,20 +185,66 @@ class LoginControllerSpec extends spock.lang.Specification {
     !response.cookies[0].secure
   }
 
+  def "successful login of account requiring totp renders code entry"() {
+    setup:
+    session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
+    def loginService = Mock(aaf.vhr.LoginService)
+    grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
+    grailsApplication.config.aaf.vhr.login.ssl_only_cookie = false
 
+    def ms = ManagedSubject.build(active:true, failedLogins: 0, totpKey:'DPS6XA5YWTZFQ4FI')
+    ms.organization.active = true
 
+    controller.loginService = loginService
 
+    when:
+    controller.login(ms.login, 'password')
 
+    then:
+    1 * loginService.passwordLogin(ms, _, _, _, _) >> true
+    response.cookies.size() == 0
+    response.redirectedUrl != "https://idp.test.com/shibboleth-idp/authn"
+  }
 
+  def "extendedlogin with invalid user doesnt establish session"() {
+    setup:
+    session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
 
+    def loginService = Mock(aaf.vhr.LoginService)
+    grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
+    grailsApplication.config.aaf.vhr.login.ssl_only_cookie = false
 
+    controller.loginService = loginService
 
+    when:
+    controller.twosteplogin(100000, 123456)
 
+    then:
+    session.getAttribute(controller.INVALID_USER)
+    response.redirectedUrl == "/login/index"
+    response.cookies.size() == 0
+  }
 
+  def "successful extendedlogin sets cookie and redirects to IdP login ssourl"() {
+    setup:
+    session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
+    def loginService = Mock(aaf.vhr.LoginService)
+    grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
+    grailsApplication.config.aaf.vhr.login.ssl_only_cookie = false
 
+    def ms = ManagedSubject.build(active:true, failedLogins: 0)
+    ms.organization.active = true
 
+    controller.loginService = loginService
 
+    when:
+    controller.twosteplogin(ms.id, 123456)
 
-
+    then:
+    1 * loginService.totpLogin(ms, 123456, _) >> true
+    response.redirectedUrl == "https://idp.test.com/shibboleth-idp/authn"
+    response.cookies[0].maxAge == 1 * 60
+    !response.cookies[0].secure
+  }
 
 }

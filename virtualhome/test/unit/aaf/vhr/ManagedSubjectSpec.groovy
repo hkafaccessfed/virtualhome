@@ -912,13 +912,13 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
     !s.resetCodeExternal
   }
 
-  def 'ensure requiresTotpLogin works correctly'() {
+  def 'ensure isUsingTwoStepLogin works correctly'() {
     setup:
     def s = ManagedSubject.build(failedLogins:0, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222', totpKey: totpKey)
     s.organization.active = true
 
     when:
-    def result = s.requiresTotpLogin()
+    def result = s.isUsingTwoStepLogin()
 
     then:
     result == expected
