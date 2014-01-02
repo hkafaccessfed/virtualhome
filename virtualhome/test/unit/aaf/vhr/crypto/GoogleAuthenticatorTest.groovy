@@ -13,7 +13,7 @@ public class GoogleAuthenticatorTest extends grails.test.GrailsUnitTestCase {
     println qrURL
 
     assert secret.length() == 16
-    assert qrURL == "https://www.google.com/chart?chs=200x200&chld=M%7C0&cht=qr&chl=otpauth://totp/testuser@vhr.test.edu.au%3Fsecret%3D" + secret
+    assert qrURL == "https://chart.googleapis.com/chart?chs=200x200&chld=M%7C0&cht=qr&chl=otpauth://totp/testuser@vhr.test.edu.au%3Fsecret%3D" + secret
   }
 
   /*
