@@ -141,7 +141,9 @@
     <h3 class="muted">2-Step Verification</h3>
     <g:if test="${managedSubjectInstance.isUsingTwoStepLogin()}">
       <p>This account has been successfully setup to use 2-Step verfication.</p>
-      <img src="${totpURL}" width="200" height="200">
+
+      <div class="row"><div class="span12 centered"><br><img src="${totpURL}" width="200" height="200" class="img-polaroid"><br><br></div></div>
+
       <p>If you haven't already done so please <strong>follow the instructions on your installed app</strong> to scan the above QR code and complete the set up on your phone.<p>
     </g:if>
     <g:else>
