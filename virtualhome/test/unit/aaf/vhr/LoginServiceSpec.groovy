@@ -167,4 +167,21 @@ class LoginServiceSpec extends spock.lang.Specification {
     service.loginCache.size() == 1
   }
 
+  def 'ManagedSubject that cant login returns false for totp'() {
+    setup:
+    def request = Mock(javax.servlet.http.HttpServletRequest)
+    def session = Mock(javax.servlet.http.HttpSession)
+    def params = [:]
+    ms.active = false
+
+    when:
+    def outcome = service.totpLogin(ms, 1234, request)
+
+    then:
+    !outcome
+    ms.stateChanges.size() == 1
+    ms.stateChanges.toArray()[0].category == 'login_attempt'
+    ms.stateChanges.toArray()[0].reason == "User attempted login but account is disabled (TOTP)."
+  }
+
 }

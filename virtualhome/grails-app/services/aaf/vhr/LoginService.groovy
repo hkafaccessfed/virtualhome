@@ -85,7 +85,7 @@ class LoginService implements InitializingBean{
     }
 
     if(!GoogleAuthenticator.checkCode(managedSubjectInstance.totpKey, code, System.currentTimeMillis())) {
-      String reason = "User provided invalid code at login (TOTP)."
+      String reason = "User provided invalid code for 2-Step verification."
       String requestDetails = createRequestDetails(request)
 
       managedSubjectInstance.failLogin(reason, 'login_attempt', requestDetails, null)
@@ -96,7 +96,7 @@ class LoginService implements InitializingBean{
 
     log.info "The TOTP code supplied for ManagedSubject $managedSubjectInstance was valid."
 
-    String reason = "User provided valid code at login (TOTP)."
+    String reason = "User provided valid code for 2-Step verification."
     String requestDetails = createRequestDetails(request)
     managedSubjectInstance.successfulLogin(reason, 'login_attempt', requestDetails, null)
 

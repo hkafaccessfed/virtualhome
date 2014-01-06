@@ -206,6 +206,27 @@ class LoginControllerSpec extends spock.lang.Specification {
     response.redirectedUrl != "https://idp.test.com/shibboleth-idp/authn"
   }
 
+  def "successful login of account with enforced totp but not having been setup yet renders account setup"() {
+    setup:
+    session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
+    def loginService = Mock(aaf.vhr.LoginService)
+    grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
+    grailsApplication.config.aaf.vhr.login.ssl_only_cookie = false
+
+    def ms = ManagedSubject.build(active:true, failedLogins: 0, totpForce:true)
+    ms.organization.active = true
+
+    controller.loginService = loginService
+
+    when:
+    controller.login(ms.login, 'password')
+
+    then:
+    1 * loginService.passwordLogin(ms, _, _, _, _) >> true
+    response.redirectedUrl == "/account/setuptwostep"
+    session.getAttribute(AccountController.CURRENT_USER) == ms.id
+  }
+
   def "extendedlogin with invalid user doesnt establish session"() {
     setup:
     session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
