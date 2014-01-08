@@ -61,9 +61,6 @@ class UrlMappings {
     "/lostusername/$action" {
       controller="lostUsername"
     }
-    "/migration/$action" {
-      controller="migrate"
-    }
 
     "/dashboard"(controller:"dashboard", action:"dashboard")
 
