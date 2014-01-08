@@ -178,7 +178,7 @@ class ManagedSubject {
   }
 
   public boolean enforceTwoStepLogin() {
-    this.totpForce
+    this.totpForce || group.enforceTwoStepLogin()
   }
 
   public boolean hasEstablishedTwoStepLogin(String sessionID) {

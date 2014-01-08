@@ -199,8 +199,16 @@
                     <td><g:formatBoolean boolean="${managedSubjectInstance.isUsingTwoStepLogin()}"/></td>
                   </tr>
                   <tr>
-                    <td><strong>User is required by administrator policy to use two-step login?</strong></td>
-                    <td><g:formatBoolean boolean="${managedSubjectInstance.enforceTwoStepLogin()}"/></td>
+                    <td><strong>User is required by local administrator policy to use two-step login?</strong></td>
+                    <td>
+                      <g:formatBoolean boolean="${managedSubjectInstance.totpForce}"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>User is required by group administrator policy to use two-step login?</strong></td>
+                    <td>
+                      <g:formatBoolean boolean="${managedSubjectInstance.group.totpForce}"/>
+                    </td>
                   </tr>
                 </tbody>
               </table>

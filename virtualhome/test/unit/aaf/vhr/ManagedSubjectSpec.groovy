@@ -983,4 +983,19 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
       s.twoStepSessions.size() == 1
   }
 
+  def 'ensure enforceTwoStepLogin works correctly'() {
+    setup:
+    def s = ManagedSubject.build(failedLogins:0, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222', totpForce: subjectForce)
+    s.group.totpForce = groupForce
+
+    expect:
+    s.enforceTwoStepLogin() == result
+
+    where:
+    subjectForce << [true, false, true, false]
+    groupForce << [false, true, true, false]
+    result << [true, true, true, false]
+
+  }
+
 }
