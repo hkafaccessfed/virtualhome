@@ -1,15 +1,15 @@
-<p>The Virtual Home supports 2-Step verification via a smart phone app which provide you with a random code that is required to be entered at login.</p>
-<p>Using 2-Step verification considerably improves the security of your account. We use the same technology as Google, Dropbox, Amazon and Yahoo to achieve this.</p>
+<p>The Virtual Home supports 2-Step verification via a smart phone app which provides you with a random code that is required to be entered at login.</p>
 
 <h4 class="muted">Signing in to your account will work a little differently</h4>
 <ol>
   <li>
-    <h5>Enter your password</h5>
+    <h5>Step 1: Enter your password</h5>
     <p>Whenever you sign in to the AAF VHO, you'll enter your password as usual.</p>
   </li>
   <li>
-    <h5>Enter a verification code</h5>
-    <p>Then, you'll be asked for a verification code which will be provided by an app on your spart phone. You'll then be asked for this verification periodically in the future.</p>
+    <h5>Step 2: Enter a verification code</h5>
+    <p>You'll be asked to enter your random 2-Step verification code which will be provided by an app on your smart phone.</p>
+    <p>This code only needs to be entered once every 90 days on each computer you use. If you use multiple types of web browser to access AAF services, e.g. Google Chrome and Firefox, you'll also be asked to enter the code once every 90 days in each web browser.</p>
   </li>
 </ol>
 

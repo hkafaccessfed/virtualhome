@@ -5,9 +5,15 @@ import grails.buildtestdata.mixin.Build
 import spock.lang.*
 import grails.plugin.spock.*
 
+import aaf.vhr.crypto.GoogleAuthenticator
+
+import org.springframework.mock.web.*
+
+import groovy.time.TimeCategory
+
 @TestFor(aaf.vhr.LoginService)
 @Build([aaf.vhr.Organization, aaf.vhr.Group, aaf.vhr.ManagedSubject])
-@Mock([Organization, Group, StateChange, ManagedSubject])
+@Mock([Organization, Group, StateChange, ManagedSubject, TwoStepSession])
 class LoginServiceSpec extends spock.lang.Specification {
 
   @Shared 
@@ -25,6 +31,8 @@ class LoginServiceSpec extends spock.lang.Specification {
 
     service.afterPropertiesSet()
     ms = ManagedSubject.build(hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
+    ms.twoStepSessions = []
+    ms.metaClass.addToTwoStepSessions = {TwoStepSession session -> ms.twoStepSessions.add(session)}
 
     service.loginCache.invalidateAll()
   }
@@ -167,21 +175,84 @@ class LoginServiceSpec extends spock.lang.Specification {
     service.loginCache.size() == 1
   }
 
-  def 'ManagedSubject that cant login returns false for totp'() {
+  def 'ManagedSubject that cant login returns false for twoStepLogin'() {
     setup:
     def request = Mock(javax.servlet.http.HttpServletRequest)
+    def response = Mock(javax.servlet.http.HttpServletResponse)
     def session = Mock(javax.servlet.http.HttpSession)
     def params = [:]
     ms.active = false
 
     when:
-    def outcome = service.totpLogin(ms, 1234, request)
+    def outcome = service.twoStepLogin(ms, 1234, request, response)
 
     then:
     !outcome
     ms.stateChanges.size() == 1
     ms.stateChanges.toArray()[0].category == 'login_attempt'
-    ms.stateChanges.toArray()[0].reason == "User attempted login but account is disabled (TOTP)."
+    ms.stateChanges.toArray()[0].reason == "User attempted login but account is disabled (2-Step Verification)."
   }
+
+  def 'Incorrect two step code returns false'() {
+    setup:
+    def request = new MockHttpServletRequest()
+    def response = new MockHttpServletResponse()
+    def session = Mock(javax.servlet.http.HttpSession)
+    def params = [:]
+
+    ms.failedLogins = 0
+    ms.active = true
+    ms.organization.active = true
+
+    GoogleAuthenticator.metaClass.static.checkCode = { String key, long code, long time -> false }
+
+    when:
+    def outcome = service.twoStepLogin(ms, 1234, request, response)
+
+    then:
+    !outcome
+    ms.stateChanges.size() == 1
+    ms.stateChanges.toArray()[0].category == 'login_attempt'
+    ms.stateChanges.toArray()[0].reason == "Invalid code for 2-Step Verification."
+
+    response.cookies.size() == 0
+  }
+
+  def 'Correct two step code sets up 90 day session, cleans up old sessions and returns true'() {
+    setup:
+    def request = new MockHttpServletRequest()
+    def response = new MockHttpServletResponse()
+    def session = Mock(javax.servlet.http.HttpSession)
+    def params = [:]
+
+    ms.failedLogins = 0
+    ms.active = true
+    ms.organization.active = true
+
+    ms.twoStepSessions = [new TwoStepSession(value:'1234abcd', expiry: use(TimeCategory) {91.days.ago}), new TwoStepSession(value:'1234abcd', expiry: use(TimeCategory) {100.days.ago})]
+    ms.save()
+
+    GoogleAuthenticator.metaClass.static.checkCode = { String key, long code, long time -> code == 1234 }
+
+    expect:
+    TwoStepSession.count() == 2
+
+    when:
+    def outcome = service.twoStepLogin(ms, 1234, request, response)
+
+    then:
+    outcome
+    ms.stateChanges.size() == 1
+    ms.stateChanges.toArray()[0].category == 'login_attempt'
+    ms.stateChanges.toArray()[0].reason.startsWith "Valid code for 2-Step verification. Assigned 90 day sessionID of"
+
+    TwoStepSession.count() == 1   // Two old sessions removed, 1 new session present
+
+    response.cookies.size() == 1
+    response.cookies[0].maxAge == 90 * 24 * 60 * 60 // 90 days in seconds
+    response.cookies[0].secure == response.cookies[0].secure
+  }
+
+
 
 }

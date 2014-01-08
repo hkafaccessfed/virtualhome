@@ -8,6 +8,8 @@ import groovy.transform.ToString
 import aaf.base.identity.Subject
 import org.apache.shiro.SecurityUtils
 
+import groovy.time.TimeCategory
+
 @ToString(includeNames=true, includes="id, login, cn, email")
 @EqualsAndHashCode
 class ManagedSubject {
@@ -74,7 +76,8 @@ class ManagedSubject {
   static hasMany = [challengeResponse: ChallengeResponse,
                     emailReset: EmailReset,
                     invitations: ManagedSubjectInvitation,
-                    stateChanges: StateChange]  
+                    stateChanges: StateChange,
+                    twoStepSessions: TwoStepSession]
 
   static belongsTo = [organization:Organization,
                       group:Group]
@@ -176,6 +179,39 @@ class ManagedSubject {
 
   public boolean enforceTwoStepLogin() {
     this.totpForce
+  }
+
+  public boolean hasEstablishedTwoStepLogin(String sessionID) {
+    use (TimeCategory) {
+      def twoStepSession = twoStepSessions?.find{ it?.value == sessionID }
+      (twoStepSession && twoStepSession.expiry > 90.days.ago)
+    }
+  }
+
+  public TwoStepSession establishTwoStepSession() {
+    def session = new TwoStepSession()
+    session.populate()
+
+    this.addToTwoStepSessions(session)
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when adding TwoStep session"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when adding TwoStep session")
+    }
+
+    session
+  }
+
+  public void cleanupEstablishedTwoStepLogin() {
+    use (TimeCategory) {
+      twoStepSessions?.each { twoStepSession ->
+        if(twoStepSession && twoStepSession?.expiry < 90.days.ago)
+          twoStepSession.delete()
+      }
+    }
   }
 
   public boolean functioning() {
@@ -371,6 +407,14 @@ class ManagedSubject {
 
     def change = new StateChange(event:StateChangeType.LOGIN, reason:reason, category:category, environment:environment, actionedBy:actionedBy)
     this.addToStateChanges(change)
+
+    if(!this.save(flush:true)) {
+      log.error "Unable to save $this when setting successfulLogin state"
+      this.errors.each {
+        log.error it
+      }
+      throw new RuntimeException ("Unable to save $this when setting successfulLogin state")
+    }
   }
 
   public successfulLostPassword() {

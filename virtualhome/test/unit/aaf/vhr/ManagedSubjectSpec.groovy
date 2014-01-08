@@ -9,9 +9,11 @@ import aaf.vhr.ManagedSubject
 
 import test.shared.ShiroEnvironment
 
+import groovy.time.TimeCategory
+
 @TestFor(aaf.vhr.ManagedSubject)
-@Build([ManagedSubject, Organization, Group, ChallengeResponse])
-@Mock([ManagedSubject, Organization, Group, ChallengeResponse, StateChange])
+@Build([ManagedSubject, Organization, Group, ChallengeResponse, TwoStepSession])
+@Mock([ManagedSubject, Organization, Group, ChallengeResponse, StateChange, TwoStepSession])
 class ManagedSubjectSpec extends spock.lang.Specification  {
 
   @Shared def shiroEnvironment = new ShiroEnvironment()
@@ -926,6 +928,59 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
     where:
     expected << [false, true]
     totpKey << [null, 'DPS6XA5YWTZFQ4FI']
+  }
+
+  def 'ensure hasEstablishedTwoStepLogin works correctly'() {
+      setup:
+      def s = ManagedSubject.build(failedLogins:0, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222', totpKey: 'DPS6XA5YWTZFQ4FI')
+      s.organization.active = true
+      s.twoStepSessions = [sessions]
+
+      when:
+      def result = s.hasEstablishedTwoStepLogin('1234abcd')
+
+      then:
+      result == expected
+
+      where:
+      //yesterday, 91 days ago, no sessions
+      sessions << [(new TwoStepSession(value:'1234abcd', expiry: use(TimeCategory) {1.days.ago})), (new TwoStepSession(value:'1234abcd', expiry: use(TimeCategory) {91.days.ago})), null]
+      expected << [true, false, false]
+  }
+
+  def 'ensure cleanupEstablishedTwoStepLogin works correctly'() {
+      setup:
+      def s = ManagedSubject.build(failedLogins:0, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222', totpKey: 'DPS6XA5YWTZFQ4FI')
+      s.organization.active = true
+      s.twoStepSessions = [sessions]
+      s.save()
+
+      when:
+      def result = s.cleanupEstablishedTwoStepLogin()
+
+      then:
+      TwoStepSession.count() == expected
+
+      where:
+      //yesterday, 91 days ago, no sessions
+      sessions << [new TwoStepSession(value:'1234abcd', expiry: use(TimeCategory) {1.days.ago}), new TwoStepSession(value:'1234abcd', expiry: use(TimeCategory) {91.days.ago}), null]
+      expected << [1, 0, 0]
+  }
+
+  def 'ensure establishTwoStepSession works correctly'() {
+      setup:
+      def s = ManagedSubject.build(failedLogins:0, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222', totpKey: 'DPS6XA5YWTZFQ4FI')
+      s.organization.active = true
+
+      expect:
+      TwoStepSession.count() == 0
+
+      when:
+      s.establishTwoStepSession()
+
+      then:
+      TwoStepSession.count() == 1
+      s.twoStepSessions.size() == 1
   }
 
 }

@@ -4,9 +4,14 @@ import org.springframework.beans.factory.InitializingBean
 import java.util.concurrent.TimeUnit
 import com.google.common.cache.*
 
+import javax.servlet.http.Cookie
+
 import aaf.vhr.crypto.GoogleAuthenticator
 
 class LoginService implements InitializingBean{
+
+  static final String SSO_COOKIE_NAME = "_vh_l1"
+  static final String TWOSTEP_COOKIE_NAME = "_vh_l2"
 
   boolean transactional = true
   def grailsApplication
@@ -73,32 +78,44 @@ class LoginService implements InitializingBean{
     true
   }
 
-  public boolean totpLogin(ManagedSubject managedSubjectInstance, long code, def request) {
+  public boolean twoStepLogin(ManagedSubject managedSubjectInstance, long code, def request, def response) {
     if(!managedSubjectInstance.canLogin()) {
-      String reason = "User attempted login but account is disabled (TOTP)."
+      String reason = "User attempted login but account is disabled (2-Step Verification)."
       String requestDetails = createRequestDetails(request)
 
       managedSubjectInstance.failLogin(reason, 'login_attempt', requestDetails, null)
 
-      log.error "The ManagedSubject $managedSubjectInstance can not use login at this time due to inactivty or locks (TOTP)."
+      log.error "The ManagedSubject $managedSubjectInstance can not use login at this time due to inactivty or locks (2-Step Verification)."
       return false
     }
 
     if(!GoogleAuthenticator.checkCode(managedSubjectInstance.totpKey, code, System.currentTimeMillis())) {
-      String reason = "User provided invalid code for 2-Step verification."
+      String reason = "Invalid code for 2-Step Verification."
       String requestDetails = createRequestDetails(request)
 
       managedSubjectInstance.failLogin(reason, 'login_attempt', requestDetails, null)
 
-      log.error "The TOTP code supplied for ManagedSubject $managedSubjectInstance is not correct or does not match the stored totpKey."
+      log.error "The 2-Step Verification code supplied for ManagedSubject $managedSubjectInstance is not correct or does not match the stored key."
       return false
     }
 
-    log.info "The TOTP code supplied for ManagedSubject $managedSubjectInstance was valid."
+    def twoStepSession = managedSubjectInstance.establishTwoStepSession()
 
-    String reason = "User provided valid code for 2-Step verification."
+    log.info "The 2-Step verification code supplied for $managedSubjectInstance was valid."
+
+    String reason = "Valid code for 2-Step verification. Assigned 90 day sessionID of ${twoStepSession.value}."
     String requestDetails = createRequestDetails(request)
     managedSubjectInstance.successfulLogin(reason, 'login_attempt', requestDetails, null)
+
+    int maxAge = 90 * 24 * 60 * 60 // 90 days in seconds
+    Cookie cookie = new Cookie(LoginService.TWOSTEP_COOKIE_NAME, twoStepSession.value)
+    cookie.maxAge = maxAge
+    cookie.secure = grailsApplication.config.aaf.vhr.login.ssl_only_cookie
+    cookie.path = grailsApplication.config.aaf.vhr.login.path
+    response.addCookie(cookie)
+
+    // We should stick this in its own reactive thread but this is Grails so LOLZ.
+    managedSubjectInstance.cleanupEstablishedTwoStepLogin()
 
     true
   }

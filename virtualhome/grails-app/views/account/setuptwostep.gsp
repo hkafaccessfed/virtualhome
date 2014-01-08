@@ -14,7 +14,7 @@
 
     <div class="row">
       <div class="span12">
-        <p>The Virtual Home now supports 2-Step verificati and the <strong>administrators of your account</strong> have made it mandatory for you to secure your account using this process before you can continue to access AAF connected services.</p>
+        <p>The Virtual Home now supports 2-Step verification and the <strong>administrators of your account</strong> have made it mandatory for you to secure your account using this process before you can continue to access AAF connected services.</p>
 
         <g:render template="appdetails" />
 
