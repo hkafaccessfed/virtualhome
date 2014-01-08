@@ -1,4 +1,4 @@
-<p>The Virtual Home supports 2-Step verification via a smart phone app which provides you with a random code that is required to be entered at login.</p>
+<p>The Virtual Home supports 2-Step verification via a smart phone app which provides you with a random code to use at login, in addition to your password.</p>
 
 <h4 class="muted">Signing in to your account will work a little differently</h4>
 <ol>

@@ -69,8 +69,8 @@ class AccountController {
       return
     }
 
-    if(!loginService.totpLogin(managedSubjectInstance, totp, request)) {
-      log.info "LoginService indicates totp failure for attempted login by $managedSubjectInstance"
+    if(!loginService.twoStepLogin(managedSubjectInstance, totp, request, response)) {
+      log.info "LoginService indicates 2-Step verification failure for attempted login by $managedSubjectInstance"
       render(view: "twostep", model: [managedSubjectInstance: managedSubjectInstance, loginError:true])
       return
     }
@@ -175,7 +175,7 @@ class AccountController {
     redirect action: 'show'
   }
 
-  def setuptotp() {
+  def enabletwostep() {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
     if(!managedSubjectInstance) {
       log.error "A valid session does not already exist to allow completedetailschange to function"

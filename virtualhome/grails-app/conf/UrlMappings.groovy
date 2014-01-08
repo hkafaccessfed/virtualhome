@@ -59,9 +59,9 @@ class UrlMappings {
       controller="account"
       action="completedetailschange"
     }
-    "/myaccount/setuptotp" {
+    "/myaccount/enabletwostep" {
       controller="account"
-      action="setuptotp"
+      action="enabletwostep"
     }
     "/myaccount/setuptwostep" {
       controller="account"

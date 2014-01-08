@@ -27,8 +27,8 @@ class ManagedSubject {
   String login
   String hash
 
-  String totpKey              // Time-base One Time Password - used with Google Authenticator
-  boolean totpForce           // This account must setup TOTP and can't opt out
+  String totpKey              // 2-Step Verification (Time-base One Time Password), Used with Google Authenticator and simillar apps
+  boolean totpForce           // This account must setup 2-Step Verification and can't opt out
 
   String apiKey               // Use for local account management context
   String eptidKey             // Used as input for EPTID generation so login changes don't impact us - should never be altered.

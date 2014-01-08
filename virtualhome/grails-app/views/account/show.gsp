@@ -138,7 +138,7 @@
 
     <hr>
 
-    <h3 class="muted">2-Step Verification</h3>
+    <h3 class="muted">2-Step verification</h3>
     <g:if test="${managedSubjectInstance.isUsingTwoStepLogin()}">
       <p>This account has been successfully setup to use 2-Step verfication.</p>
 
@@ -147,9 +147,9 @@
       <p>If you haven't already done so please <strong>follow the instructions on your installed app</strong> to scan the above QR code and complete the set up on your phone.<p>
     </g:if>
     <g:else>
-      <p>Would you like to enable extra security for your AAF VHO account?.</p>
+      <p>Would you like to enable extra security for your account?.</p>
       <g:render template="appdetails" />
-      <p><g:link action="setuptotp" id="${managedSubjectInstance.id}" class="btn btn-large btn-warning">Enable 2-Step verification</g:link></p>
+      <p><g:link action="enabletwostep" id="${managedSubjectInstance.id}" class="btn btn-large btn-warning">Enable 2-Step verification</g:link></p>
     </g:else>
 
     <hr>
