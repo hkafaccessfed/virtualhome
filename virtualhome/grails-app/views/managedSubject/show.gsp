@@ -55,7 +55,7 @@
         <p><g:message encodeAs='HTML' code="views.aaf.vhr.managedsubject.show.finalized.correct"/></p>
       </div>
     </g:if>
-    <g:if test="${!(managedSubjectInstance.functioning()) && managedSubjectInstance.login != null && !managedSubjectInstance.blocked && !managedSubjectInstance.locked && !managedSubjectInstance.archived && !managedSubjectInstance.isExpired()}">
+    <g:if test="${managedSubjectInstance.finalized && !(managedSubjectInstance.functioning()) && managedSubjectInstance.login != null && !managedSubjectInstance.blocked && !managedSubjectInstance.locked && !managedSubjectInstance.archived && !managedSubjectInstance.isExpired()}">
       <div class="alert alert-block alert-info">
         <h4><g:message encodeAs='HTML' code="views.aaf.vhr.managedsubject.show.functioning.heading"/></h4>
         <p><g:message encodeAs='HTML' code="views.aaf.vhr.managedsubject.show.functioning.reason"/></p>
@@ -84,12 +84,12 @@
               <tbody>
 
                 <tr><td colspan="2"><h4><g:message encodeAs='HTML' code="label.coreattributes"/></h4></td></tr>
-                
+
                 <tr>
                   <th class="span4"><span id="cn-label"><strong><g:message encodeAs='HTML' code="label.cn" /></strong></span></th>
                   <td><span aria-labelledby="cn-label"><g:fieldValue bean="${managedSubjectInstance}" field="cn"/></span></td>
                 </tr>
-              
+
                 <tr>
                   <th class="span4"><span id="email-label"><strong><g:message encodeAs='HTML' code="label.email" /></strong></span></th>
                   <td><span aria-labelledby="email-label"><g:fieldValue bean="${managedSubjectInstance}" field="email"/></span></td>

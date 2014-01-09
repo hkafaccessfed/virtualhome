@@ -33,7 +33,7 @@ class ManagedSubject {
   // Last time the password reset codes were resent to the user. Used for throttling.
   Date lastCodeResend
 
-  Date accountExpires         
+  Date accountExpires
 
   // AAF Core
   String cn                   // oid:2.5.4.3
@@ -43,7 +43,7 @@ class ManagedSubject {
   String eduPersonAssurance   // oid:1.3.6.1.4.1.5923.1.1.1.11
   String eduPersonAffiliation // oid:1.3.6.1.4.1.5923.1.1.1.1 - stored seperated by ; for IdP resolver simplification
   String eduPersonEntitlement // oid:1.3.6.1.4.1.5923.1.1.1.7 - stored seperated by ; for IdP resolver simplification
-  
+
   // AAF Optional
   String givenName            // oid:2.5.4.42
   String surname              // oid:2.5.4.4
@@ -77,7 +77,7 @@ class ManagedSubject {
   static constraints = {
     login nullable:true, blank: false, unique: true, size: 3..100,  validator: { val -> if (val?.contains(' ')) return 'value.contains.space' }
     hash nullable:true, blank:false, minSize:60, maxSize:60
-    
+
     resetCode nullable:true
     resetCodeExternal nullable:true, validator: {val, obj ->
       val == null || val != obj.resetCode
@@ -105,11 +105,11 @@ class ManagedSubject {
     eduPersonAffiliation nullable:false, blank:false, maxSize: 255
 
     mobileNumber nullable: true, blank: false, validator: validMobileNumber
-    givenName nullable: true, blank: false          
-    surname nullable: true, blank: false            
-    telephoneNumber nullable: true, blank: false   
-    postalAddress nullable: true, blank: false      
-    organizationalUnit nullable: true, blank: false 
+    givenName nullable: true, blank: false
+    surname nullable: true, blank: false
+    telephoneNumber nullable: true, blank: false
+    postalAddress nullable: true, blank: false
+    organizationalUnit nullable: true, blank: false
 
     organization nullable: false
     group nullable: false
@@ -141,6 +141,11 @@ class ManagedSubject {
     SecurityUtils.subject.isPermitted("app:administrator") || 
     ( SecurityUtils.subject.isPermitted("app:manage:organization:${organization.id}:group:${group.id}:managedsubject:${id}:edit") 
       && !archived && !blocked && group.functioning() )
+  }
+
+  public boolean canMutateLogin() {
+    SecurityUtils.subject.isPermitted("app:administrator") ||
+    ( canMutate() && login )  // Only allows normal administrators to modify login if already populated through finalization process
   }
 
   public boolean canDelete() {
