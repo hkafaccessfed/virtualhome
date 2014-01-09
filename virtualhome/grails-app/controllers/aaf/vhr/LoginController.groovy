@@ -5,7 +5,6 @@ import static groovyx.net.http.ContentType.JSON
 import javax.servlet.http.Cookie
 
 import aaf.vhr.switchch.vho.DeprecatedSubject
-import aaf.vhr.MigrateController
 
 class LoginController {
 

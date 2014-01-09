@@ -5,7 +5,6 @@ import aaf.base.identity.SessionRecord
 
 import aaf.base.identity.Role
 import aaf.vhr.switchch.vho.DeprecatedSubject
-import aaf.vhr.MigrateController
 
 import aaf.vhr.crypto.GoogleAuthenticator
 
