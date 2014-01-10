@@ -63,6 +63,10 @@ class UrlMappings {
       controller="account"
       action="enabletwostep"
     }
+    "/myaccount/finishenablingtwostep" {
+      controller="account"
+      action="finishenablingtwostep"
+    }
     "/myaccount/setuptwostep" {
       controller="account"
       action="setuptwostep"

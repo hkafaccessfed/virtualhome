@@ -97,11 +97,7 @@ class AccountController {
     def groupRole = Role.findWhere(name:"group:${managedSubjectInstance.group.id}:administrators")
     def organizationRole = Role.findWhere(name:"organization:${managedSubjectInstance.organization.id}:administrators")
 
-    def totpURL = null
-    if(managedSubjectInstance.isUsingTwoStepLogin())
-      totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, "VHO", managedSubjectInstance.totpKey)
-
-    [managedSubjectInstance:managedSubjectInstance, totpURL: totpURL, groupRole:groupRole, organizationRole:organizationRole]
+    [managedSubjectInstance:managedSubjectInstance, groupRole:groupRole, organizationRole:organizationRole]
   }
 
   def changedetails() {
@@ -178,7 +174,7 @@ class AccountController {
   def enabletwostep() {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
     if(!managedSubjectInstance) {
-      log.error "A valid session does not already exist to allow completedetailschange to function"
+      log.error "A valid session does not already exist to allow enabletwostep to function"
       response.sendError 403
       return
     }
@@ -190,7 +186,30 @@ class AccountController {
       return
     }
 
-    redirect action:'show'
+    def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, managedSubjectInstance.totpKey)
+    [managedSubjectInstance:managedSubjectInstance, totpURL: totpURL]
+  }
+
+  def finishenablingtwostep(long totp) {
+    def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
+    if(!managedSubjectInstance) {
+      log.error "A valid session does not already exist to allow finishenablingtwostep to function"
+      response.sendError 403
+      return
+    }
+
+    if(!GoogleAuthenticator.checkCode(managedSubjectInstance.totpKey, totp, System.currentTimeMillis())) {
+      flash.type = 'error'
+      flash.message = 'controllers.aaf.vhr.account.finish.twostep.error'
+
+      def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, managedSubjectInstance.totpKey)
+
+      render view: 'enabletwostep', model: [managedSubjectInstance:managedSubjectInstance, totpURL: totpURL]
+    } else {
+      flash.type = 'success'
+      flash.message = 'controllers.aaf.vhr.account.finish.twostep.success'
+      redirect action:'show'
+    }
   }
 
   def setuptwostep() {
@@ -222,7 +241,7 @@ class AccountController {
       return
     }
 
-    def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, "VHO", managedSubjectInstance.totpKey)
+    def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, managedSubjectInstance.totpKey)
 
     [managedSubjectInstance:managedSubjectInstance, totpURL:totpURL]
   }

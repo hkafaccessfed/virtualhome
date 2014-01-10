@@ -4,6 +4,8 @@ import grails.test.mixin.*
 import grails.plugin.spock.*
 import grails.buildtestdata.mixin.Build
 
+import aaf.vhr.crypto.GoogleAuthenticator
+
 import spock.lang.*
 
 import aaf.base.identity.*
@@ -225,6 +227,62 @@ class AccountControllerSpec extends spock.lang.Specification {
     flash.message == 'controllers.aaf.vhr.account.completedetailschange.success'
 
     managedSubjectTestInstance.mobileNumber == '+61412345678'
+  }
+
+  def 'ensure enabletwostep generates totpkey'() {
+    setup:
+    def managedSubjectTestInstance = ManagedSubject.build(login: 'validlogin', mobileNumber: '+61487654321')
+    session.setAttribute(controller.CURRENT_USER, managedSubjectTestInstance.id)
+
+    expect:
+    managedSubjectTestInstance.totpKey == null
+
+    when:
+    controller.enabletwostep()
+
+    then:
+    response.status == 200
+    managedSubjectTestInstance.totpKey != null
+  }
+
+  def 'ensure finishenablingtwostep fails with invalid code'() {
+    setup:
+    def managedSubjectTestInstance = ManagedSubject.build(login: 'validlogin', mobileNumber: '+61487654321')
+    session.setAttribute(controller.CURRENT_USER, managedSubjectTestInstance.id)
+
+    GoogleAuthenticator.metaClass.static.checkCode = { String key, long code, long time -> false }
+
+    expect:
+    managedSubjectTestInstance.totpKey == null
+
+    when:
+    params.totp = 1
+    controller.finishenablingtwostep()
+
+    then:
+    response.status == 200
+    flash.type == 'error'
+    flash.message == 'controllers.aaf.vhr.account.finish.twostep.error'
+  }
+
+  def 'ensure finishenablingtwostep succeeds with valid code'() {
+    setup:
+    def managedSubjectTestInstance = ManagedSubject.build(login: 'validlogin', mobileNumber: '+61487654321')
+    session.setAttribute(controller.CURRENT_USER, managedSubjectTestInstance.id)
+
+    GoogleAuthenticator.metaClass.static.checkCode = { String key, long code, long time -> true }
+
+    expect:
+    managedSubjectTestInstance.totpKey == null
+
+    when:
+    params.totp = 1
+    controller.finishenablingtwostep()
+
+    then:
+    response.status == 302
+    flash.type == 'success'
+    flash.message == 'controllers.aaf.vhr.account.finish.twostep.success'
   }
 
 }
