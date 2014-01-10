@@ -80,19 +80,6 @@ class LoginControllerSpec extends spock.lang.Specification {
     !model.requiresChallenge
   }
 
-  def "non migrated user goes directly to migrate controller"() {
-    setup:
-    def ds = DeprecatedSubject.build(login:'username', migrated:false)
-  
-    when:
-    controller.login('username', 'passoword')
-
-    then:
-    response.status == 302
-    response.redirectUrl == '/migrate/introduction'
-    session.getAttribute(MigrateController.MIGRATION_USER) == 'username'
-  }
-
   def "login without valid managedSubject sets INVALID_USER"() {
     setup:
     session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
@@ -151,7 +138,7 @@ class LoginControllerSpec extends spock.lang.Specification {
     setup:
     def loginService = Mock(aaf.vhr.LoginService)
     grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
-    grailsApplication.config.aaf.vhr.login.ssl_only_cookie = true
+    grailsApplication.config.aaf.vhr.login.ssl_only_cookie = false
 
     def ms = ManagedSubject.build(active:true, failedLogins: 0)
     ms.organization.active = true
@@ -162,7 +149,6 @@ class LoginControllerSpec extends spock.lang.Specification {
     controller.login(ms.login, 'password')
 
     then:
-    1 * loginService.passwordLogin(ms, _, _, _, _) >> true
     response.redirectedUrl == "/login/oops"
     response.cookies.size() == 0
   }
