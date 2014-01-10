@@ -95,8 +95,6 @@ class LoginService implements InitializingBean{
       return false
     }
 
-    println "x"
-
     // Make sure there is no replay attack going on
     def totpCacheKey = "$code:${managedSubjectInstance.login}"
     if(totpCache.getIfPresent(totpCacheKey)) {
@@ -109,8 +107,6 @@ class LoginService implements InitializingBean{
       return false
     }
 
-    println "x2"
-
     if(!GoogleAuthenticator.checkCode(managedSubjectInstance.totpKey, code, System.currentTimeMillis())) {
       String reason = "Invalid code for 2-Step Verification."
       String requestDetails = createRequestDetails(request)
@@ -120,8 +116,6 @@ class LoginService implements InitializingBean{
       log.error "The 2-Step Verification code supplied for ManagedSubject $managedSubjectInstance is not correct or does not match the stored key."
       return false
     }
-
-    println "x3"
 
     def twoStepSession = managedSubjectInstance.establishTwoStepSession()
 
