@@ -5,7 +5,6 @@ import static groovyx.net.http.ContentType.JSON
 import javax.servlet.http.Cookie
 
 import aaf.vhr.switchch.vho.DeprecatedSubject
-import aaf.vhr.MigrateController
 
 class LoginController {
 
@@ -42,10 +41,10 @@ class LoginController {
   }
 
   def login(String username, String password) {
-    def deprecatedSubject = DeprecatedSubject.findWhere(login:username, migrated:false)
-    if(deprecatedSubject) {
-      session.setAttribute(MigrateController.MIGRATION_USER, username)
-      redirect (controller:'migrate', action:'introduction')
+    def redirectURL = session.getAttribute(SSO_URL)
+    if(!redirectURL) {
+      log.error "No redirectURL set for login, redirecting to oops"
+      redirect action: "oops"
       return
     }
 
