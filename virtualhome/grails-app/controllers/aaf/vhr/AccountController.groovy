@@ -191,6 +191,7 @@ class AccountController {
     }
 
     if(!GoogleAuthenticator.checkCode(managedSubjectInstance.totpKey, totp, System.currentTimeMillis())) {
+      log.warn("The account $managedSubjectInstance entered an invalid code when finishing 2-Step setup")
       flash.type = 'error'
       flash.message = 'controllers.aaf.vhr.account.finish.twostep.error'
 
@@ -198,6 +199,7 @@ class AccountController {
 
       render view: 'enabletwostep', model: [managedSubjectInstance:managedSubjectInstance, totpURL: totpURL]
     } else {
+      log.info("The account $managedSubjectInstance entered a valid code when finishing 2-Step setup")
       flash.type = 'success'
       flash.message = 'controllers.aaf.vhr.account.finish.twostep.success'
       redirect action:'show'
