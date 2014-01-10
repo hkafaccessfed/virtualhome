@@ -22,6 +22,7 @@ class LoginService implements InitializingBean{
   int validityPeriod = 2  // Defaults to 2 minutes, override in config
 
   Cache<String, String> loginCache
+  Cache<String, String> totpCache
 
   void afterPropertiesSet()  {
     if(grailsApplication.config.aaf.vhr.login.validity_period_minutes)
@@ -30,6 +31,11 @@ class LoginService implements InitializingBean{
     //initialize the loginCache
     loginCache = CacheBuilder.newBuilder().
     expireAfterWrite(validityPeriod, TimeUnit.MINUTES).
+    maximumSize(1000).
+    build()
+
+    totpCache = CacheBuilder.newBuilder().
+    expireAfterWrite(validityPeriod * 3, TimeUnit.MINUTES).
     maximumSize(1000).
     build()
   }
@@ -89,6 +95,22 @@ class LoginService implements InitializingBean{
       return false
     }
 
+    println "x"
+
+    // Make sure there is no replay attack going on
+    def totpCacheKey = "$code:${managedSubjectInstance.login}"
+    if(totpCache.getIfPresent(totpCacheKey)) {
+      String reason = "Attempted to reuse code for 2-Step Verification."
+      String requestDetails = createRequestDetails(request)
+
+      managedSubjectInstance.failLogin(reason, 'login_attempt', requestDetails, null)
+
+      log.error "The 2-Step Verification code supplied for ManagedSubject $managedSubjectInstance was previously used."
+      return false
+    }
+
+    println "x2"
+
     if(!GoogleAuthenticator.checkCode(managedSubjectInstance.totpKey, code, System.currentTimeMillis())) {
       String reason = "Invalid code for 2-Step Verification."
       String requestDetails = createRequestDetails(request)
@@ -98,6 +120,8 @@ class LoginService implements InitializingBean{
       log.error "The 2-Step Verification code supplied for ManagedSubject $managedSubjectInstance is not correct or does not match the stored key."
       return false
     }
+
+    println "x3"
 
     def twoStepSession = managedSubjectInstance.establishTwoStepSession()
 
@@ -113,6 +137,9 @@ class LoginService implements InitializingBean{
     cookie.secure = grailsApplication.config.aaf.vhr.login.ssl_only_cookie
     cookie.path = grailsApplication.config.aaf.vhr.login.path
     response.addCookie(cookie)
+
+    // Prevent replay - we don't really need the value for anything we're really just using the timeout
+    totpCache.put(totpCacheKey, managedSubjectInstance.login)
 
     // We should stick this in its own reactive thread but this is Grails so LOLZ.
     managedSubjectInstance.cleanupEstablishedTwoStepLogin()

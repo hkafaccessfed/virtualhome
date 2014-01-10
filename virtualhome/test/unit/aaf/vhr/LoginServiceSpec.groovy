@@ -253,6 +253,71 @@ class LoginServiceSpec extends spock.lang.Specification {
     response.cookies[0].secure == response.cookies[0].secure
   }
 
+  def 'Correct two step code that was used previously is rejected as potential MIIM'() {
+    setup:
+    def request = new MockHttpServletRequest()
+    def response = new MockHttpServletResponse()
+    def session = Mock(javax.servlet.http.HttpSession)
+    def params = [:]
 
+    ms.failedLogins = 0
+    ms.active = true
+    ms.organization.active = true
+    ms.save()
+
+    GoogleAuthenticator.metaClass.static.checkCode = { String key, long code, long time -> code == 1234 }
+
+    expect:
+    TwoStepSession.count() == 0
+
+    when:
+    service.twoStepLogin(ms, 1234, request, response)
+    response.reset()
+    def outcome = service.twoStepLogin(ms, 1234, request, response)
+
+    then:
+    !outcome
+    ms.stateChanges.toArray()[1].category == 'login_attempt'
+    ms.stateChanges.toArray()[1].reason.startsWith "Attempted to reuse code for 2-Step Verification."
+
+    TwoStepSession.count() == 1   // Only 1st session establishment was successful.
+    response.cookies.size() == 0
+  }
+
+  def 'Correct two step code that was used previously is rejected as potential MIIM but subsquent refreshed code is ok'() {
+    setup:
+    def request = new MockHttpServletRequest()
+    def response = new MockHttpServletResponse()
+    def session = Mock(javax.servlet.http.HttpSession)
+    def params = [:]
+
+    ms.failedLogins = 0
+    ms.active = true
+    ms.organization.active = true
+    ms.save()
+
+    GoogleAuthenticator.metaClass.static.checkCode = { String key, long code, long time -> code == 1234 || code == 5678 }
+
+    expect:
+    TwoStepSession.count() == 0
+
+    when:
+    service.twoStepLogin(ms, 1234, request, response)
+    response.reset()
+    def miim = service.twoStepLogin(ms, 1234, request, response)
+    response.reset()
+    def outcome = service.twoStepLogin(ms, 5678, request, response)
+
+    then:
+    !miim
+    outcome
+    ms.stateChanges.toArray()[1].category == 'login_attempt'
+    ms.stateChanges.toArray()[1].reason.startsWith "Attempted to reuse code for 2-Step Verification."
+    ms.stateChanges.toArray()[2].category == 'login_attempt'
+    ms.stateChanges.toArray()[2].reason.startsWith "Valid code for 2-Step verification. Assigned 90 day sessionID of"
+
+    TwoStepSession.count() == 2   // 1st and 3rd session establishment was successful.
+    response.cookies.size() == 1
+  }
 
 }

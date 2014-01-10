@@ -67,6 +67,7 @@ class LoginController {
 
     if(managedSubjectInstance.enforceTwoStepLogin() && !managedSubjectInstance.isUsingTwoStepLogin()){
       // This account needs to be updated before they can login
+      log.info("Due to local or group policy the account $managedSubjectInstance must enroll into 2-Step verification with their phone before continuing login.")
       session.setAttribute(AccountController.CURRENT_USER, managedSubjectInstance.id)
       redirect controller:'account', action:'setuptwostep'
       return
