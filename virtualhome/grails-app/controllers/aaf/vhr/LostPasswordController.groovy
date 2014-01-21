@@ -59,7 +59,7 @@ class LostPasswordController {
   def reset() {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
 
-    if(managedSubjectInstance.resetCode == null || (managedSubjectInstance.mobileNumber && managedSubjectInstance.resetCodeExternal == null)) {
+    if(managedSubjectInstance.resetCode == null || (grailsApplication.config.aaf.vhr.passwordreset.second_factor_required && managedSubjectInstance.mobileNumber && managedSubjectInstance.resetCodeExternal == null)) {
       if(grailsApplication.config.aaf.vhr.passwordreset.second_factor_required && managedSubjectInstance.mobileNumber) {
         managedSubjectInstance.resetCodeExternal = aaf.vhr.crypto.CryptoUtil.randomAlphanumeric(grailsApplication.config.aaf.vhr.passwordreset.reset_code_length)
       } else {
