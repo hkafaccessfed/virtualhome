@@ -206,40 +206,6 @@ class AccountController {
     }
   }
 
-  def setuptwostep() {
-    def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
-    if(!managedSubjectInstance) {
-      log.error "A valid session does not already exist to allow completedetailschange to function"
-      response.sendError 403
-      return
-    }
-
-    def groupRole = Role.findWhere(name:"group:${managedSubjectInstance.group.id}:administrators")
-    def organizationRole = Role.findWhere(name:"organization:${managedSubjectInstance.organization.id}:administrators")
-
-    [managedSubjectInstance:managedSubjectInstance, groupRole:groupRole, organizationRole:organizationRole]
-  }
-
-  def completesetuptwostep() {
-    def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
-    if(!managedSubjectInstance) {
-      log.error "A valid session does not already exist to allow completedetailschange to function"
-      response.sendError 403
-      return
-    }
-
-    managedSubjectInstance.totpKey = GoogleAuthenticator.generateSecretKey()
-    if(!managedSubjectInstance.save()) {
-      log.error "Unable to persist totpKey for $managedSubjectInstance"
-      response.sendError 500
-      return
-    }
-
-    def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, managedSubjectInstance.totpKey)
-
-    [managedSubjectInstance:managedSubjectInstance, totpURL:totpURL]
-  }
-
   private String createRequestDetails(def request) {
 """User Agent: ${request.getHeader('User-Agent')}
 Remote Host: ${request.getRemoteHost()}

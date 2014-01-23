@@ -146,7 +146,7 @@
     </g:if>
     <g:else>
       <p>Would you like to enable extra security for your account?.</p>
-      <g:render template="appdetails" />
+      <g:render template="/templates/appdetails" />
       <p><g:link action="enabletwostep" id="${managedSubjectInstance.id}" class="btn btn-large btn-warning">Enable 2-Step verification</g:link></p>
     </g:else>
 

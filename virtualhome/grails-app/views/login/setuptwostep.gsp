@@ -16,9 +16,9 @@
       <div class="span12">
         <p>The Virtual Home now supports 2-Step verification and the <strong>administrators of your account</strong> have made it mandatory for you to secure your account using this process before you can continue to access AAF connected services.</p>
 
-        <g:render template="appdetails" />
+        <g:render template="/templates/appdetails" />
 
-        <p><g:link action="completesetuptwostep" id="${managedSubjectInstance.id}" class="btn btn-large btn-warning">Enable two-step login</g:link></p>
+        <p><g:link action="completesetuptwostep" class="btn btn-large btn-warning">Enable two-step login</g:link></p>
       </div>
     </div>
 

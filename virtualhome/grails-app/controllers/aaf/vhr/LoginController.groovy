@@ -4,11 +4,17 @@ import groovyx.net.http.*
 import static groovyx.net.http.ContentType.JSON
 import javax.servlet.http.Cookie
 
+import aaf.base.identity.Role
 import aaf.vhr.switchch.vho.DeprecatedSubject
+
+import aaf.vhr.crypto.GoogleAuthenticator
 
 class LoginController {
 
+  static allowedMethods = [login: 'POST', verifytwostepcode:'POST']
+
   final String INVALID_USER = "aaf.vhr.LoginController.INVALID_USER"
+  final String FAILED_USER = "aaf.vhr.LoginController.FAILED_USER"
   final String CURRENT_USER = "aaf.vhr.LoginController.CURRENT_USER"
   final String SSO_URL = "aaf.vhr.LoginController.SSO_URL"
 
@@ -30,11 +36,11 @@ class LoginController {
       return [loginError:true, requiresChallenge:false]
     }
 
-    if(session.getAttribute(CURRENT_USER)) {
-      def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
+    if(session.getAttribute(FAILED_USER)) {
+      def managedSubjectInstance = ManagedSubject.get(session.getAttribute(FAILED_USER))
       if(managedSubjectInstance) {
-        log.debug "CURRENT_USER is set indicating previous failure. Rendering default login screen."
-        session.removeAttribute(CURRENT_USER)
+        log.debug "FAILED_USER is set for $managedSubjectInstance indicating previous failure. Rendering default login screen."
+        session.removeAttribute(FAILED_USER)
         return [loginError:true, requiresChallenge:managedSubjectInstance.requiresLoginCaptcha()]
       }
     }
@@ -60,16 +66,18 @@ class LoginController {
 
     if(!validPassword) {
       log.info "LoginService indicates failure for attempted login by $managedSubjectInstance"
-      session.setAttribute(CURRENT_USER, managedSubjectInstance.id)
+      session.setAttribute(FAILED_USER, managedSubjectInstance.id)
       redirect action:"index"
       return
     }
 
+    session.setAttribute(CURRENT_USER, managedSubjectInstance.id)
     if(managedSubjectInstance.enforceTwoStepLogin() && !managedSubjectInstance.isUsingTwoStepLogin()){
       // This account needs to be updated before they can login
       log.info("Due to local or group policy the account $managedSubjectInstance must enroll into 2-Step verification with their phone before continuing login.")
-      session.setAttribute(AccountController.CURRENT_USER, managedSubjectInstance.id)
-      redirect controller:'account', action:'setuptwostep'
+
+
+      redirect action:'setuptwostep'
       return
     }
 
@@ -77,7 +85,7 @@ class LoginController {
       def twoStepCookie = request.cookies.find { it.name == LoginService.TWOSTEP_COOKIE_NAME }
       if(!twoStepCookie || !managedSubjectInstance.hasEstablishedTwoStepLogin(twoStepCookie.value)) {
         // No existing 2 step login or existing session is invalid
-        log.info "Requesting 2-Step verification for ${managedSubjectInstance}"
+        log.info "Requesting 2-Step verification for ${managedSubjectInstance} as valid existing 2-Step verification was not found."
         render(view: "twostep", model: [managedSubjectInstance: managedSubjectInstance])
         return
       }
@@ -85,15 +93,15 @@ class LoginController {
       log.info("Existing two step session identifier ${twoStepCookie.value} is valid for ${managedSubjectInstance}.")
     }
 
+    log.info("Verified that all supplied credentials for ${managedSubjectInstance} are valid, establishing session.")
     redirect url: establishSession(managedSubjectInstance)
   }
 
-  def twosteplogin(long id, long totp) {
-    def managedSubjectInstance = ManagedSubject.get(id)
+  def twosteplogin(long totp) {
+    def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
     if(!managedSubjectInstance) {
-      log.error "No ManagedSubject represented by $id in extendedlogin"
-      session.setAttribute(INVALID_USER, true)
-      redirect action:"index"
+      log.error "A valid session does not already exist to allow twosteplogin to function"
+      response.sendError 403
       return
     }
 
@@ -103,6 +111,60 @@ class LoginController {
       return
     }
 
+    log.info("Verified that 2Step code for ${managedSubjectInstance} is valid, establishing session.")
+    redirect url: establishSession(managedSubjectInstance)
+  }
+
+  def setuptwostep() {
+    def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
+    if(!managedSubjectInstance) {
+      log.error "A valid session does not already exist to allow setuptwostep to function"
+      response.sendError 403
+      return
+    }
+
+    def groupRole = Role.findWhere(name:"group:${managedSubjectInstance.group.id}:administrators")
+    def organizationRole = Role.findWhere(name:"organization:${managedSubjectInstance.organization.id}:administrators")
+
+    [managedSubjectInstance:managedSubjectInstance, groupRole:groupRole, organizationRole:organizationRole]
+  }
+
+  def completesetuptwostep() {
+    def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
+    if(!managedSubjectInstance) {
+      log.error "A valid session does not already exist to allow completesetuptwostep to function"
+      response.sendError 403
+      return
+    }
+
+    managedSubjectInstance.totpKey = GoogleAuthenticator.generateSecretKey()
+    if(!managedSubjectInstance.save()) {
+      log.error "Unable to persist totpKey for $managedSubjectInstance"
+      response.sendError 500
+      return
+    }
+
+    def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, managedSubjectInstance.totpKey)
+    [managedSubjectInstance:managedSubjectInstance, totpURL:totpURL]
+  }
+
+  def verifytwostepcode(long totp) {
+    def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
+    if(!managedSubjectInstance) {
+      log.error "A valid session does not already exist to allow verifytwostepcode to function"
+      response.sendError 403
+      return
+    }
+
+    if(!loginService.twoStepLogin(managedSubjectInstance, totp, request, response)) {
+      log.info "LoginService indicates twoStepLogin failure for attempted login by $managedSubjectInstance when verifying 2Step setup"
+
+      def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, managedSubjectInstance.totpKey)
+      render(view: "completesetuptwostep", model: [managedSubjectInstance:managedSubjectInstance, totpURL:totpURL, loginError:true])
+      return
+    }
+
+    log.info("Verified that initial 2Step configuration for ${managedSubjectInstance} is valid, account is now fully enrolled in 2-Step verification. Establishing session.")
     redirect url: establishSession(managedSubjectInstance)
   }
 
@@ -135,6 +197,8 @@ class LoginController {
       log.error "No redirectURL set for login, redirecting to oops"
       return createLink(action: 'oops')
     }
+
+    session.removeAttribute(CURRENT_USER)
 
     def sessionID = loginService.establishSession(managedSubjectInstance)
     log.info "Login by ${managedSubjectInstance} was completed successfully. Associated new VH > Shib API session verification id of ${sessionID}."
