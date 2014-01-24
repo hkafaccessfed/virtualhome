@@ -13,6 +13,8 @@ import javax.servlet.http.Cookie
 
 import groovy.time.TimeCategory
 
+import aaf.vhr.crypto.GoogleAuthenticator
+
 @TestFor(aaf.vhr.LoginController)
 @Build([aaf.vhr.Organization, aaf.vhr.Group, aaf.vhr.ManagedSubject,aaf.vhr.switchch.vho.DeprecatedSubject])
 @Mock([Organization, Group, ManagedSubject, TwoStepSession])
@@ -63,19 +65,19 @@ class LoginControllerSpec extends spock.lang.Specification {
     !model.requiresChallenge
   }
 
-  def "current user sets loginError"() {
+  def "failed user sets loginError"() {
     setup:
     def ms = ManagedSubject.build()
 
     session.setAttribute(controller.SSO_URL, "http://test.com")
-    session.setAttribute(controller.CURRENT_USER, ms.id)
+    session.setAttribute(controller.FAILED_USER, ms.id)
   
     when:
     def model = controller.index()
 
     then:
     response.status == 200
-    session.getAttribute(controller.CURRENT_USER) == null
+    session.getAttribute(controller.FAILED_USER) == null
     model.loginError
     !model.requiresChallenge
   }
@@ -109,7 +111,7 @@ class LoginControllerSpec extends spock.lang.Specification {
     then:
     1 * loginService.passwordLogin(ms, _, _, _, _) >> false
     response.redirectedUrl == "/login/index"
-    session.getAttribute(controller.CURRENT_USER) == ms.id
+    session.getAttribute(controller.FAILED_USER) == ms.id
   }
 
   def "successful login sets cookie and if set redirects to IdP login ssourl"() {
@@ -272,11 +274,11 @@ class LoginControllerSpec extends spock.lang.Specification {
 
     then:
     1 * loginService.passwordLogin(ms, _, _, _, _) >> true
-    response.redirectedUrl == "/account/setuptwostep"
-    session.getAttribute(AccountController.CURRENT_USER) == ms.id
+    response.redirectedUrl == "/login/setuptwostep"
+    session.getAttribute(controller.CURRENT_USER) == ms.id
   }
 
-  def "twosteplogin with invalid user doesnt establish session"() {
+  def "twosteplogin with invalid user denies request"() {
     setup:
     session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
 
@@ -287,11 +289,10 @@ class LoginControllerSpec extends spock.lang.Specification {
     controller.loginService = loginService
 
     when:
-    controller.twosteplogin(100000, 123456)
+    controller.twosteplogin(123456)
 
     then:
-    session.getAttribute(controller.INVALID_USER)
-    response.redirectedUrl == "/login/index"
+    response.status == 403
     response.cookies.size() == 0
   }
 
@@ -307,19 +308,150 @@ class LoginControllerSpec extends spock.lang.Specification {
 
     controller.loginService = loginService
 
+    session.setAttribute(controller.CURRENT_USER, ms.id)
+
     when:
-    controller.twosteplogin(ms.id, 123456)
+    controller.twosteplogin(123456)
 
     then:
     1 * loginService.twoStepLogin(ms, 123456, _, _) >> true
     response.redirectedUrl == "https://idp.test.com/shibboleth-idp/authn"
 
     response.cookies.size() == 1
-
     response.cookies[0].maxAge == 60
     !response.cookies[0].secure
   }
 
+  def "setuptwostep with invalid user denies request"() {
+    setup:
+    session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
+
+    def loginService = Mock(aaf.vhr.LoginService)
+    grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
+    grailsApplication.config.aaf.vhr.login.ssl_only_cookie = false
+
+    controller.loginService = loginService
+
+    when:
+    controller.setuptwostep()
+
+    then:
+    response.status == 403
+    response.cookies.size() == 0
+  }
+
+  def "completesetuptwostep with invalid user denies request"() {
+    setup:
+    session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
+
+    def loginService = Mock(aaf.vhr.LoginService)
+    grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
+    grailsApplication.config.aaf.vhr.login.ssl_only_cookie = false
+
+    controller.loginService = loginService
+
+    when:
+    controller.completesetuptwostep()
+
+    then:
+    response.status == 403
+    response.cookies.size() == 0
+  }
+
+  def "completesetuptwostep with valid user renders QR code"() {
+    setup:
+    session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
+
+    def loginService = Mock(aaf.vhr.LoginService)
+    grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
+    grailsApplication.config.aaf.vhr.login.ssl_only_cookie = false
+
+    controller.loginService = loginService
+
+    def ms = ManagedSubject.build(active:true, failedLogins: 0)
+    ms.organization.active = true
+    session.setAttribute(controller.CURRENT_USER, ms.id)
+
+    when:
+    def model = controller.completesetuptwostep()
+
+    then:
+    response.status == 200
+    response.cookies.size() == 0
+    model.totpURL
+  }
+
+  def "verifytwostepcode with invalid user denies request"() {
+    setup:
+    session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
+
+    def loginService = Mock(aaf.vhr.LoginService)
+    grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
+    grailsApplication.config.aaf.vhr.login.ssl_only_cookie = false
+
+    controller.loginService = loginService
+
+    when:
+    controller.verifytwostepcode(123456)
+
+    then:
+    response.status == 403
+    response.cookies.size() == 0
+  }
+
+  def "verifytwostepcode with invalid code entry renders QR code"() {
+    setup:
+    session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
+
+    def loginService = Mock(aaf.vhr.LoginService)
+    grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
+    grailsApplication.config.aaf.vhr.login.ssl_only_cookie = false
+
+    controller.loginService = loginService
+
+    def ms = ManagedSubject.build(active:true, failedLogins: 0)
+    ms.organization.active = true
+    session.setAttribute(controller.CURRENT_USER, ms.id)
+
+    GoogleAuthenticator.metaClass.static.checkCode = { String key, long code, long time -> false }
+
+    when:
+    controller.verifytwostepcode(123456)
+
+    then:
+    1 * loginService.twoStepLogin(ms, 123456, _, _) >> false
+    response.status == 200
+    response.cookies.size() == 0
+    model.totpURL
+  }
+
+  def "verifytwostepcode with valid code entry establishes session"() {
+    setup:
+    session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
+
+    def loginService = Mock(aaf.vhr.LoginService)
+    grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
+    grailsApplication.config.aaf.vhr.login.ssl_only_cookie = false
+
+    controller.loginService = loginService
+
+    def ms = ManagedSubject.build(active:true, failedLogins: 0)
+    ms.organization.active = true
+    session.setAttribute(controller.CURRENT_USER, ms.id)
+
+    GoogleAuthenticator.metaClass.static.checkCode = { String key, long code, long time -> true }
+
+    when:
+    controller.verifytwostepcode(123456)
+
+    then:
+    1 * loginService.twoStepLogin(ms, 123456, _, _) >> true
+    response.status == 302
+    response.redirectedUrl == "https://idp.test.com/shibboleth-idp/authn"
+    response.cookies.size() == 1
+    response.cookies[0].maxAge == 60
+    !response.cookies[0].secure
+  }
 }
 
 
