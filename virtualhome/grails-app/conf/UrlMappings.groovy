@@ -100,7 +100,8 @@ class UrlMappings {
       controller="manageAdministrators"
     }
 
-    "/api/v1/login/$action/$sessionID" (controller: "loginApi")
+    "/api/v1/login/confirmsession/$sessionID" (controller: "loginApi", action: "confirmsession")
+    "/api/v1/login/basicauth" (controller: "loginApi", action:"basicauth")
     "/api/v1/organizations/$action/$id?" (controller: "organizationApi")
   }
 
