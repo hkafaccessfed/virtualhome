@@ -17,6 +17,7 @@ class LoginController {
   final String FAILED_USER = "aaf.vhr.LoginController.FAILED_USER"
   final String CURRENT_USER = "aaf.vhr.LoginController.CURRENT_USER"
   final String SSO_URL = "aaf.vhr.LoginController.SSO_URL"
+  final String NEW_TOTP_KEY = "aaf.vhr.LoginController.NEW_TOTP_KEY"
 
   def loginService
 
@@ -137,35 +138,50 @@ class LoginController {
       return
     }
 
-    managedSubjectInstance.totpKey = GoogleAuthenticator.generateSecretKey()
-    if(!managedSubjectInstance.save()) {
-      log.error "Unable to persist totpKey for $managedSubjectInstance"
-      response.sendError 500
-      return
-    }
+    def totpKey = GoogleAuthenticator.generateSecretKey()
+    session.setAttribute(NEW_TOTP_KEY, totpKey)
 
-    def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, managedSubjectInstance.totpKey)
+    def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, totpKey)
     [managedSubjectInstance:managedSubjectInstance, totpURL:totpURL]
   }
 
   def verifytwostepcode(long totp) {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
-    if(!managedSubjectInstance) {
+    def totpKey = session.getAttribute(NEW_TOTP_KEY)
+
+    if(!managedSubjectInstance || !totpKey) {
       log.error "A valid session does not already exist to allow verifytwostepcode to function"
       response.sendError 403
       return
     }
 
-    if(!loginService.twoStepLogin(managedSubjectInstance, totp, request, response)) {
-      log.info "LoginService indicates twoStepLogin failure for attempted login by $managedSubjectInstance when verifying 2Step setup"
+    if(GoogleAuthenticator.checkCode(totpKey, totp, System.currentTimeMillis())) {
+      managedSubjectInstance.totpKey = totpKey
+      if(!managedSubjectInstance.save()) {
+        log.error "Unable to persist totpKey for $managedSubjectInstance"
+        response.sendError 500
+        return
+      }
+
+      session.removeAttribute(NEW_TOTP_KEY)
+
+      // Verify again just to record it in the cache.
+      if (!loginService.twoStepLogin(managedSubjectInstance, totp, request, response)) {
+        log.error "LoginService indicates twoStepLogin failure for attempted login by $managedSubjectInstance, but token had already been validated. User is enabling 2-step using a replayed token value!? This should never happen"
+        response.sendError 500
+        return
+      }
+
+      log.info("Verified that initial 2Step configuration for ${managedSubjectInstance} is valid, account is now fully enrolled in 2-Step verification. Establishing session.")
+      redirect url: establishSession(managedSubjectInstance)
+    } else {
+      log.info "GoogleAuthenticator indicates twoStepLogin failure for attempted login by $managedSubjectInstance when verifying 2Step setup"
 
       def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, managedSubjectInstance.totpKey)
       render(view: "completesetuptwostep", model: [managedSubjectInstance:managedSubjectInstance, totpURL:totpURL, loginError:true])
       return
     }
 
-    log.info("Verified that initial 2Step configuration for ${managedSubjectInstance} is valid, account is now fully enrolled in 2-Step verification. Establishing session.")
-    redirect url: establishSession(managedSubjectInstance)
   }
 
   def oops() {

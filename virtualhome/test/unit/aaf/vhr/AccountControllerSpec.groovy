@@ -234,21 +234,19 @@ class AccountControllerSpec extends spock.lang.Specification {
     def managedSubjectTestInstance = ManagedSubject.build(login: 'validlogin', mobileNumber: '+61487654321')
     session.setAttribute(controller.CURRENT_USER, managedSubjectTestInstance.id)
 
-    expect:
-    managedSubjectTestInstance.totpKey == null
-
     when:
     controller.enabletwostep()
 
     then:
     response.status == 200
-    managedSubjectTestInstance.totpKey != null
+    session.getAttribute(controller.NEW_TOTP_KEY) != null
   }
 
   def 'ensure finishenablingtwostep fails with invalid code'() {
     setup:
     def managedSubjectTestInstance = ManagedSubject.build(login: 'validlogin', mobileNumber: '+61487654321')
     session.setAttribute(controller.CURRENT_USER, managedSubjectTestInstance.id)
+    session.setAttribute(controller.NEW_TOTP_KEY, "0")
 
     GoogleAuthenticator.metaClass.static.checkCode = { String key, long code, long time -> false }
 
@@ -269,6 +267,7 @@ class AccountControllerSpec extends spock.lang.Specification {
     setup:
     def managedSubjectTestInstance = ManagedSubject.build(login: 'validlogin', mobileNumber: '+61487654321')
     session.setAttribute(controller.CURRENT_USER, managedSubjectTestInstance.id)
+    session.setAttribute(controller.NEW_TOTP_KEY, "0")
 
     GoogleAuthenticator.metaClass.static.checkCode = { String key, long code, long time -> true }
 

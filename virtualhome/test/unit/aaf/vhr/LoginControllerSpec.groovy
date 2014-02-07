@@ -384,6 +384,7 @@ class LoginControllerSpec extends spock.lang.Specification {
   def "verifytwostepcode with invalid user denies request"() {
     setup:
     session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
+    session.setAttribute(controller.NEW_TOTP_KEY, "0")
 
     def loginService = Mock(aaf.vhr.LoginService)
     grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
@@ -402,6 +403,7 @@ class LoginControllerSpec extends spock.lang.Specification {
   def "verifytwostepcode with invalid code entry renders QR code"() {
     setup:
     session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
+    session.setAttribute(controller.NEW_TOTP_KEY, "0")
 
     def loginService = Mock(aaf.vhr.LoginService)
     grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
@@ -419,7 +421,6 @@ class LoginControllerSpec extends spock.lang.Specification {
     controller.verifytwostepcode(123456)
 
     then:
-    1 * loginService.twoStepLogin(ms, 123456, _, _) >> false
     response.status == 200
     response.cookies.size() == 0
     model.totpURL
@@ -428,6 +429,7 @@ class LoginControllerSpec extends spock.lang.Specification {
   def "verifytwostepcode with valid code entry establishes session"() {
     setup:
     session.setAttribute(controller.SSO_URL, "https://idp.test.com/shibboleth-idp/authn")
+    session.setAttribute(controller.NEW_TOTP_KEY, "0")
 
     def loginService = Mock(aaf.vhr.LoginService)
     grailsApplication.config.aaf.vhr.login.validity_period_minutes = 1
