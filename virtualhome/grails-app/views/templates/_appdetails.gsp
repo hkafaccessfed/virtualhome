@@ -2,7 +2,7 @@
 
 <hr>
 
-<h4 class="muted">How do I setup up 2-Step verification?</h4>
+<h4 class="muted">How do I set up 2-Step verification?</h4>
 
 <div class="row"><div class="span12 centered"><br><g:img file="2stepflow.jpg" class="img-polaroid"/><br><br></div></div>
 
