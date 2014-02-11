@@ -67,14 +67,6 @@ class UrlMappings {
       controller="account"
       action="finishenablingtwostep"
     }
-    "/myaccount/setuptwostep" {
-      controller="account"
-      action="setuptwostep"
-    }
-    "/myaccount/completesetuptwostep" {
-      controller = "account"
-      action = "completesetuptwostep"
-    }
 
     "/lostpassword/$action" {
       controller="lostPassword"

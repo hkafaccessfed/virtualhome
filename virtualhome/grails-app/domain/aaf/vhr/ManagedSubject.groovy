@@ -167,7 +167,7 @@ class ManagedSubject {
   } 
 
   public boolean canChangePassword() {
-    !locked && !blocked && !archived && organization?.functioning() && group?.functioning()
+    !this.isExpired() && !locked && !blocked && !archived && organization?.functioning() && group?.functioning()
   }
 
   public boolean canLogin() {

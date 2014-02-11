@@ -17,7 +17,7 @@
                 </div>
               </g:if>
 
-              <p>Please enter the current 2-Step verification code for your account. This is available from the smart phone app which you have previously set up.</p>
+              <p>Please enter the current 2-Step verification code for your account. This is available from the device which you have previously set up.</p>
 
               <fieldset>
                 <div class="control-group">

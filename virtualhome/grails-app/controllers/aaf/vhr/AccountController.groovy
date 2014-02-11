@@ -13,6 +13,7 @@ class AccountController {
   static allowedMethods = [completedetailschange: 'POST']
 
   static final CURRENT_USER = "aaf.vhr.AccountController.CURRENT_USER"
+  static final NEW_TOTP_KEY = "aaf.vhr.AccountController.NEW_TOTP_KEY"
 
   def loginService
   def cryptoService
@@ -171,73 +172,46 @@ class AccountController {
       return
     }
 
-    managedSubjectInstance.totpKey = GoogleAuthenticator.generateSecretKey()
-    if(!managedSubjectInstance.save()) {
-      log.error "Unable to persist totpKey for $managedSubjectInstance"
-      response.sendError 500
-      return
-    }
+    def totpKey = GoogleAuthenticator.generateSecretKey()
+    session.setAttribute(NEW_TOTP_KEY, totpKey)
 
-    def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, managedSubjectInstance.totpKey)
+    def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, totpKey)
     [managedSubjectInstance:managedSubjectInstance, totpURL: totpURL]
   }
 
   def finishenablingtwostep(long totp) {
     def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
-    if(!managedSubjectInstance) {
+    def totpKey = session.getAttribute(NEW_TOTP_KEY)
+
+    if(!managedSubjectInstance || !totpKey) {
       log.error "A valid session does not already exist to allow finishenablingtwostep to function"
       response.sendError 403
       return
     }
 
-    if(!GoogleAuthenticator.checkCode(managedSubjectInstance.totpKey, totp, System.currentTimeMillis())) {
-      log.warn("The account $managedSubjectInstance entered an invalid code when finishing 2-Step setup")
-      flash.type = 'error'
-      flash.message = 'controllers.aaf.vhr.account.finish.twostep.error'
+    if(GoogleAuthenticator.checkCode(totpKey, totp, System.currentTimeMillis())) {
+      managedSubjectInstance.totpKey = totpKey
+      if(!managedSubjectInstance.save()) {
+        log.error "Unable to persist totpKey for $managedSubjectInstance"
+        response.sendError 500
+        return
+      }
 
-      def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, managedSubjectInstance.totpKey)
+      session.removeAttribute(NEW_TOTP_KEY)
 
-      render view: 'enabletwostep', model: [managedSubjectInstance:managedSubjectInstance, totpURL: totpURL]
-    } else {
       log.info("The account $managedSubjectInstance entered a valid code when finishing 2-Step setup")
       flash.type = 'success'
       flash.message = 'controllers.aaf.vhr.account.finish.twostep.success'
       redirect action:'show'
+    } else {
+      log.warn("The account $managedSubjectInstance entered an invalid code when finishing 2-Step setup")
+      flash.type = 'error'
+      flash.message = 'controllers.aaf.vhr.account.finish.twostep.error'
+
+      def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, totpKey)
+
+      render view: 'enabletwostep', model: [managedSubjectInstance:managedSubjectInstance, totpURL: totpURL]
     }
-  }
-
-  def setuptwostep() {
-    def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
-    if(!managedSubjectInstance) {
-      log.error "A valid session does not already exist to allow completedetailschange to function"
-      response.sendError 403
-      return
-    }
-
-    def groupRole = Role.findWhere(name:"group:${managedSubjectInstance.group.id}:administrators")
-    def organizationRole = Role.findWhere(name:"organization:${managedSubjectInstance.organization.id}:administrators")
-
-    [managedSubjectInstance:managedSubjectInstance, groupRole:groupRole, organizationRole:organizationRole]
-  }
-
-  def completesetuptwostep() {
-    def managedSubjectInstance = ManagedSubject.get(session.getAttribute(CURRENT_USER))
-    if(!managedSubjectInstance) {
-      log.error "A valid session does not already exist to allow completedetailschange to function"
-      response.sendError 403
-      return
-    }
-
-    managedSubjectInstance.totpKey = GoogleAuthenticator.generateSecretKey()
-    if(!managedSubjectInstance.save()) {
-      log.error "Unable to persist totpKey for $managedSubjectInstance"
-      response.sendError 500
-      return
-    }
-
-    def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login, request.serverName, managedSubjectInstance.totpKey)
-
-    [managedSubjectInstance:managedSubjectInstance, totpURL:totpURL]
   }
 
   private String createRequestDetails(def request) {

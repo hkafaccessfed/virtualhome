@@ -20,13 +20,13 @@
 
         <div class="row"><div class="span12 centered"><br><img src="${totpURL}" width="200" height="200" class="img-polaroid"><br><br></div></div>
 
-        <p>Please <strong>follow the instructions on your installed smart phone app</strong> to scan the above QR code and complete the setup on your phone.<p>
+        <p>Please <strong>follow the instructions on your installed app</strong> to scan the above QR code and complete the setup on your device.<p>
       </div>
     </div>
 
     <div class="row">
       <div class="span12">
-        <p>Once your smart phone app is configured enter the current code below to complete the process.</p>
+        <p>Once your device is configured, enter the current code displayed on screen to continue logging into your service.</p>
 
           <g:form controller="account" action="finishenablingtwostep" id="${managedSubjectInstance.id}" method="post" class="form form-horizontal form-login form-validating well well-small">
             <fieldset>
