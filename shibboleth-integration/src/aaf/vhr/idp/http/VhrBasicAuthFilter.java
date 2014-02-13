@@ -54,6 +54,8 @@ public class VhrBasicAuthFilter implements Filter {
           log.info ("Confirmed supplied credentials for " + credentials[0] + ", VH confirmed remoteUser value of " + remoteUser);
           VhrRequestWrapper vhrRequestWrapper = new VhrRequestWrapper(request, remoteUser);
           chain.doFilter(vhrRequestWrapper, response);
+
+          return;
         }
       } else {
         log.info ("Invalid Authorization header detected when attempting to setup session");
