@@ -231,6 +231,10 @@
                   <th><span id="internalid-label"><strong><g:message encodeAs='HTML' code="label.internalid" /></strong></span></th>
                   <td><span aria-labelledby="internalid-label"><g:fieldValue bean="${managedSubjectInstance}" field="id" /></span></td>
                 </tr>
+                <tr>
+                  <th><span id="dateCreated-label"><strong><g:message encodeAs='HTML' code="label.created" /></strong></span></th>
+                  <td><span aria-labelledby="createdat-label"><g:formatDate date="${managedSubjectInstance.dateCreated}" type="datetime" style="LONG" timeStyle="SHORT"/></span></td>
+                </tr>
 
                 <tr>
                   <th><span id="login-label"><strong><g:message encodeAs='HTML' code="label.login" /></strong></span></th>
