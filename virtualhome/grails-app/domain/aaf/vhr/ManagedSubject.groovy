@@ -212,9 +212,17 @@ class ManagedSubject {
 
   public void cleanupEstablishedTwoStepLogin() {
     use (TimeCategory) {
+      def oldSessions = [] as List
+      def today = new Date()
       twoStepSessions?.each { twoStepSession ->
-        if(twoStepSession && twoStepSession?.expiry < 90.days.ago)
-          twoStepSession.delete()
+        if(twoStepSession && twoStepSession?.expiry < today) {
+          oldSessions.add(twoStepSession)
+        }
+      }
+
+      oldSessions.each { twoStepSession ->
+        twoStepSessions.remove(twoStepSession)
+        twoStepSession.delete()
       }
     }
   }
