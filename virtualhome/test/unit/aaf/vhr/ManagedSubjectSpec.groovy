@@ -963,7 +963,7 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
 
       where:
       //yesterday, 91 days ago, no sessions
-      sessions << [new TwoStepSession(value:'1234abcd', expiry: use(TimeCategory) {1.days.ago}), new TwoStepSession(value:'1234abcd', expiry: use(TimeCategory) {91.days.ago}), null]
+      sessions << [new TwoStepSession(value:'1234abcd', expiry: use(TimeCategory) {1.days.from.now}), new TwoStepSession(value:'1234abcd', expiry: use(TimeCategory) {1.days.ago}), null]
       expected << [1, 0, 0]
   }
 
