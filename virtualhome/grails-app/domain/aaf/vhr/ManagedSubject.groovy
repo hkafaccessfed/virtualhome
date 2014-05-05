@@ -14,6 +14,7 @@ import groovy.time.TimeCategory
 @EqualsAndHashCode
 class ManagedSubject {
   static auditable = true
+  def managedSubjectService
 
   static final affiliations = [ 'affiliate',
                                 'alum',
@@ -391,6 +392,9 @@ class ManagedSubject {
     if(failedLogins >= 5) {
       def change = new StateChange(event:StateChangeType.FAILMULTIPLELOGIN, reason:"$reason Reached login attempts limit, account deactivated", category:category, environment:environment, actionedBy:actionedBy)
       this.addToStateChanges(change)
+
+      if(active)
+        managedSubjectService.sendAccountDeactivated(this)  // send an email when we initially deactive the account
 
       this.active = false     // prevent future auth attempts until unlocked by admin
     } else {
