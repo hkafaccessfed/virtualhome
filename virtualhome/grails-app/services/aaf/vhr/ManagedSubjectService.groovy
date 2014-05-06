@@ -43,7 +43,7 @@ class ManagedSubjectService {
   def finalize(ManagedSubjectInvitation invitation, String login, String plainPassword, String plainPasswordConfirmation, String mobileNumber) {
     def managedSubject = invitation.managedSubject
 
-    if(invitation.utilized || managedSubject.finalized)
+    if(invitation.utilized || managedSubject.isFinalized())
       return [false, messageSource.getMessage(INVITATION_INVALID, [] as Object[], INVITATION_INVALID, LocaleContextHolder.locale)]
 
     managedSubject.login = login
@@ -69,7 +69,7 @@ class ManagedSubjectService {
       return [false, managedSubject]
     }
 
-    managedSubject.active = true
+    managedSubject.finalize(invitation)
     
     if(!managedSubject.save()) {
       log.error "Failed trying to save $managedSubject when finalizing"

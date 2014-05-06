@@ -320,6 +320,14 @@ class ManagedSubject {
     }
   }
 
+  public finalize(ManagedSubjectInvitation invitation) {
+    this.active = true
+    this.failedLogins = 0
+
+    def finalize = new StateChange(event:StateChangeType.FINALIZED, reason:"User finalized account via supplied invitation code ${invitation.inviteCode}")
+    this.addToStateChanges(finalize)
+  }
+
   public activate(String reason, String category, String environment, Subject actionedBy) {
     this.active = true
     this.failedLogins = 0

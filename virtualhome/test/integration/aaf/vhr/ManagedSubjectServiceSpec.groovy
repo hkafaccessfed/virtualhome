@@ -77,6 +77,10 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     managedSubject.hasErrors() == false
     managedSubject.login == 'usert'
     managedSubject.mobileNumber == '+61413123456'
+    managedSubject.stateChanges.size() == 1
+    def change = managedSubject.stateChanges.iterator().next()
+    change.event == StateChangeType.FINALIZED
+    change.reason == "User finalized account via supplied invitation code ${invitation.inviteCode}"
     cryptoService.verifyPasswordHash('thisisalongpasswordtotest', managedSubject)
     ms.finalized
     ms.functioning()
@@ -108,6 +112,10 @@ class ManagedSubjectServiceSpec extends IntegrationSpec {
     managedSubject != null
     managedSubject.hasErrors() == false
     managedSubject.login == 'usert'
+    managedSubject.stateChanges.size() == 1
+    def change = managedSubject.stateChanges.iterator().next()
+    change.event == StateChangeType.FINALIZED
+    change.reason == "User finalized account via supplied invitation code ${invitation.inviteCode}"
     managedSubject.mobileNumber == null
     cryptoService.verifyPasswordHash('thisisalongpasswordtotest', managedSubject)
     ms.functioning()
