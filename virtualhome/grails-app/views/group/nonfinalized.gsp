@@ -49,9 +49,9 @@
           </tr>
         </thead>
         <tbody>
-        <g:each in="${groupInstance.nonFinalizedAccounts()}" var="subject">
+        <g:each in="${groupInstance.nonFinalizedAccounts().sort{it.dateCreated}}" var="subject">
           <tr>
-            <td><g:formatDate date="${groupInstance?.dateCreated}" /></td>
+            <td><g:formatDate date="${subject?.dateCreated}" /></td>
             <td><g:fieldValue bean="${subject}" field="cn"/></td>
             <td><g:fieldValue bean="${subject}" field="email"/></td>
             <td><g:link controller="finalization" action="index" absolute="true" params="[inviteCode: subject.invitations.first().inviteCode]"><g:createLink controller="finalization" action="index" absolute="true" params="[inviteCode: subject.invitations.first().inviteCode]" /></g:link></td>
