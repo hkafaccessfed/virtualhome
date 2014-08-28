@@ -179,7 +179,7 @@ class AccountController {
 
     def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login,
                                                       request.serverName, totpKey,
-                                                      managedSubjectInstance.twoStepIssuer)
+                                                      managedSubjectInstance.encodedTwoStepIssuer)
     [managedSubjectInstance:managedSubjectInstance, totpURL: totpURL]
   }
 
@@ -214,7 +214,7 @@ class AccountController {
 
       def totpURL = GoogleAuthenticator.getQRBarcodeURL(managedSubjectInstance.login,
                                                         request.serverName, totpKey,
-                                                        managedSubjectInstance.twoStepIssuer)
+                                                        managedSubjectInstance.encodedTwoStepIssuer)
 
       render view: 'enabletwostep', model: [managedSubjectInstance:managedSubjectInstance, totpURL: totpURL]
     }

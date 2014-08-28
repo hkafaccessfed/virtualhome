@@ -229,10 +229,11 @@ class ManagedSubject {
     }
   }
 
-  public String getTwoStepIssuer() {
+  public String getEncodedTwoStepIssuer() {
     def issuer = Holders.config.aaf.vhr.twosteplogin.issuer
     if ( issuer && !issuer.isEmpty() )
-      URLEncoder.encode(issuer.replace(' ', '%20'), 'UTF-8')
+      // Double encode as used as parameter within parameter
+      URLEncoder.encode(URLEncoder.encode(issuer).replace('+', '%20'), 'UTF-8')
     else
       null
   }

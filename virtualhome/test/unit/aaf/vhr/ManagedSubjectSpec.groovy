@@ -1031,7 +1031,7 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
     def s = ManagedSubject.build(failedLogins:0, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
 
     expect:
-    s.twoStepIssuer == null
+    s.encodedTwoStepIssuer == null
   }
 
   def 'empty issuer returned as null'() {
@@ -1040,16 +1040,35 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
     def s = ManagedSubject.build(failedLogins:0, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
 
     expect:
-    s.twoStepIssuer == null
+    s.encodedTwoStepIssuer == null
   }
 
-  def 'specified issuer returned as % uri encoded'() {
+  def 'specified issuer returned as uri encoded'() {
+    setup:
+    config.aaf.vhr.twosteplogin.issuer = 'Example'
+    def s = ManagedSubject.build(failedLogins:0, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
+
+    expect:
+    s.encodedTwoStepIssuer == 'Example'
+  }
+
+  def 'specified issuer returned as uri encoded when space present'() {
     setup:
     config.aaf.vhr.twosteplogin.issuer = 'Example Org'
     def s = ManagedSubject.build(failedLogins:0, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
 
     expect:
-    s.twoStepIssuer == 'Example%2520Org'
+    s.encodedTwoStepIssuer == 'Example%2520Org'
   }
+
+  def 'specified issuer returned as uri encoded when special char present'() {
+    setup:
+    config.aaf.vhr.twosteplogin.issuer = 'Example & Example Org'
+    def s = ManagedSubject.build(failedLogins:0, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
+
+    expect:
+    s.encodedTwoStepIssuer == 'Example%2520%2526%2520Example%2520Org'
+  }
+
 
 }
