@@ -19,10 +19,11 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
   @Shared def shiroEnvironment = new ShiroEnvironment()
 
   org.apache.shiro.subject.Subject shiroSubject
+
   def managedSubjectService
-  
-  def cleanupSpec() { 
-    shiroEnvironment.tearDownShiro() 
+
+  def cleanupSpec() {
+    shiroEnvironment.tearDownShiro()
   }
 
   def setup() {
@@ -1023,6 +1024,32 @@ class ManagedSubjectSpec extends spock.lang.Specification  {
     groupForce << [false, true, true, false]
     result << [true, true, true, false]
 
+  }
+
+  def 'non specified issuer returned as null'() {
+    setup:
+    def s = ManagedSubject.build(failedLogins:0, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
+
+    expect:
+    s.twoStepIssuer == null
+  }
+
+  def 'empty issuer returned as null'() {
+    setup:
+    config.aaf.vhr.twosteplogin.issuer = ''
+    def s = ManagedSubject.build(failedLogins:0, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
+
+    expect:
+    s.twoStepIssuer == null
+  }
+
+  def 'specified issuer returned as % uri encoded'() {
+    setup:
+    config.aaf.vhr.twosteplogin.issuer = 'Example Org'
+    def s = ManagedSubject.build(failedLogins:0, active:true, hash:'z0tYfrdu6V8stLN/hIu+xK8Rd5dsSueYwJ88XRgL2U4Z0JFSVspxsGOPK222')
+
+    expect:
+    s.twoStepIssuer == 'Example%2520Org'
   }
 
 }
