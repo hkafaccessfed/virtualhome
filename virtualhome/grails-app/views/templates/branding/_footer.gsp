@@ -7,5 +7,5 @@
 <p>
   <g:message encodeAs='HTML' code="branding.application.name"/> <strong><g:message encodeAs='HTML' code="branding.footer.version"/> <g:meta name="app.version"/></strong>
   <br>
-  Developed for the <a href="http://www.aaf.edu.au">Australian Access Federation</a> by <a href="http://bradleybeddoes.com">Bradley Beddoes</a>
+  Developed by the <a href="http://www.aaf.edu.au">Australian Access Federation</a>
 </p>
