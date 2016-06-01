@@ -511,10 +511,10 @@ class ManagedSubject {
     def checkedNumber = value
 
     // Translate Australian numbers to international format
-    if(checkedNumber.startsWith('04')) {
-      checkedNumber = checkedNumber[1..-1]
-      checkedNumber = "+61$checkedNumber"
-    }
+    // if(checkedNumber.startsWith('04')) {
+    //  checkedNumber = checkedNumber[1..-1]
+    //  checkedNumber = "+61$checkedNumber"
+    //}
 
     checkedNumber = checkedNumber.replace(' ','')
 

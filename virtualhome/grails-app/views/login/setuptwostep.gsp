@@ -14,7 +14,7 @@
 
     <div class="row">
       <div class="span12">
-        <p>The AAF have been busy to make your account and access to AAF services even more secure. The Virtual Home now supports 2-Step verification which is a secondary security measure used when logging into your account. The <strong>administrators of your account</strong> have enabled this for you, so simply follow the 3 steps below to set up and enable 2-Step verification to continue accessing AAF services.</p>
+        <p>The HKAF have been busy to make your account and access to HKAF services even more secure. The Virtual Home now supports 2-Step verification which is a secondary security measure used when logging into your account. The <strong>administrators of your account</strong> have enabled this for you, so simply follow the 3 steps below to set up and enable 2-Step verification to continue accessing HKAF services.</p>
 
         <g:render template="/templates/appdetails" />
 

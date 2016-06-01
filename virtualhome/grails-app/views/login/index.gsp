@@ -7,8 +7,8 @@
 
       <div class="row">
         <div id="description" class="span6">
-          <h2>Welcome to the AAF Virtual Home</h2>
-          <p> The AAF Virtual Home enables small organisations, including collaborative research facilities, to manage user identities for international, government and industry based researchers, as well as collaborators who are sponsored by an AAF subscribed organisation.</p>
+          <h2>Welcome to the HKAF Virtual Home</h2>
+          <p> The HKAF Virtual Home enables small organisations, including collaborative research facilities, to manage user identities for international, government and industry based researchers, as well as collaborators who are sponsored by an HKAF subscribed organization.</p>
 
           <p>Users are provided with:</p>
           <ul>
