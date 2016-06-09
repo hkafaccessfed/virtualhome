@@ -52,7 +52,7 @@
     <li><g:link controller="lostPassword" action="start"><g:message code="templates.aaf.vhr.loginform.help.lostpwd"/></g:link></li> 
     <li><g:link controller="lostUsername" action="start"><g:message code="templates.aaf.vhr.loginform.help.lostusername"/></g:link></li>
     <li><g:message code="templates.aaf.vhr.loginform.help.guide"/></li>
-    <li><a href="http://hkafaccessfed.github.io/wiki/faqs/vh/vh_create_account"><g:message code="templates.aaf.vhr.loginform.help.account"/></a></li>
+    <li><a href="http://hkafaccessfed.github.io/info/faqs/vh/vh_create_account"><g:message code="templates.aaf.vhr.loginform.help.account"/></a></li>
   </ul>
 </div>
 
